@@ -32,7 +32,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 			display this help"
 	@echo "make all				build and install all"
-	@echo "make <target>		builds a target: binutils, gcc"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd"
 	@echo "make clean			remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -44,15 +44,15 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils 
-all: gcc binutils
+.PHONY: all gcc binutils fd2sfd
+all: gcc binutils fd2sfd
 	@echo "built all"
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils
-clean: clean-gcc clean-binutils
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd
+clean: clean-gcc clean-binutils clean-fd2sfd
 	rm -rf build
 
 clean-gcc:
@@ -60,6 +60,9 @@ clean-gcc:
 
 clean-binutils:
 	rm -rf build/binutils	
+
+clean-fd2sfd:
+	rm -rf build/fd2sfd	
 	
 # clean-prefix drops the files from prefix folder
 clean-prefix:
@@ -68,14 +71,17 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils
-update: update-gcc update-binutils
+.PHONY: update update-gcc update-binutils update-fd2sfd
+update: update-gcc update-binutils update-fd2sfd
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
 
 update-binutils: projects/binutils/configure
 	pushd projects/binutils; git pull; popd
+
+update-fd2fsd: projects/fd2sfd/configure
+	pushd projects/fd2sfd; git pull; popd
 	
 # =================================================
 # gcc
@@ -95,7 +101,8 @@ gcc: $(GCC)
 	@echo "built $(GCC)"
 
 $(GCCP): build/gcc/Makefile $(shell find $(GCCD) -maxdepth 1 -type f )
-	+pushd build/gcc; make all-gcc install-gcc;	popd
+	+pushd build/gcc; make all-gcc;	popd
+	+pushd build/gcc; make install-gcc;	popd
 	@true
 	
 build/gcc/Makefile: projects/gcc/configure
@@ -135,3 +142,27 @@ build/binutils/Makefile: projects/binutils/configure
 projects/binutils/configure:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/amigaos-binutils-2.14 binutils; popd
+
+
+# =================================================
+# fd2sfd
+# =================================================
+CONFIG_FD2SFD = --prefix=$(PREFIX) --target=m68k-amigaos 
+FD2SFD_CMD = fd2sfd
+FD2SFD = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(FD2SFD_CMD))
+FD2SFDP = $(patsubst fd2%,$(PREFIX)/bin/\%%$(EXEEXT), $(FD2SFD_CMD))
+
+fd2sfd: $(FD2SFD)
+	@echo "built $(FD2SFD)"
+
+$(FD2SFDP): build/fd2sfd/Makefile $(shell find projects/fd2sfd -type f)
+	+pushd build/fd2sfd; make all; popd
+	+pushd build/fd2sfd; make install; popd
+
+build/fd2sfd/Makefile: projects/fd2sfd/configure
+	@mkdir -p build/fd2sfd
+	pushd build/fd2sfd; $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD); popd
+
+projects/fd2sfd/configure:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd; popd
