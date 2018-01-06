@@ -13,6 +13,7 @@ CFLAGS=-Os
 CPPFLAGS=-Os
 CXXFLAGS=-Os
 
+
 PREFIX=/opt/amiga
 PATH := $(PREFIX)/bin:$(PATH)
 SHELL = /bin/bash
@@ -32,7 +33,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 			display this help"
 	@echo "make all				build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc"
 	@echo "make clean			remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -51,8 +52,8 @@ all: gcc binutils fd2sfd fd2pragma ira
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc
 	rm -rf build
 
 clean-gcc:
@@ -70,6 +71,9 @@ clean-fd2pragma:
 clean-ira:
 	rm -rf build/ira
 
+clean-sfdc:
+	rm -rf build/sfdc
+
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
@@ -77,8 +81,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
@@ -94,6 +98,9 @@ update-fd2pragma: projects/fd2pragma/makefile
 
 update-ira: projects/ira/Makefile
 	pushd projects/ira; git pull; popd
+
+update-sfdc: projects/sfdc/configure
+	pushd projects/sfdc; git pull; popd
 
 # =================================================
 # gcc
@@ -160,14 +167,11 @@ projects/binutils/configure:
 # fd2sfd
 # =================================================
 CONFIG_FD2SFD = --prefix=$(PREFIX) --target=m68k-amigaos
-FD2SFD_CMD = fd2sfd
-FD2SFD = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(FD2SFD_CMD))
-FD2SFDP = $(patsubst fd2%,$(PREFIX)/bin/\%%$(EXEEXT), $(FD2SFD_CMD))
 
-fd2sfd: $(FD2SFD)
-	@echo "built $(FD2SFD)"
+fd2sfd: $(PREFIX)/bin/fd2sfd
+	@echo "built $(PREFIX)/bin/fd2sfd"
 
-$(FD2SFDP): build/fd2sfd/Makefile $(shell find projects/fd2sfd -type f)
+$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find projects/fd2sfd -type f)
 	+pushd build/fd2sfd; make all; popd
 	+pushd build/fd2sfd; make install; popd
 
@@ -212,3 +216,23 @@ build/ira/ira: projects/ira/Makefile $(shell find projects/ira -type f)
 projects/ira/Makefile:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ira; popd
+
+# =================================================
+# sfdc
+# =================================================
+CONFIG_SFDC = --prefix=$(PREFIX) --target=m68k-amigaos
+
+sfdc: $(PREFIX)/bin/sfdc
+	@echo "built $(PREFIX)/bin/sfdc"
+
+$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -type f)
+	+pushd build/sfdc; make all; popd
+	+pushd build/sfdc; make install; popd
+
+build/sfdc/Makefile: projects/sfdc/configure
+	@mkdir -p build/sfdc
+	pushd build/sfdc; $(E) $(PWD)/projects/sfdc/configure $(CONFIG_SFDC); popd
+
+projects/sfdc/configure:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/sfdc; popd
