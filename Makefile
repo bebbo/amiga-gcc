@@ -232,12 +232,12 @@ sfdc: $(PREFIX)/bin/sfdc
 	@echo "built $(PREFIX)/bin/sfdc"
 
 $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -type f)
-	+pushd build/sfdc; make all; popd
-	+pushd build/sfdc; make install; popd
+	+pushd build/sfdc; make sfdc; popd
+	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
-	@mkdir -p build/sfdc
-	pushd build/sfdc; $(E) $(PWD)/projects/sfdc/configure $(CONFIG_SFDC); popd
+	rsync -aq --progress projects/sfdc build --exclude .git
+	pushd build/sfdc; $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC); popd
 
 projects/sfdc/configure:
 	@mkdir -p projects
