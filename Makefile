@@ -33,7 +33,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 			display this help"
 	@echo "make all				build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc"
 	@echo "make clean			remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -45,15 +45,15 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira
-all: gcc binutils fd2sfd fd2pragma ira
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc
 	@echo "built all"
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc
 	rm -rf build
 
 clean-gcc:
@@ -73,6 +73,9 @@ clean-ira:
 
 clean-sfdc:
 	rm -rf build/sfdc
+	
+clean-vbcc:
+	rm -rf build/vbcc
 
 # clean-prefix drops the files from prefix folder
 clean-prefix:
@@ -81,8 +84,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
@@ -101,6 +104,9 @@ update-ira: projects/ira/Makefile
 
 update-sfdc: projects/sfdc/configure
 	pushd projects/sfdc; git pull; popd
+
+update-vbcc: projects/vbcc/Makefile
+	pushd projects/vbcc; git pull; popd
 
 # =================================================
 # gcc
@@ -236,3 +242,27 @@ build/sfdc/Makefile: projects/sfdc/configure
 projects/sfdc/configure:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/sfdc; popd
+	
+# =================================================
+# vbcc
+# =================================================
+CONFIG_VBCC = --prefix=$(PREFIX) --target=m68k-amigaos
+VBCC_CMD = vbccm68k vprof vc
+VBCC = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VBCC_CMD))
+VBCCP = $(patsubst v%,$(PREFIX)/bin/\%%$(EXEEXT), $(VBCC_CMD))
+
+vbcc: $(VBCC)
+	@echo "built $(VBCC)"
+
+$(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -type f)
+	+pushd build/vbcc; TARGET=m68k make; popd
+	install build/vbcc/bin/v* $(PREFIX)/bin/
+
+build/vbcc/Makefile: projects/vbcc/Makefile
+	rsync -aq --progress projects/vbcc build --exclude .git
+	mkdir -p build/vbcc/bin
+
+projects/vbcc/Makefile:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vbcc; popd
+
