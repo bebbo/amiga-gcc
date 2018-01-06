@@ -32,7 +32,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 			display this help"
 	@echo "make all				build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma"
 	@echo "make clean			remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -44,15 +44,15 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd
-all: gcc binutils fd2sfd
+.PHONY: all gcc binutils fd2sfd fd2pragma
+all: gcc binutils fd2sfd fd2pragma
 	@echo "built all"
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd
-clean: clean-gcc clean-binutils clean-fd2sfd
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma
 	rm -rf build
 
 clean-gcc:
@@ -63,6 +63,9 @@ clean-binutils:
 
 clean-fd2sfd:
 	rm -rf build/fd2sfd	
+
+clean-fd2pragma:
+	rm -rf build/fd2pragma	
 	
 # clean-prefix drops the files from prefix folder
 clean-prefix:
@@ -71,8 +74,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd
-update: update-gcc update-binutils update-fd2sfd
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
@@ -82,6 +85,9 @@ update-binutils: projects/binutils/configure
 
 update-fd2fsd: projects/fd2sfd/configure
 	pushd projects/fd2sfd; git pull; popd
+
+update-fd2pragma: projects/fd2pragma/makefile
+	pushd projects/fd2pragma; git pull; popd
 	
 # =================================================
 # gcc
@@ -166,3 +172,25 @@ build/fd2sfd/Makefile: projects/fd2sfd/configure
 projects/fd2sfd/configure:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd; popd
+
+# =================================================
+# fd2pragma
+# =================================================
+CONFIG_FD2PRAGMA = --prefix=$(PREFIX) --target=m68k-amigaos 
+FD2PRAGMA_CMD = fd2pragma
+FD2PRAGMA = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(FD2PRAGMA_CMD))
+FD2PRAGMAP = $(patsubst fd2%,$(PREFIX)/bin/\%%$(EXEEXT), $(FD2PRAGMA_CMD))
+
+fd2pragma: $(FD2PRAGMA)
+	@echo "built $(FD2PRAGMA)"
+
+$(FD2PRAGMAP): build/fd2pragma/fd2pragma $(shell find projects/fd2pragma -type f)
+	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
+
+build/fd2pragma/fd2pragma: $(shell find projects/fd2pragma -type f)
+	@mkdir -p build/fd2pragma
+	+pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
+
+projects/fd2pragma/makefile:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/fd2pragma; popd
