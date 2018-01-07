@@ -80,6 +80,7 @@ clean-vlink:
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
+	mkdir -p $(PREFIX)/bin
 
 # =================================================
 # update all projects
