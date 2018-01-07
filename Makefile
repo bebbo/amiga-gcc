@@ -183,7 +183,7 @@ CONFIG_FD2SFD = --prefix=$(PREFIX) --target=m68k-amigaos
 fd2sfd: $(PREFIX)/bin/fd2sfd
 	@echo "built $(PREFIX)/bin/fd2sfd"
 
-$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find projects/fd2sfd -type f)
+$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
 	+pushd build/fd2sfd; make all; popd
 	+pushd build/fd2sfd; make install; popd
 
@@ -201,10 +201,10 @@ projects/fd2sfd/configure:
 fd2pragma: $(PREFIX)/bin/fd2pragma
 	@echo "built $(PREFIX)/bin/fd2pragma"
 
-$(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma $(shell find projects/fd2pragma -type f)
+$(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma 
 	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
 
-build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -type f)
+build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
 	+pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
 
@@ -218,10 +218,10 @@ projects/fd2pragma/makefile:
 ira: $(PREFIX)/bin/ira
 	@echo "built $(PREFIX)/bin/ira"
 
-$(PREFIX)/bin/ira: build/ira/ira $(shell find projects/ira -type f)
+$(PREFIX)/bin/ira: build/ira/ira
 	install build/ira/ira $(PREFIX)/bin/
 
-build/ira/ira: projects/ira/Makefile $(shell find projects/ira -type f)
+build/ira/ira: projects/ira/Makefile $(shell find projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
 	+pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c; popd
 
@@ -237,7 +237,7 @@ CONFIG_SFDC = --prefix=$(PREFIX) --target=m68k-amigaos
 sfdc: $(PREFIX)/bin/sfdc
 	@echo "built $(PREFIX)/bin/sfdc"
 
-$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -type f)
+$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
 	+pushd build/sfdc; make sfdc; popd
 	install build/sfdc/sfdc $(PREFIX)/bin
 
@@ -259,7 +259,7 @@ VBCCP = $(patsubst v%,$(PREFIX)/bin/\%%$(EXEEXT), $(VBCC_CMD))
 vbcc: $(VBCC)
 	@echo "built $(VBCC)"
 
-$(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -type f)
+$(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
 	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
 	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd	+pushd build/vbcc; TARGET=m68k make; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
@@ -283,7 +283,7 @@ VLINKP = $(patsubst v%,$(PREFIX)/bin/\%%$(EXEEXT), $(VLINK_CMD))
 vlink: $(VLINK)
 	@echo "built $(VLINK)"
 
-$(VLINKP): build/vlink/Makefile $(shell find projects/vlink -type f)
+$(VLINKP): build/vlink/Makefile $(shell find projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	+pushd build/vlink; TARGET=m68k make; popd
 	+install build/vlink/vlink $(PREFIX)/bin/
 
