@@ -73,13 +73,13 @@ clean-ira:
 
 clean-sfdc:
 	rm -rf build/sfdc
-	
+
 clean-vbcc:
 	rm -rf build/vbcc
 
 clean-vlink:
 	rm -rf build/vlink
-	
+
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
@@ -201,7 +201,7 @@ projects/fd2sfd/configure:
 fd2pragma: $(PREFIX)/bin/fd2pragma
 	@echo "built $(PREFIX)/bin/fd2pragma"
 
-$(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma 
+$(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
@@ -248,7 +248,7 @@ build/sfdc/Makefile: projects/sfdc/configure
 projects/sfdc/configure:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/sfdc; popd
-	
+
 # =================================================
 # vbcc
 # =================================================
@@ -261,7 +261,7 @@ vbcc: $(VBCC)
 
 $(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
 	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
-	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd	+pushd build/vbcc; TARGET=m68k make; popd
+	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
 	+install build/vbcc/bin/v* $(PREFIX)/bin/
 
