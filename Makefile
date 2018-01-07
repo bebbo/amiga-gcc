@@ -255,8 +255,11 @@ vbcc: $(VBCC)
 	@echo "built $(VBCC)"
 
 $(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -type f)
+	echo 1
+	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
+	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd	+pushd build/vbcc; TARGET=m68k make; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
-	install build/vbcc/bin/v* $(PREFIX)/bin/
+	+install build/vbcc/bin/v* $(PREFIX)/bin/
 
 build/vbcc/Makefile: projects/vbcc/Makefile
 	rsync -aq --progress projects/vbcc build --exclude .git
