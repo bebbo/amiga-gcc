@@ -12,12 +12,11 @@
 CFLAGS=-Os
 CPPFLAGS=-Os
 CXXFLAGS=-Os
-
+E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 PREFIX=/opt/amiga
 PATH := $(PREFIX)/bin:$(PATH)
 SHELL = /bin/bash
-
 
 # =================================================
 # determine exe extension for cygwin
@@ -31,16 +30,14 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 # =================================================
 .PHONY: help
 help:
-	@echo "make help 			display this help"
-	@echo "make all				build and install all"
+	@echo "make help 		display this help"
+	@echo "make all 		build and install all"
 	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink"
-	@echo "make clean			remove the build folder"
+	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
-	@echo "make update			perform git pull for all targets"
+	@echo "make update		perform git pull for all targets"
 	@echo "make update-<target>	perform git pull for the given target"
-
-E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 # =================================================
 # all
