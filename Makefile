@@ -33,7 +33,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 			display this help"
 	@echo "make all				build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink"
 	@echo "make clean			remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -45,15 +45,15 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink
 	@echo "built all"
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink
 	rm -rf build
 
 clean-gcc:
@@ -77,6 +77,9 @@ clean-sfdc:
 clean-vbcc:
 	rm -rf build/vbcc
 
+clean-vlink:
+	rm -rf build/vlink
+	
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
@@ -84,8 +87,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
@@ -107,6 +110,9 @@ update-sfdc: projects/sfdc/configure
 
 update-vbcc: projects/vbcc/Makefile
 	pushd projects/vbcc; git pull; popd
+
+update-vlink: projects/vlink/Makefile
+	pushd projects/vlink; git pull; popd
 
 # =================================================
 # gcc
@@ -246,7 +252,6 @@ projects/sfdc/configure:
 # =================================================
 # vbcc
 # =================================================
-CONFIG_VBCC = --prefix=$(PREFIX) --target=m68k-amigaos
 VBCC_CMD = vbccm68k vprof vc
 VBCC = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VBCC_CMD))
 VBCCP = $(patsubst v%,$(PREFIX)/bin/\%%$(EXEEXT), $(VBCC_CMD))
@@ -255,7 +260,6 @@ vbcc: $(VBCC)
 	@echo "built $(VBCC)"
 
 $(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -type f)
-	echo 1
 	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
 	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd	+pushd build/vbcc; TARGET=m68k make; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
@@ -269,3 +273,23 @@ projects/vbcc/Makefile:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vbcc; popd
 
+# =================================================
+# vlink
+# =================================================
+VLINK_CMD = vlink
+VLINK = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VLINK_CMD))
+VLINKP = $(patsubst v%,$(PREFIX)/bin/\%%$(EXEEXT), $(VLINK_CMD))
+
+vlink: $(VLINK)
+	@echo "built $(VLINK)"
+
+$(VLINKP): build/vlink/Makefile $(shell find projects/vlink -type f)
+	+pushd build/vlink; TARGET=m68k make; popd
+	+install build/vlink/vlink $(PREFIX)/bin/
+
+build/vlink/Makefile: projects/vlink/Makefile
+	rsync -aq --progress projects/vlink build --exclude .git
+
+projects/vlink/Makefile:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vlink; popd
