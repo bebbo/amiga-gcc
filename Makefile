@@ -326,41 +326,39 @@ $(LIBGCCA):
 # =================================================
 
 NDK_INCLUDE = $(shell find projects/NDK_3.9/Include/include_h -type f)
-SYS_INCLUDE2 = $(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(NDK_INCLUDE))
 NDK_INCLUDE_SFD = $(shell find projects/NDK_3.9/Include/sfd -type f -name *.sfd)
-SYS_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/inline/%.h,$(NDK_INCLUDE_SFD))
-SYS_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,$(NDK_INCLUDE_SFD))
-SYS_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/proto/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/inline/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/proto/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE2 = $(filter-out $(SYS_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(NDK_INCLUDE)))
 
 x:
-	@echo $(NDK_INCLUDE_SFD)
-	@echo $(SYS_INCLUDE_INLINE)
-	@echo $(SYS_INCLUDE_LVO)
-	@echo $(SYS_INCLUDE_PROTO)
-
+	@echo $(SYS_INCLUDE2)
 
 $(SYS_INCLUDE2): sys-include2
+
 .PHONY: sys-include2 sys-include-dir
 
 sys-include2: sys-include-dir projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INLINE) $(SYS_INCLUDE_PRAGMA) $(SYS_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
-	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/sys-include
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/sys-include --exclude proto
 	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/sys-include
 	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
 	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
 	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	cp projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/sys-include/inline
-	cp projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/sys-include/inline
-	cp projects/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/sys-include/inline
+	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/sys-include/proto
+	cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/sys-include/inline
+	cp -p projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/sys-include/inline
+	cp -p projects/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/sys-include/inline
 
 $(SYS_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
-	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
 
 $(SYS_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
-	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
 
 $(SYS_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	
-	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
 	
 sys-include-dir:
 	mkdir -p $(PREFIX)/m68k-amigaos/sys-include/inline
@@ -373,7 +371,7 @@ projects/NDK_3.9.info: download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
-		else cp -v "$$i" "projects/$${i:8}"; fi ; done
+		else cp -pv "$$i" "projects/$${i:8}"; fi ; done
 
 download/NDK39.lha:
 	mkdir -p download
@@ -404,7 +402,7 @@ projects/ixemul/configure:
 # =================================================
 # libnix
 # =================================================
-CONFIG_LIBNIX = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
+CONFIG_LIBNIX = --prefix=$(PREFIX)/m68k-amigaos/libnix --target=m68k-amigaos --host=m68k-amigaos
 
 LIBNIX_LIBS = libnix.a
 LIBNIX = $(patsubst %,$(PREFIX)/m68k-amigaos/libnix/lib/libnix/%, $(LIBNIX_LIBS))
@@ -416,6 +414,7 @@ libnix: $(LIBNIX)
 $(LIBNIX): binutils gcc build/libnix/Makefile 
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
 	+pushd build/libnix; make; popd
+	+pushd build/libnix; make install; popd
 	
 
 build/libnix/Makefile: $(SYS_INCLUDE) $(SYS_INCLUDE2) $(LIBGCCA) projects/libnix/configure \
@@ -428,3 +427,16 @@ build/libnix/Makefile: $(SYS_INCLUDE) $(SYS_INCLUDE2) $(LIBGCCA) projects/libnix
 projects/libnix/configure:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/libnix; popd
+
+# =================================================
+# libamiga
+# =================================================
+
+LIBAMIGA=$(PREFIX)/m68k-amigaos/lib/libamiga.a $(PREFIX)/m68k-amigaos/lib/libb/libamiga.a
+
+libamiga: $(LIBAMIGA)
+	@echo "built $(LIBAMIGA)"
+
+$(LIBAMIGA):
+	mkdir -p $(@D)
+	cp -p $(patsubst $(PREFIX)/m68k-amigaos/%,%,$@) $(@D)
