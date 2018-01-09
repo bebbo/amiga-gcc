@@ -8,6 +8,10 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
+
+GCCBRANCH=gcc-6-branch
+GCCVERSION=6.3.1b
+
 CFLAGS=-Os
 CPPFLAGS=-Os
 CXXFLAGS=-Os
@@ -160,7 +164,7 @@ build/gcc/Makefile: projects/gcc/configure
 
 projects/gcc/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b gcc-6-branch --depth 1 https://github.com/bebbo/gcc; popd
+	pushd projects;	git clone -b $(GCCBRANCH) --depth 1 https://github.com/bebbo/gcc; popd
 
 # =================================================
 # binutils
@@ -210,6 +214,7 @@ build/fd2sfd/.done: $(PREFIX)/bin/fd2sfd
 
 $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
 	+pushd build/fd2sfd; make all; popd
+	mkdir -p $(PREFIX)/bin/
 	+pushd build/fd2sfd; make install; popd
 
 build/fd2sfd/Makefile: projects/fd2sfd/configure
@@ -230,6 +235,7 @@ build/fd2pragma/.done: $(PREFIX)/bin/fd2pragma
 	@echo "done" >$@
 
 $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
+	mkdir -p $(PREFIX)/bin/
 	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
@@ -250,6 +256,7 @@ build/ira/.done: $(PREFIX)/bin/ira
 	@echo "done" >$@
 
 $(PREFIX)/bin/ira: build/ira/ira
+	mkdir -p $(PREFIX)/bin/
 	install build/ira/ira $(PREFIX)/bin/
 
 build/ira/ira: projects/ira/Makefile $(shell find projects/ira -not \( -path projects/ira/.git -prune \) -type f)
@@ -273,6 +280,7 @@ build/sfdc/.done: $(PREFIX)/bin/sfdc
 
 $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
 	+pushd build/sfdc; make sfdc; popd
+	mkdir -p $(PREFIX)/bin/
 	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
@@ -300,6 +308,7 @@ $(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -not \( -path projects/
 	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
 	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
+	mkdir -p $(PREFIX)/bin/
 	install build/vbcc/bin/v* $(PREFIX)/bin/
 
 build/vbcc/Makefile: projects/vbcc/Makefile
@@ -325,6 +334,7 @@ build/vlink/.done: $(VLINK)
 
 $(VLINKP): build/vlink/Makefile $(shell find projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	+pushd build/vlink; TARGET=m68k make; popd
+	mkdir -p $(PREFIX)/bin/
 	install build/vlink/vlink $(PREFIX)/bin/
 
 build/vlink/Makefile: projects/vlink/Makefile
@@ -337,11 +347,11 @@ projects/vlink/Makefile:
 # =================================================
 # L I B R A R I E S
 # =================================================
-$(eval GCCVERSION = $(shell ls $(PREFIX)/lib/gcc/m68k-amigaos/))
 LIBGCCA=$(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a
 
-$(LIBGCCA):
+$(LIBGCCA): build/gcc/.done
 	echo "creating dummy libgcc.a as $(LIBGCCA)"
+	mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos
 	$(shell [ -e $(LIBGCCA) ] || m68k-amigaos-ar r $(LIBGCCA) )
 
 # =================================================
@@ -361,12 +371,13 @@ SYS_INCLUDE2 = $(filter-out $(SYS_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Inc
 sys-include2: build/sys-include/.done2
 
 build/sys-include/.done2: projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INLINE) $(SYS_INCLUDE_PRAGMA) $(SYS_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
+	mkdir -p $(PREFIX)/m68k-amigaos/sys-include
 	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/sys-include --exclude proto
 	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/sys-include
+	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
 	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
 	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
 	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
 	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/sys-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/sys-include/proto
 	cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/sys-include/inline
