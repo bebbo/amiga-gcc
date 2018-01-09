@@ -14,6 +14,9 @@ CPPFLAGS=-Os
 CXXFLAGS=-Os
 E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
+# cross compile:
+A=CFLAGS="-Os" CPPFLAGS="-Os" CXXFLAGS="-Os"
+
 PREFIX=/opt/amiga
 PATH := $(PREFIX)/bin:$(PATH)
 SHELL = /bin/bash
@@ -32,7 +35,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 		display this help"
 	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul"
 	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -42,15 +45,15 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul
 	@echo "built all"
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul
 	rm -rf build
 
 clean-gcc:
@@ -77,6 +80,12 @@ clean-vbcc:
 clean-vlink:
 	rm -rf build/vlink
 
+clean-libnix:
+	rm -rf build/libnix
+	
+clean-ixemul:
+	rm -rf build/ixemul
+
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
@@ -85,8 +94,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; git pull; popd
@@ -112,6 +121,16 @@ update-vbcc: projects/vbcc/Makefile
 update-vlink: projects/vlink/Makefile
 	pushd projects/vlink; git pull; popd
 
+update-libnix:
+	pushd projects/libnix; git pull; popd
+	
+update-ixemul:
+	pushd projects/ixemul; git pull; popd
+
+# =================================================
+# B I N
+# =================================================
+	
 # =================================================
 # gcc
 # =================================================
@@ -204,7 +223,7 @@ $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
-	+pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
+	pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
@@ -221,7 +240,7 @@ $(PREFIX)/bin/ira: build/ira/ira
 
 build/ira/ira: projects/ira/Makefile $(shell find projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
-	+pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c; popd
+	pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c; popd
 
 projects/ira/Makefile:
 	@mkdir -p projects
@@ -240,7 +259,7 @@ $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -not \( -path
 	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
-	rsync -aq --progress projects/sfdc build --exclude .git
+	rsync -a projects/sfdc build --exclude .git
 	pushd build/sfdc; $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC); popd
 
 projects/sfdc/configure:
@@ -261,10 +280,10 @@ $(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -not \( -path projects/
 	+pushd build/vbcc; TARGET=m68k make bin/dtgen; popd
 	+pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd
 	+pushd build/vbcc; TARGET=m68k make; popd
-	+install build/vbcc/bin/v* $(PREFIX)/bin/
+	install build/vbcc/bin/v* $(PREFIX)/bin/
 
 build/vbcc/Makefile: projects/vbcc/Makefile
-	rsync -aq --progress projects/vbcc build --exclude .git
+	rsync -a projects/vbcc build --exclude .git
 	mkdir -p build/vbcc/bin
 
 projects/vbcc/Makefile:
@@ -283,11 +302,129 @@ vlink: $(VLINK)
 
 $(VLINKP): build/vlink/Makefile $(shell find projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	+pushd build/vlink; TARGET=m68k make; popd
-	+install build/vlink/vlink $(PREFIX)/bin/
+	install build/vlink/vlink $(PREFIX)/bin/
 
 build/vlink/Makefile: projects/vlink/Makefile
-	rsync -aq --progress projects/vlink build --exclude .git
+	rsync -a projects/vlink build --exclude .git
 
 projects/vlink/Makefile:
 	@mkdir -p projects
 	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vlink; popd
+
+# =================================================
+# L I B R A R I E S
+# =================================================
+$(eval GCCVERSION = $(shell ls $(PREFIX)/lib/gcc/m68k-amigaos/))
+LIBGCCA=$(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a
+
+$(LIBGCCA):
+	echo "creating dummy libgcc.a as $(LIBGCCA)"
+	$(shell [ -e $(LIBGCCA) ] || m68k-amigaos-ar r $(LIBGCCA) )
+
+# =================================================
+# NDK - no git
+# =================================================
+
+NDK_INCLUDE = $(shell find projects/NDK_3.9/Include/include_h -type f)
+SYS_INCLUDE2 = $(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(NDK_INCLUDE))
+NDK_INCLUDE_SFD = $(shell find projects/NDK_3.9/Include/sfd -type f -name *.sfd)
+SYS_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/inline/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%.sfd,$(PREFIX)/m68k-amigaos/sys-include/proto/%.h,$(NDK_INCLUDE_SFD))
+
+x:
+	@echo $(NDK_INCLUDE_SFD)
+	@echo $(SYS_INCLUDE_INLINE)
+	@echo $(SYS_INCLUDE_LVO)
+	@echo $(SYS_INCLUDE_PROTO)
+
+
+$(SYS_INCLUDE2): sys-include2
+.PHONY: sys-include2 sys-include-dir
+
+sys-include2: sys-include-dir projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INLINE) $(SYS_INCLUDE_PRAGMA) $(SYS_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/sys-include
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/sys-include
+	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
+	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
+	cp projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/sys-include/inline
+	cp projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/sys-include/inline
+	cp projects/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/sys-include/inline
+
+$(SYS_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
+	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+
+$(SYS_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
+	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+
+$(SYS_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	
+	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%.sfd,$@) 
+	
+sys-include-dir:
+	mkdir -p $(PREFIX)/m68k-amigaos/sys-include/inline
+	mkdir -p $(PREFIX)/m68k-amigaos/sys-include/lvo
+	mkdir -p $(PREFIX)/m68k-amigaos/sys-include/proto
+
+projects/NDK_3.9.info: download/NDK39.lha
+	mkdir -p projects
+	pushd projects; lha x ../download/NDK39.lha; popd
+	for i in $$(find patches/NDK_3.9/ -type f); \
+	do if [[ "$$i" == *.diff ]] ; \
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
+		else cp -v "$$i" "projects/$${i:8}"; fi ; done
+
+download/NDK39.lha:
+	mkdir -p download
+	pushd download; wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha; popd
+	
+# =================================================
+# ixemul
+# =================================================
+CONFIG_IXEMUL = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos --disable-cat
+
+IXEMUL_INCLUDE = $(shell find projects/ixemul/include -type f)
+SYS_INCLUDE = $(patsubst projects/ixemul/include/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(IXEMUL_INCLUDE))
+
+build/ixemul/Makefile: $(LIBGCCA) projects/ixemul/configure $(shell find projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
+	mkdir -p build/ixemul
+	+pushd build/ixemul; $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL); popd
+
+$(SYS_INCLUDE): sys-include
+.PHONY: sys-include
+sys-include: $(IXEMUL_INCLUDE) projects/ixemul/configure
+	mkdir -p $(PREFIX)/m68k-amigaos/sys-include
+	rsync -a projects/ixemul/include/* $(PREFIX)/m68k-amigaos/sys-include
+
+projects/ixemul/configure:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ixemul; popd
+
+# =================================================
+# libnix
+# =================================================
+CONFIG_LIBNIX = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
+
+LIBNIX_LIBS = libnix.a
+LIBNIX = $(patsubst %,$(PREFIX)/m68k-amigaos/libnix/lib/libnix/%, $(LIBNIX_LIBS))
+LIBNIXP = $(patsubst lib%,$(PREFIX)/m68k-amigaos/libnix/lib/libnix/\%%, $(LIBNIX_LIBS))
+
+libnix: $(LIBNIX)
+	@echo "built $(LIBNIX)"
+
+$(LIBNIX): binutils gcc build/libnix/Makefile 
+	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
+	+pushd build/libnix; make; popd
+	
+
+build/libnix/Makefile: $(SYS_INCLUDE) $(SYS_INCLUDE2) $(LIBGCCA) projects/libnix/configure \
+		$(shell find projects/libnix -not \( -path projects/libnix/.git -prune \) \
+		-not \( -path projects/libnix/sources/stubs/libbases -prune \) \
+		-not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
+	mkdir -p build/libnix 
+	+pushd build/libnix; AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX); popd
+	
+projects/libnix/configure:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/libnix; popd
