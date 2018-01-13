@@ -13,7 +13,7 @@ export PATH := $(PREFIX)/bin:$(PATH)
 SHELL = /bin/bash
 
 GCCBRANCH=gcc-6-branch
-GCCVERSION=$(shell cat projects/gcc/gcc/BASE-VER)
+GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 CFLAGS=-Os
 CPPFLAGS=-Os
@@ -100,7 +100,7 @@ update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira upd
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done; popd
-	GCCVERSION=$(shell cat projects/gcc/gcc/BASE-VER)
+	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
 	pushd projects/binutils; git pull; popd
@@ -129,6 +129,9 @@ update-libnix: projects/libnix/configure
 update-ixemul: projects/ixemul/configure
 	pushd projects/ixemul; git pull; popd
 
+
+status-all:
+	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 # =================================================
 # B I N
 # =================================================
@@ -153,7 +156,7 @@ build/gcc/.done: $(GCC)
 	@echo "built $(GCC)"
 	@echo "done" >$@
 
-$(GCCP): build/gcc/Makefile $(shell find $(GCCD) -maxdepth 1 -type f ) build/binutils/.done
+$(GCCP): build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f ) build/binutils/.done
 	pushd build/gcc; $(MAKE) all-gcc;	popd
 	pushd build/gcc; $(MAKE) install-gcc; popd
 
@@ -185,7 +188,7 @@ build/binutils/.done: $(BINUTILS)
 	@echo "done" >$@
 
 
-$(BINUTILSP): build/binutils/Makefile $(shell find $(BINUTILSD) -maxdepth 1 -type f)
+$(BINUTILSP): build/binutils/Makefile $(shell find 2>/dev/null $(BINUTILSD) -maxdepth 1 -type f)
 	touch -d19710101 projects/binutils/binutils/arparse.y
 	touch -d19710101 projects/binutils/binutils/arlex.l
 	touch -d19710101 projects/binutils/ld/ldgram.y
@@ -211,7 +214,7 @@ build/fd2sfd/.done: $(PREFIX)/bin/fd2sfd
 	@echo "built $(PREFIX)/bin/fd2sfd"
 	@echo "done" >$@
 
-$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
+$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
 	pushd build/fd2sfd; $(MAKE) all; popd
 	mkdir -p $(PREFIX)/bin/
 	pushd build/fd2sfd; $(MAKE) install; popd
@@ -237,7 +240,7 @@ $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 	mkdir -p $(PREFIX)/bin/
 	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
 
-build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
+build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
 	pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
 
@@ -258,7 +261,7 @@ $(PREFIX)/bin/ira: build/ira/ira
 	mkdir -p $(PREFIX)/bin/
 	install build/ira/ira $(PREFIX)/bin/
 
-build/ira/ira: projects/ira/Makefile $(shell find projects/ira -not \( -path projects/ira/.git -prune \) -type f)
+build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
 	pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c; popd
 
@@ -277,7 +280,7 @@ build/sfdc/.done: $(PREFIX)/bin/sfdc
 	@echo "built $(PREFIX)/bin/sfdc"
 	@echo "done" >$@
 
-$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
+$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
 	pushd build/sfdc; $(MAKE) sfdc; popd
 	mkdir -p $(PREFIX)/bin/
 	install build/sfdc/sfdc $(PREFIX)/bin
@@ -303,7 +306,7 @@ build/vbcc/.done: $(VBCC)
 	@echo "built $(VBCC)"
 	@echo "done" >$@
 
-$(VBCCP): build/vbcc/Makefile $(shell find projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
+$(VBCCP): build/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
 	pushd build/vbcc; TARGET=m68k $(MAKE) bin/dtgen; popd
 	pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd
 	pushd build/vbcc; TARGET=m68k $(MAKE); popd
@@ -331,7 +334,7 @@ build/vlink/.done: $(VLINK)
 	@echo "built $(VLINK)"
 	@echo "done" >$@
 
-$(VLINKP): build/vlink/Makefile $(shell find projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
+$(VLINKP): build/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	pushd build/vlink; TARGET=m68k $(MAKE); popd
 	mkdir -p $(PREFIX)/bin/
 	install build/vlink/vlink $(PREFIX)/bin/
@@ -350,8 +353,8 @@ projects/vlink/Makefile:
 # NDK - no git
 # =================================================
 
-NDK_INCLUDE = $(shell find projects/NDK_3.9/Include/include_h -type f)
-NDK_INCLUDE_SFD = $(shell find projects/NDK_3.9/Include/sfd -type f -name *.sfd)
+NDK_INCLUDE = $(shell find 2>/dev/null projects/NDK_3.9/Include/include_h -type f)
+NDK_INCLUDE_SFD = $(shell find 2>/dev/null projects/NDK_3.9/Include/sfd -type f -name *.sfd)
 SYS_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/inline/%.h,$(NDK_INCLUDE_SFD))
 SYS_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/lvo/%.h,$(NDK_INCLUDE_SFD))
 SYS_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/sys-include/proto/%.h,$(NDK_INCLUDE_SFD))
@@ -422,10 +425,10 @@ download/NDK39.lha:
 # =================================================
 CONFIG_IXEMUL = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos --disable-cat
 
-IXEMUL_INCLUDE = $(shell find projects/ixemul/include -type f)
+IXEMUL_INCLUDE = $(shell find 2>/dev/null projects/ixemul/include -type f)
 SYS_INCLUDE = $(patsubst projects/ixemul/include/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(IXEMUL_INCLUDE))
 
-build/ixemul/Makefile: $(DUMMYLIBSP) projects/ixemul/configure $(shell find projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
+build/ixemul/Makefile: $(DUMMYLIBSP) projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
 	mkdir -p build/ixemul
 	pushd build/ixemul; $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL); popd
 
@@ -472,7 +475,7 @@ $(DUMMYSTART): build/gcc/.done
 
 CONFIG_LIBNIX = --prefix=$(PREFIX)/m68k-amigaos/libnix --target=m68k-amigaos --host=m68k-amigaos
 
-LIBNIX_SRC = $(shell find projects/libnix -not \( -path projects/libnix/.git -prune \) -not \( -path projects/libnix/sources/stubs/libbases -prune \) -not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
+LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/libnix/.git -prune \) -not \( -path projects/libnix/sources/stubs/libbases -prune \) -not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
 
 libnix: build/libnix/.done
 
