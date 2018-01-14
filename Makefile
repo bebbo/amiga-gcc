@@ -409,6 +409,7 @@ build/sys-include/.proto:
 
 projects/NDK_3.9.info: download/NDK39.lha
 	mkdir -p projects
+	if [ !$$(which lha) ]; then pushd build; rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; popd; fi
 	pushd projects; lha x ../download/NDK39.lha; popd
 	touch -d19710101 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
