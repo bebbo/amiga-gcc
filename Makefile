@@ -16,8 +16,8 @@ GCCBRANCH=gcc-6-branch
 GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 CFLAGS=-Os
-CPPFLAGS=-Os
-CXXFLAGS=-Os
+CPPFLAGS=$(CFLAGS)
+CXXFLAGS=$(CFLAGS)
 E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 # cross compile:
@@ -99,35 +99,35 @@ clean-prefix:
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul
 
 update-gcc: projects/gcc/configure
-	pushd projects/gcc; export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done; popd
+	pushd projects/gcc; export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
-	pushd projects/binutils; git pull; popd
+	pushd projects/binutils; git pull
 
 update-fd2fsd: projects/fd2sfd/configure
-	pushd projects/fd2sfd; git pull; popd
+	pushd projects/fd2sfd; git pull
 
 update-fd2pragma: projects/fd2pragma/makefile
-	pushd projects/fd2pragma; git pull; popd
+	pushd projects/fd2pragma; git pull
 
 update-ira: projects/ira/Makefile
-	pushd projects/ira; git pull; popd
+	pushd projects/ira; git pull
 
 update-sfdc: projects/sfdc/configure
-	pushd projects/sfdc; git pull; popd
+	pushd projects/sfdc; git pull
 
 update-vbcc: projects/vbcc/Makefile
-	pushd projects/vbcc; git pull; popd
+	pushd projects/vbcc; git pull
 
 update-vlink: projects/vlink/Makefile
-	pushd projects/vlink; git pull; popd
+	pushd projects/vlink; git pull
 
 update-libnix: projects/libnix/configure
-	pushd projects/libnix; git pull; popd
+	pushd projects/libnix; git pull
 	
 update-ixemul: projects/ixemul/configure
-	pushd projects/ixemul; git pull; popd
+	pushd projects/ixemul; git pull
 
 
 status-all:
@@ -156,17 +156,21 @@ build/gcc/.done: $(GCC)
 	@echo "built $(GCC)"
 	@echo "done" >$@
 
-$(GCCP): build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f ) build/binutils/.done
-	pushd build/gcc; $(MAKE) all-gcc;	popd
-	pushd build/gcc; $(MAKE) install-gcc; popd
+$(GCCP): build/gcc/.build
+	@true
 
-build/gcc/Makefile: projects/gcc/configure projects/ixemul/configure
+build/gcc/.build: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f ) build/binutils/.done
+	pushd build/gcc; $(MAKE) all-gcc
+	pushd build/gcc; $(MAKE) install-gcc
+	echo "done" >build/gcc/.build
+
+build/gcc/Makefile: projects/gcc/configure projects/ixemul/configure build/binutils/.done
 	@mkdir -p build/gcc
-	pushd build/gcc; $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC); popd
+	pushd build/gcc; $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC)
 
 projects/gcc/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b $(GCCBRANCH) --depth 1 https://github.com/bebbo/gcc; popd
+	pushd projects;	git clone -b $(GCCBRANCH) --depth 1 https://github.com/bebbo/gcc
 
 # =================================================
 # binutils
@@ -187,20 +191,24 @@ build/binutils/.done: $(BINUTILS)
 	@echo "built $(BINUTILS)"
 	@echo "done" >$@
 
+$(BINUTILSP): build/binutils/.build
+	@true
 
-$(BINUTILSP): build/binutils/Makefile $(shell find 2>/dev/null $(BINUTILSD) -maxdepth 1 -type f)
+build/binutils/.build: build/binutils/Makefile $(shell find 2>/dev/null $(BINUTILSD) -maxdepth 1 -type f)
 	touch -d19710101 projects/binutils/binutils/arparse.y
 	touch -d19710101 projects/binutils/binutils/arlex.l
 	touch -d19710101 projects/binutils/ld/ldgram.y
-	pushd build/binutils; $(MAKE) all install; popd
+	pushd build/binutils; $(MAKE) 
+	pushd build/binutils; $(MAKE) install
+	echo "done" >build/binutils/.build
 
 build/binutils/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
-	pushd build/binutils; $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS); popd
+	pushd build/binutils; $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS)
 
 projects/binutils/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/amigaos-binutils-2.14 binutils; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/amigaos-binutils-2.14 binutils
 
 
 # =================================================
@@ -215,17 +223,17 @@ build/fd2sfd/.done: $(PREFIX)/bin/fd2sfd
 	@echo "done" >$@
 
 $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
-	pushd build/fd2sfd; $(MAKE) all; popd
+	pushd build/fd2sfd; $(MAKE) all
 	mkdir -p $(PREFIX)/bin/
-	pushd build/fd2sfd; $(MAKE) install; popd
+	pushd build/fd2sfd; $(MAKE) install
 
 build/fd2sfd/Makefile: projects/fd2sfd/configure
 	@mkdir -p build/fd2sfd
-	pushd build/fd2sfd; $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD); popd
+	pushd build/fd2sfd; $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd
 
 # =================================================
 # fd2pragma
@@ -242,11 +250,11 @@ $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
-	pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c; popd
+	pushd projects/fd2pragma; $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/fd2pragma; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/fd2pragma
 
 # =================================================
 # ira
@@ -263,11 +271,11 @@ $(PREFIX)/bin/ira: build/ira/ira
 
 build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
-	pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c; popd
+	pushd projects/ira; $(CC) -o $(PWD)/$@ $(CFLAGS) ira.c ira_2.c supp.c
 
 projects/ira/Makefile:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ira; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ira
 
 # =================================================
 # sfdc
@@ -281,17 +289,17 @@ build/sfdc/.done: $(PREFIX)/bin/sfdc
 	@echo "done" >$@
 
 $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
-	pushd build/sfdc; $(MAKE) sfdc; popd
+	pushd build/sfdc; $(MAKE) sfdc
 	mkdir -p $(PREFIX)/bin/
 	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
 	rsync -a projects/sfdc build --exclude .git
-	pushd build/sfdc; $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC); popd
+	pushd build/sfdc; $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC)
 
 projects/sfdc/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/sfdc; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/adtools/sfdc
 
 # =================================================
 # vbcc
@@ -307,9 +315,9 @@ build/vbcc/.done: $(VBCC)
 	@echo "done" >$@
 
 $(VBCCP): build/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
-	pushd build/vbcc; TARGET=m68k $(MAKE) bin/dtgen; popd
-	pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt; popd
-	pushd build/vbcc; TARGET=m68k $(MAKE); popd
+	pushd build/vbcc; TARGET=m68k $(MAKE) bin/dtgen
+	pushd build/vbcc; echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt
+	pushd build/vbcc; TARGET=m68k $(MAKE)
 	mkdir -p $(PREFIX)/bin/
 	install build/vbcc/bin/v* $(PREFIX)/bin/
 
@@ -319,7 +327,7 @@ build/vbcc/Makefile: projects/vbcc/Makefile
 
 projects/vbcc/Makefile:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vbcc; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vbcc
 
 # =================================================
 # vlink
@@ -335,7 +343,7 @@ build/vlink/.done: $(VLINK)
 	@echo "done" >$@
 
 $(VLINKP): build/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
-	pushd build/vlink; TARGET=m68k $(MAKE); popd
+	pushd build/vlink; TARGET=m68k $(MAKE)
 	mkdir -p $(PREFIX)/bin/
 	install build/vlink/vlink $(PREFIX)/bin/
 
@@ -344,7 +352,7 @@ build/vlink/Makefile: projects/vlink/Makefile
 
 projects/vlink/Makefile:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vlink; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/leffmann/vlink
 
 # =================================================
 # L I B R A R I E S
@@ -409,8 +417,8 @@ build/sys-include/.proto:
 
 projects/NDK_3.9.info: download/NDK39.lha
 	mkdir -p projects
-	if [ !$$(which lha) ]; then pushd build; rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; popd; fi
-	pushd projects; lha x ../download/NDK39.lha; popd
+	if [ !$$(which lha) ]; then pushd build; rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
+	pushd projects; lha x ../download/NDK39.lha
 	touch -d19710101 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
@@ -419,7 +427,7 @@ projects/NDK_3.9.info: download/NDK39.lha
 
 download/NDK39.lha:
 	mkdir -p download
-	pushd download; wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha; popd
+	pushd download; wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha
 	
 # =================================================
 # ixemul
@@ -431,7 +439,7 @@ SYS_INCLUDE = $(patsubst projects/ixemul/include/%,$(PREFIX)/m68k-amigaos/sys-in
 
 build/ixemul/Makefile: $(DUMMYLIBSP) projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
 	mkdir -p build/ixemul
-	pushd build/ixemul; $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL); popd
+	pushd build/ixemul; $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL)
 
 .PHONY: sys-include
 sys-include: build/sys-include/.done
@@ -444,7 +452,7 @@ build/sys-include/.done: $(IXEMUL_INCLUDE) projects/ixemul/configure
 
 projects/ixemul/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ixemul; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/ixemul
 
 # =================================================
 # libnix
@@ -489,18 +497,18 @@ $(LIBNIX): build/libnix/.build
 build/libnix/.build: build/binutils/.done build/gcc/.done build/libnix/Makefile 
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix/
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
-	pushd build/libnix; $(MAKE); popd
-	pushd build/libnix; $(MAKE) install; popd
+	pushd build/libnix; $(MAKE)
+	pushd build/libnix; $(MAKE) install
 	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >build/libnix/.build
 		
 build/libnix/Makefile: build/sys-include/.done build/sys-include/.done2 build/libnix/.dummydone projects/libnix/configure $(LIBNIX_SRC)		
-	pushd build/libnix; AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX); popd
+	pushd build/libnix; AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
 	touch build/libnix/Makefile
 	
 projects/libnix/configure:
 	@mkdir -p projects
-	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/libnix; popd
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/libnix
 
 # =================================================
 # libamiga
@@ -524,5 +532,5 @@ LIBGCCSP=$(patsubst $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/lib%,$(PREFIX)/
 libgcc: $(LIBGCCS)
 
 $(LIBGCCSP): build/libnix/.done $(DUMMYLIBSP) $(LIBAMIGA)
-	pushd build/gcc; $(MAKE) all-target; popd
-	pushd build/gcc; $(MAKE) install-target; popd
+	pushd build/gcc; $(MAKE) all-target
+	pushd build/gcc; $(MAKE) install-target
