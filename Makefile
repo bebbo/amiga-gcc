@@ -426,7 +426,7 @@ CONFIG_IXEMUL = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos --d
 IXEMUL_INCLUDE = $(shell find 2>/dev/null projects/ixemul/include -type f)
 SYS_INCLUDE = $(patsubst projects/ixemul/include/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(IXEMUL_INCLUDE))
 
-build/ixemul/Makefile: $(DUMMYLIBSP) projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
+build/ixemul/Makefile: build/libnix/_dummydone projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
 	mkdir -p build/ixemul
 	pushd build/ixemul; $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL)
 
@@ -451,10 +451,7 @@ DUMMYLIBSP=$(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a $(patsubst %,$(
 LIBNIX=$(patsubst %,$(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/%,$(LIBNIXLIBS))
 DUMMYSTART=$(PREFIX)/m68k-amigaos/libnix/lib/libnix/ncrt0.o
 
-build/libnix/_dummydone: dummylibs 
-
-.PHONY: dummylibs
-dummylibs: $(DUMMYLIBSP)
+build/libnix/_dummydone: $(DUMMYLIBSP)
 	echo "done" >build/libnix/_dummydone
 
 $(DUMMYLIBSP): $(DUMMYSTART)
@@ -474,17 +471,20 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 
 libnix: build/libnix/_done
 
-build/libnix/_done: build/binutils/_done build/gcc/_done build/libnix/Makefile build/libnix/_dummydone 
+build/libnix/_done: build/libnix/Makefile 
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix/
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
 	pushd build/libnix; $(MAKE)
 	pushd build/libnix; $(MAKE) install
 	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >build/libnix/_done
+	@echo "done" >build/libnix/_dummydone
 	@echo "built $(LIBNIX)"
 	
 		
-build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/libnix/_dummydone projects/libnix/configure $(LIBNIX_SRC)		
+build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/binutils/_done build/gcc/_done projects/libnix/configure $(LIBNIX_SRC)
+	@rm -f build/libnix/_dummydone
+	$(MAKE) build/libnix/_dummydone		
 	pushd build/libnix; AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
 	touch build/libnix/Makefile
 	
@@ -512,7 +512,7 @@ LIBGCCS= $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/%,$(LIBGCCS_N
 
 libgcc: build/gcc/_libgcc_done
 
-build/gcc/_libgcc_done: build/libnix/_done $(DUMMYLIBSP) $(LIBAMIGA)
+build/gcc/_libgcc_done: build/libnix/_done $(LIBAMIGA)
 	pushd build/gcc; $(MAKE) all-target
 	pushd build/gcc; $(MAKE) install-target
 	echo "done" >build/gcc/_libgcc_done
@@ -524,7 +524,7 @@ build/gcc/_libgcc_done: build/libnix/_done $(DUMMYLIBSP) $(LIBAMIGA)
 
 clib2: build/clib2/_done
 
-build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/libnix/.git -prune \) -type f) build/libnix/_done $(DUMMYLIBSP) $(LIBAMIGA)
+build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/_done $(LIBAMIGA)
 	mkdir -p build/clib2/ 
 	rsync -a projects/clib2/library/* build/clib2
 	pushd build/clib2; $(MAKE) -f GNUmakefile.68k
