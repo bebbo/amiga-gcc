@@ -189,11 +189,6 @@ BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 binutils: build/binutils/_done
 
 build/binutils/_done: build/binutils/Makefile $(shell find 2>/dev/null $(BINUTILSD) -maxdepth 1 -type f)
-	echo "==================================================="
-	echo "==================================================="
-	echo "==================================================="
-	echo "==================================================="
-	echo "==================================================="
 	touch -d19710101 projects/binutils/binutils/arparse.y
 	touch -d19710101 projects/binutils/binutils/arlex.l
 	touch -d19710101 projects/binutils/ld/ldgram.y
@@ -411,7 +406,7 @@ build/sys-include/_proto:
 
 projects/NDK_3.9.info: download/NDK39.lha
 	mkdir -p projects
-	if [ !$$(which lha) ]; then pushd build; rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
+	if [ ! -e "$$(which lha)" ]; then pushd build; rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
 	pushd projects; lha x ../download/NDK39.lha
 	touch -d19710101 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
@@ -533,7 +528,7 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 	mkdir -p build/clib2/ 
 	rsync -a projects/clib2/library/* build/clib2
 	pushd build/clib2; $(MAKE) -f GNUmakefile.68k
-	mkdir $(PREFIX)/m68k-amigaos/clib2
+	mkdir -p $(PREFIX)/m68k-amigaos/clib2
 	rsync -a build/clib2/include $(PREFIX)/m68k-amigaos/clib2
 	rsync -a build/clib2/lib $(PREFIX)/m68k-amigaos/clib2
 	echo "done" >build/clib2/_done	
