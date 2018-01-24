@@ -426,7 +426,7 @@ CONFIG_IXEMUL = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos --d
 IXEMUL_INCLUDE = $(shell find 2>/dev/null projects/ixemul/include -type f)
 SYS_INCLUDE = $(patsubst projects/ixemul/include/%,$(PREFIX)/m68k-amigaos/sys-include/%, $(IXEMUL_INCLUDE))
 
-build/ixemul/Makefile: build/libnix/_dummydone projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
+build/ixemul/Makefile: build/libnix/Makefile projects/ixemul/configure $(shell find 2>/dev/null projects/ixemul -not \( -path projects/ixemul/.git -prune \) -type f)
 	mkdir -p build/ixemul
 	cd build/ixemul && $(A) $(PWD)/projects/ixemul/configure $(CONFIG_IXEMUL)
 
@@ -473,19 +473,18 @@ libnix: build/libnix/_done
 
 build/libnix/_done: build/libnix/Makefile 
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix/
-	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
 	cd build/libnix && $(MAKE)
 	cd build/libnix && $(MAKE) install
-	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >build/libnix/_done
 	@echo "done" >build/libnix/_dummydone
 	@echo "built $(LIBNIX)"
-	
 		
 build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/binutils/_done build/gcc/_done projects/libnix/configure $(LIBNIX_SRC)
 	@rm -f build/libnix/_dummydone
 	$(MAKE) build/libnix/_dummydone		
 	cd build/libnix && AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
+	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
+	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	touch build/libnix/Makefile
 	
 projects/libnix/configure:
@@ -524,7 +523,7 @@ build/gcc/_libgcc_done: build/libnix/_done $(LIBAMIGA)
 
 clib2: build/clib2/_done
 
-build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/_done $(LIBAMIGA)
+build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/Makefile $(LIBAMIGA)
 	mkdir -p build/clib2/ 
 	rsync -a projects/clib2/library/* build/clib2
 	cd build/clib2 && $(MAKE) -f GNUmakefile.68k
