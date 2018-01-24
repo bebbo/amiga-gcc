@@ -37,7 +37,7 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 help:
 	@echo "make help 		display this help"
 	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc, clib2"
 	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -47,18 +47,22 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2
 	rm -rf build
 
 clean-gcc:
 	rm -rf build/gcc
+
+clean-libgcc:
+	rm -rf build/gcc/m68k-amigaos
+	rm build/gcc/_libgcc_done
 
 clean-binutils:
 	rm -rf build/binutils
@@ -86,6 +90,9 @@ clean-libnix:
 	
 clean-ixemul:
 	rm -rf build/ixemul
+	
+clean-clib2:
+	rm -rf build/clib2
 
 # clean-prefix drops the files from prefix folder
 clean-prefix:
@@ -95,8 +102,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2
 
 update-gcc: projects/gcc/configure
 	pushd projects/gcc; export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -129,6 +136,8 @@ update-libnix: projects/libnix/configure
 update-ixemul: projects/ixemul/configure
 	pushd projects/ixemul; git pull
 
+update-clib2: projects/clib2/LICENSE
+	pushd projects/clib2; git pull
 
 status-all:
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
@@ -513,3 +522,22 @@ build/gcc/_libgcc_done: build/libnix/_done $(DUMMYLIBSP) $(LIBAMIGA)
 	pushd build/gcc; $(MAKE) install-target
 	echo "done" >build/gcc/_libgcc_done
 	echo "$(LIBGCCS)"
+
+# =================================================
+# clib2
+# =================================================
+
+clib2: build/clib2/_done
+
+build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/libnix/.git -prune \) -type f) build/libnix/_done $(DUMMYLIBSP) $(LIBAMIGA)
+	mkdir -p build/clib2/ 
+	rsync -a projects/clib2/library/* build/clib2
+	pushd build/clib2; $(MAKE) -f GNUmakefile.68k
+	mkdir $(PREFIX)/m68k-amigaos/clib2
+	rsync -a build/clib2/include $(PREFIX)/m68k-amigaos/clib2
+	rsync -a build/clib2/lib $(PREFIX)/m68k-amigaos/clib2
+	echo "done" >build/clib2/_done	
+
+projects/clib2/LICENSE:
+	@mkdir -p projects
+	pushd projects;	git clone -b master --depth 1 https://github.com/bebbo/clib2
