@@ -1,0 +1,10 @@
+Short: A set of C macro/defines to make amiga development easier.
+Version: 1.7
+Url: git://github.com/adtools/SDI
+
+SDI_compiler.h
+SDI_hook.h
+SDI_interrupt.h
+SDI_lib.h
+SDI_misc.h
+SDI_stdarg.h

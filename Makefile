@@ -30,6 +30,14 @@ $(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)") )
 EXEEXT=$(MYMAKEEXE:%=.exe)
 # =================================================
 
+.PHONY: x
+x:
+	@if [ "$(sdk)" == "" ]; then \
+		$(MAKE) help; \
+	else \
+		$(MAKE) sdk; \
+	fi
+
 # =================================================
 # help
 # =================================================
@@ -43,6 +51,8 @@ help:
 	@echo "make clean-prefix	remove all content from the prefix folder"
 	@echo "make update		perform git pull for all targets"
 	@echo "make update-<target>	perform git pull for the given target"
+	@echo "make sdk=<sdk>		install the sdk <sdk>"
+	@echo "make all-sdk		install all sdks"
 
 # =================================================
 # all
@@ -535,3 +545,18 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 projects/clib2/LICENSE:
 	@mkdir -p projects
 	cd projects && git clone -b master --depth 1 https://github.com/bebbo/clib2
+
+# =================================================
+# sdk installation
+# =================================================
+.PHONY: sdk all-sdk
+sdk:
+	@$(PWD)/sdk/install install $(sdk) $(PREFIX)
+
+SDKS0=$(shell find sdk/*.sdk)
+SDKS=$(patsubst sdk/%.sdk,%,$(SDKS0))
+.PHONY: $(SDKS)
+all-sdk: $(SDKS)
+
+$(SDKS):
+	$(MAKE) sdk=$@

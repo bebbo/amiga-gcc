@@ -1,0 +1,29 @@
+Short: retargetable audio library
+Version: 6.0
+Url: http://aminet.net/driver/audio/m68k-amigaos-ahidev.lha
+
+m68k-amigaos-ahi/Developer/Docs/ahi.doc
+m68k-amigaos-ahi/Developer/Docs/ahi.guide
+m68k-amigaos-ahi/Developer/Docs/ahi.html
+m68k-amigaos-ahi/Developer/Docs/ahi_sub.doc
+m68k-amigaos-ahi/Developer/Docs/ahi_sub.guide
+m68k-amigaos-ahi/Developer/Docs/ahi_sub.html
+m68k-amigaos-ahi/Developer/Docs/ahidev.guide
+m68k-amigaos-ahi/Developer/Docs/ahidev.html
+m68k-amigaos-ahi/Developer/Docs/ahidev.pdf
+m68k-amigaos-ahi/Developer/Include/Asm/devices/ahi.i
+m68k-amigaos-ahi/Developer/Include/Asm/libraries/ahi_sub.i
+m68k-amigaos-ahi/Developer/Include/C/clib/ahi_protos.h
+m68k-amigaos-ahi/Developer/Include/C/clib/ahi_sub_protos.h
+m68k-amigaos-ahi/Developer/Include/C/defines/ahi.h
+m68k-amigaos-ahi/Developer/Include/C/defines/ahi_sub.h
+m68k-amigaos-ahi/Developer/Include/C/devices/ahi.h
+m68k-amigaos-ahi/Developer/Include/C/interfaces/ahi.h
+m68k-amigaos-ahi/Developer/Include/C/interfaces/ahi_sub.h
+m68k-amigaos-ahi/Developer/Include/C/libraries/ahi_sub.h
+m68k-amigaos-ahi/Developer/Include/C/pragmas/ahi_pragmas.h
+m68k-amigaos-ahi/Developer/Include/C/pragmas/ahi_sub_pragmas.h
+m68k-amigaos-ahi/Developer/Include/SFD/ahi_lib.sfd = ahi.sfd
+m68k-amigaos-ahi/Developer/Include/SFD/ahi_sub_lib.sfd = ahi_sub.sfd
+sfdc : ahi.sfd
+sfdc : ahi_sub.sfd

@@ -1,0 +1,13 @@
+Short: Application layer for pixel graphics
+Version: 20.0
+Url: http://aminet.net/dev/misc/guigfxlib.lha
+
+doc/autodoc/guigfx = guigfx.guide
+doc/autodoc/guigfx.doc
+include/clib/guigfx_protos.h
+include/fd/guigfx_lib.fd
+include/guigfx/guigfx.h
+include/pragmas/guigfx_pragmas.h
+fd2sfd : guigfx_lib.fd clib/guigfx_protos.h
+sfdc : guigfx_lib.sfd
+stubs : guigfx_lib.sfd

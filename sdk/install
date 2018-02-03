@@ -1,0 +1,123 @@
+#!/bin/bash
+
+if [ ! -e "sdk/$2.sdk" ]; then 
+	echo "sdk/$2.sdk not found"
+	exit 1
+fi
+
+case $1 in
+  install)	
+	while IFS='' read -r line || [[ -n "$line" ]]; do
+    	a=(${line//:/ })
+    	case ${a[0]} in
+    		Short | Version)
+    			echo "$line"
+    			;; 
+    		Url)
+    			file=$(basename ${a[2]})
+    			if [ "${a[1]}" == "git" ]; then
+	    			if [ ! -e "projects/$file" ]; then
+	    				pushd projects
+	    				git clone ${a[1]}:${a[2]} || rm -rf $file; exit 1
+	    				popd;
+	    			fi
+    				pushd projects/$file
+    				git pull
+    				popd
+    				rsync -s projects/$file/* build/$2/
+    			else
+	    			if [ ! -e "download/$file" ]; then
+	    				echo wget ${a[1]}:${a[2]} -O download/$file
+	    				wget ${a[1]}:${a[2]} -O download/$file || rm download/$file; exit 1
+	    			fi
+	    			if [ ! -e "build/$2" ]; then
+		    			mkdir build/$2
+		    			pushd build/$2
+		    				lha x "../../download/$file"
+		    			popd
+	    			fi
+	    		fi
+    		;;
+    		fd2sfd)
+    			fd=${a[1]}
+    			proto=${a[2]}
+    			file=$(basename $fd)
+   				name=${file::-3}
+    			mkdir -p $3/m68k-amigaos/lib/sfd/
+    			$3/bin/fd2sfd -o $3/m68k-amigaos/lib/sfd/$name.sfd $3/m68k-amigaos/lib/fd/$fd $3/m68k-amigaos/include/$proto || exit 1
+    		;;
+    		sfdc)
+    			sfd=${a[1]}
+    			file=$(basename $sfd)
+   				name=${file::-4}
+    			mkdir -p $3/m68k-amigaos/include/proto/
+    			$3/bin/sfdc --mode=proto --target=m68k-amigaos --output=$3/m68k-amigaos/include/proto/$name.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+    			mkdir -p $3/m68k-amigaos/include/inline/
+    			$3/bin/sfdc --mode=macros --target=m68k-amigaos --output=$3/m68k-amigaos/include/proto/$name.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+    			mkdir -p $3/m68k-amigaos/include/lvo/
+    			$3/bin/sfdc --mode=lvo --target=m68k-amigaos --output=$3/m68k-amigaos/include/proto/$name.i $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+    		;;
+    		stubs)
+    			sfd=${a[1]}
+    			file=$(basename $sfd)
+   				name=${file::-4}
+    			$3/bin/sfdc --mode=autoopen --target=m68k-amigaos --output=build/$2/$name.c $3/m68k-amigaos/lib/sfd/$name.sfd || exit 1
+    			sed -e 's/__inline//g' -e 's/: \"d0\",/:/g' build/$2/$name.c -i || exit 1
+    			echo $3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/$name.c -c  
+    			$3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/$name.c -c -o build/$2/$name.o || exit 1
+    			echo $3/bin/m68k-amigaos-ar r $3/m68k-amigaos/libnix/lib/libnix/libstubs.a  build/$2/$name.o
+    			$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/libnix/lib/libnix/libstubs.a  build/$2/$name.o || exit 1
+    		;;
+    		lib)
+    			sfd=${a[1]}
+    			file=$(basename $sfd)
+    			name=${file::-4}
+    			$3/bin/sfdc --mode=stubs --target=m68k-amigaos --output=build/$2/lib$2.c $3/m68k-amigaos/lib/sfd/$name.sfd || exit 1
+    			sed -e 's/__inline//g' -e 's/: \"d0\",/:/g' build/$2/lib$2.c -i || exit 1
+    			echo $3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/lib$2.c -c 
+    			$3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/lib$2.c -c -o build/$2/lib$2.o || exit 1
+    			echo $3/bin/m68k-amigaos-ar r $3/m68k-amigaos/libnix/lib/libnix/lib$2.a  build/$2/lib$2.o
+    			$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a  build/$2/lib$2.o || exit 1
+    		;;	
+    		*)
+    			if [ "$line" != "" ]; then		
+	    			if [ "${a[1]}" == "=" ]; then
+	    				file=${a[2]}
+	    				line=${a[0]}
+	    				cp build/$2/$line build/$2/$(dirname $line)/$file
+	    			else
+	    				file=$(basename $line)
+	    			fi
+	    			
+    				dir=$(basename $(dirname $line))
+	    			
+	    			if [[ $file == *.h ]] || [[ $file == *.i ]]; then
+						mkdir -p "$3/m68k-amigaos/include/$dir"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/include/$dir/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/include/$dir/$file" 
+					elif [[ $file == *.guide ]]; then
+						mkdir -p "$3/m68k-amigaos/guide"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/guide/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/guide/$file" 
+					elif [[ $file == *.doc ]]; then
+						mkdir -p "$3/m68k-amigaos/doc"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/doc/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/doc/$file" 
+					elif [[ $file == *.sfd ]]; then
+						mkdir -p "$3/m68k-amigaos/lib/sfd"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/lib/sfd/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/lib/sfd/$file" 
+					elif [[ $file == *.fd ]]; then
+						mkdir -p "$3/m68k-amigaos/lib/fd"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/lib/fd/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/lib/fd/$file" 
+	    			fi
+				fi	    			
+    		;;
+    	esac
+	done < "sdk/$2.sdk"
+  ;;  
+  clean)
+	rm -rf build/$2
+  ;;  
+esac

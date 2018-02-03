@@ -1,0 +1,7 @@
+Short: TextEditor custom class for MUI
+Version: 15.50
+Url: http://aminet.net/dev/mui/MCC_TextEditor-15.50.lha
+
+MCC_TextEditor/Developer/Autodocs/MCC/MCC_TextEditor.doc
+MCC_TextEditor/Developer/C/include/mui/TextEditor_mcc.h
+MCC_TextEditor/Docs/MCC_TextEditor.guide

@@ -1,0 +1,13 @@
+Short: CyberGraphX retargetable graphics system
+Version: 4.2
+Url: http://aminet.net/dev/misc/CGraphX-DevKit.lha
+
+CGraphX/Assembler/Include/cybergraphx/cybergraphics.i
+CGraphX/Autodocs/cybergraphics.doc
+CGraphX/C/Include/clib/cybergraphics_protos.h
+CGraphX/C/Include/cybergraphx/cybergraphics.h
+CGraphX/C/Include/pragmas/cybergraphics_pragmas.h
+CGraphX/FD/cybergraphics_lib.fd = cybergraphics.fd 
+fd2sfd : cybergraphics.fd clib/cybergraphics_protos.h
+sfdc : cybergraphics.sfd
+stubs : cybergraphics.sfd

@@ -1,0 +1,10 @@
+Short: Library to parse PC Card information
+Version: 1.1
+Url: http://aminet.net/util/libs/pccard.lha
+
+pccard/Developer/Include/Assembly/libraries/pccard.i
+pccard/Developer/Include/C/clib/pccard_protos.h
+pccard/Developer/Include/C/libraries/pccard.h
+pccard/Developer/pccard.doc
+pccard/Developer/SFD/pccard_lib.sfd
+sfdc : pccard_lib.sfd

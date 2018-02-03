@@ -1,0 +1,16 @@
+Short: Image processing kernel
+Version: 40.8
+Url: http://aminet.net/dev/misc/renderlib.lha
+
+renderlib/doc/render = render.guide
+renderlib/doc/render.doc
+renderlib/include/clib/render_protos.h
+renderlib/include/FD/render_lib.fd
+renderlib/include/render/render.h
+renderlib/include/render/render.i
+renderlib/include/render/renderhooks.h
+renderlib/include/render/renderhooks.i
+renderlib/include/pragmas/render_pragmas.h
+fd2sfd : render_lib.fd clib/render_protos.h
+sfdc : render_lib.sfd
+stubs : render_lib.sfd
