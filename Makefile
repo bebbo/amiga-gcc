@@ -462,6 +462,7 @@ LIBNIX=$(patsubst %,$(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/%,$(LIBNIXLIBS
 DUMMYSTART=$(PREFIX)/m68k-amigaos/libnix/lib/libnix/ncrt0.o
 
 build/libnix/_dummydone: $(DUMMYLIBSP)
+	mkdir -p build/libnix
 	echo "done" >build/libnix/_dummydone
 
 $(DUMMYLIBSP): $(DUMMYSTART)
@@ -489,7 +490,7 @@ build/libnix/_done: build/libnix/Makefile
 	@echo "done" >build/libnix/_dummydone
 	@echo "built $(LIBNIX)"
 		
-build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/binutils/_done build/gcc/_done projects/libnix/configure $(LIBNIX_SRC)
+build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC)
 	@rm -f build/libnix/_dummydone
 	$(MAKE) build/libnix/_dummydone		
 	cd build/libnix && AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
@@ -550,7 +551,7 @@ projects/clib2/LICENSE:
 # sdk installation
 # =================================================
 .PHONY: sdk all-sdk
-sdk:
+sdk: libnix
 	@$(PWD)/sdk/install install $(sdk) $(PREFIX)
 
 SDKS0=$(shell find sdk/*.sdk)
@@ -558,5 +559,5 @@ SDKS=$(patsubst sdk/%.sdk,%,$(SDKS0))
 .PHONY: $(SDKS)
 all-sdk: $(SDKS)
 
-$(SDKS):
+$(SDKS): libnix
 	$(MAKE) sdk=$@
