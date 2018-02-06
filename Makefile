@@ -45,7 +45,7 @@ x:
 help:
 	@echo "make help 		display this help"
 	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc, clib2"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug"
 	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -57,14 +57,14 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2 libdebug
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2 libdebug
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug
 	rm -rf build
 
 clean-gcc:
@@ -104,6 +104,9 @@ clean-ixemul:
 clean-clib2:
 	rm -rf build/clib2
 
+clean-libdebug:
+	rm -rf build/libdebug
+
 # clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX)/*
@@ -112,8 +115,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
 
 update-gcc: projects/gcc/configure
 	cd projects/gcc && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -149,6 +152,9 @@ update-ixemul: projects/ixemul/configure
 update-clib2: projects/clib2/LICENSE
 	cd projects/clib2 && git pull
 
+update-libdebug: projects/libdebug/configure
+	cd projects/libdebug && git pull
+	
 status-all:
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 # =================================================
@@ -546,6 +552,26 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 projects/clib2/LICENSE:
 	@mkdir -p projects
 	cd projects && git clone -b master --depth 1 https://github.com/bebbo/clib2
+
+# =================================================
+# libdebug
+# =================================================
+CONFIG_LIBDEBUG = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos 
+
+libdebug: build/libdebug/_done
+
+build/libdebug/_done: build/libdebug/Makefile
+	cd build/libdebug && $(MAKE)
+	cp build/libdebug/libdebug.a $(PREFIX)/m68k-amigaos/lib/
+	echo "done" >build/libdebug/_done
+
+build/libdebug/Makefile: build/libnix/Makefile projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
+	mkdir -p build/libdebug
+	cd build/libdebug && $(A) $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG)
+
+projects/libdebug/configure:
+	@mkdir -p projects
+	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libdebug
 
 # =================================================
 # sdk installation
