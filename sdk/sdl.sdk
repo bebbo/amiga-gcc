@@ -1,0 +1,45 @@
+Short:        Version 1.2.6 of Amiga SDL audio/video library
+Author:       Gabriele Greco
+Uploader:     gabriele greco aruba it
+Type:         dev/misc
+Version:      1.2.6
+Replaces:     SDL-Amiga.lha
+Architecture: m68k-amigaos; ppc-morphos
+Url: http://aminet.net/dev/misc/SDL-Amiga.lha
+
+SDL/include/inline/SDL.h
+SDL/include/inline/SDL_inline.h
+SDL/include/clib/SDL_protos.h
+SDL/include/SDL/SDL_keysym.h
+SDL/include/SDL/SDL_syswm.h
+SDL/include/SDL/SDL_byteorder.h
+SDL/include/SDL/SDL_error.h
+SDL/include/SDL/SDL_getenv.h
+SDL/include/SDL/SDL_timer.h
+SDL/include/SDL/SDL_mouse.h
+SDL/include/SDL/SDL_joystick.h
+SDL/include/SDL/SDL_video.h
+SDL/include/SDL/SDL_thread.h
+SDL/include/SDL/SDL_quit.h
+SDL/include/SDL/close_code.h
+SDL/include/SDL/SDL_rwops.h
+SDL/include/SDL/SDL_opengl.h
+SDL/include/SDL/SDL_loadso.h
+SDL/include/SDL/SDL_main.h
+SDL/include/SDL/SDL_version.h
+SDL/include/SDL/SDL_audio.h
+SDL/include/SDL/SDL_active.h
+SDL/include/SDL/SDL_keyboard.h
+SDL/include/SDL/begin_code.h
+SDL/include/SDL/SDL_types.h
+SDL/include/SDL/SDL.h
+SDL/include/SDL/SDL_name.h
+SDL/include/SDL/SDL_endian.h
+SDL/include/SDL/SDL_cdrom.h
+SDL/include/SDL/SDL_events.h
+SDL/include/SDL/SDL_mutex.h
+SDL/include/SDL/SDL_copying.h
+SDL/lib/libSDL.a
+
+redirinc : SDL.h SDL/SDL.h
+redirinc : SDL_audio.h SDL/SDL_audio.h

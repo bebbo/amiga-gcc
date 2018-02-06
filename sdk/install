@@ -10,7 +10,7 @@ case $1 in
 	while IFS='' read -r line || [[ -n "$line" ]]; do
     	a=(${line//:/ })
     	case ${a[0]} in
-    		Short | Version)
+    		Short | Version | Author | Uploader | Type | Replaces | Architecture)
     			echo "$line"
     			;; 
     		Url)
@@ -28,7 +28,7 @@ case $1 in
     			else
 	    			if [ ! -e "download/$file" ]; then
 	    				echo wget ${a[1]}:${a[2]} -O download/$file
-	    				wget ${a[1]}:${a[2]} -O download/$file || rm download/$file; exit 1
+	    				wget ${a[1]}:${a[2]} -O download/$file || (rm download/$file; exit 1)
 	    			fi
 	    			if [ ! -e "build/$2" ]; then
 		    			mkdir build/$2
@@ -90,7 +90,11 @@ case $1 in
     			$3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/lib$2.c -c -o build/$2/lib$2.o || exit 1
     			echo $3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o
     			$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o || exit 1
-    		;;	
+    		;;
+    		redirinc)
+    			echo creating redirecting header $3/m68k-amigaos/include/${a[1]}
+    			echo "#include \"${a[2]}\"" >$3/m68k-amigaos/include/${a[1]}
+    		;;
     		*)
     			if [ "$line" != "" ]; then		
 	    			if [ "${a[1]}" == "=" ]; then
@@ -123,6 +127,9 @@ case $1 in
 						mkdir -p "$3/m68k-amigaos/lib/fd"
 						echo cp "build/$2/$line" "$3/m68k-amigaos/lib/fd/$file" 
 						cp "build/$2/$line" "$3/m68k-amigaos/lib/fd/$file" 
+					elif [[ $file == *.a ]]; then
+						echo cp "build/$2/$line" "$3/m68k-amigaos/lib/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/lib/$file" 
 	    			fi
 				fi	    			
     		;;
