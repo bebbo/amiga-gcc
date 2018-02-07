@@ -188,7 +188,7 @@ build/gcc/Makefile: projects/gcc/configure projects/ixemul/configure build/binut
 
 projects/gcc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(GCCBRANCH) --depth 1 https://github.com/bebbo/gcc
+	cd projects &&	git clone -b $(GCCBRANCH) --depth 4 https://github.com/bebbo/gcc
 
 # =================================================
 # binutils
@@ -219,7 +219,7 @@ build/binutils/Makefile: projects/binutils/configure
 
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/amigaos-binutils-2.14 binutils
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/amigaos-binutils-2.14 binutils
 
 
 # =================================================
@@ -244,7 +244,7 @@ build/fd2sfd/Makefile: projects/fd2sfd/configure
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd
+	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
 
 # =================================================
 # fd2pragma
@@ -265,7 +265,7 @@ build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null 
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/fd2pragma
+	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/fd2pragma
 
 # =================================================
 # ira
@@ -286,7 +286,7 @@ build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not 
 
 projects/ira/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/ira
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/ira
 
 # =================================================
 # sfdc
@@ -310,7 +310,7 @@ build/sfdc/Makefile: projects/sfdc/configure
 
 projects/sfdc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/sfdc
+	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/sfdc
 
 # =================================================
 # vbcc
@@ -335,7 +335,7 @@ build/vbcc/Makefile: projects/vbcc/Makefile
 
 projects/vbcc/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vbcc
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vbcc
 
 # =================================================
 # vlink
@@ -357,7 +357,7 @@ build/vlink/Makefile: projects/vlink/Makefile
 
 projects/vlink/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vlink
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vlink
 
 # =================================================
 # L I B R A R I E S
@@ -457,7 +457,7 @@ build/sys-include/_done: $(IXEMUL_INCLUDE) projects/ixemul/configure
 
 projects/ixemul/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/ixemul
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/ixemul
 
 # =================================================
 # libnix
@@ -506,7 +506,7 @@ build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/bi
 	
 projects/libnix/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libnix
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libnix
 
 # =================================================
 # libamiga
@@ -551,7 +551,7 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 
 projects/clib2/LICENSE:
 	@mkdir -p projects
-	cd projects && git clone -b master --depth 1 https://github.com/bebbo/clib2
+	cd projects && git clone -b master --depth 4 https://github.com/bebbo/clib2
 
 # =================================================
 # libdebug
@@ -571,7 +571,7 @@ build/libdebug/Makefile: build/libnix/Makefile projects/libdebug/configure $(she
 
 projects/libdebug/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libdebug
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
 
 # =================================================
 # sdk installation
