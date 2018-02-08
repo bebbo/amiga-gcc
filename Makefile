@@ -45,7 +45,7 @@ x:
 help:
 	@echo "make help 		display this help"
 	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug"
 	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -57,14 +57,14 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2 libdebug
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vlink libnix ixemul libgcc clib2 libdebug
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug
 
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug
 	rm -rf build
 
 clean-gcc:
@@ -88,6 +88,9 @@ clean-ira:
 
 clean-sfdc:
 	rm -rf build/sfdc
+
+clean-vasm:
+	rm -rf build/vasm
 
 clean-vbcc:
 	rm -rf build/vbcc
@@ -115,8 +118,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug
 
 update-gcc: projects/gcc/configure
 	cd projects/gcc && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -136,6 +139,9 @@ update-ira: projects/ira/Makefile
 
 update-sfdc: projects/sfdc/configure
 	cd projects/sfdc && git pull
+
+update-vasm: projects/vasm/Makefile
+	cd projects/vasm && git pull
 
 update-vbcc: projects/vbcc/Makefile
 	cd projects/vbcc && git pull
@@ -311,6 +317,29 @@ build/sfdc/Makefile: projects/sfdc/configure
 projects/sfdc/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/sfdc
+
+# =================================================
+# vasm
+# =================================================
+VASM_CMD = vasmm68k_mot
+VASM = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VASM_CMD))
+
+vasm: build/vasm/_done
+
+build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
+	cd build/vasm && $(MAKE) CPU=m68k SYNTAX=mot
+	mkdir -p $(PREFIX)/bin/
+	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
+	install build/vasm/vobjdump $(PREFIX)/bin/
+	@echo "done" >$@
+	@echo "built $(vasm)"
+
+build/vasm/Makefile: projects/vasm/Makefile
+	rsync -a projects/vasm build --exclude .git
+
+projects/vasm/Makefile:
+	@mkdir -p projects
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vasm
 
 # =================================================
 # vbcc
