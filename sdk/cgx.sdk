@@ -11,3 +11,4 @@ CGraphX/FD/cybergraphics_lib.fd = cybergraphics.fd
 fd2sfd : cybergraphics.fd clib/cybergraphics_protos.h
 sfdc : cybergraphics.sfd
 stubs : cybergraphics.sfd
+symlink : include/cybergraphics include/cybergraphx

@@ -331,6 +331,10 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	mkdir -p $(PREFIX)/bin/
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
+	cp patches/vc.config build/vasm/vc.config
+	sed -e 's/\PREFIX/$(subst /,\/,$(PREFIX))/' -i build/vasm/vc.config
+	mkdir -p $(PREFIX)/m68k-amigaos/etc/
+	install build/vasm/vc.config $(PREFIX)/m68k-amigaos/etc/ 
 	@echo "done" >$@
 	@echo "built $(vasm)"
 
@@ -601,6 +605,27 @@ build/libdebug/Makefile: build/libnix/Makefile projects/libdebug/configure $(she
 projects/libdebug/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
+
+# =================================================
+# libsdl
+# =================================================
+CONFIG_LIBSDL12 = PREFX=$(PREFIX) PREF=$(PREFIX)  
+
+libSDL12: build/libSDL12/_done
+
+build/libSDL12/_done: build/libSDL12/Makefile.bax
+	cd build/libSDL12 && $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
+	cp build/libSDL12/libsdl.a $(PREFIX)/m68k-amigaos/lib/
+	echo "done" >build/libsdl/_done
+
+build/libSDL12/Makefile.bax: build/libnix/Makefile projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
+	mkdir -p build/libSDL12
+	rsync -a projects/libSDL12/* build/libSDL12 
+
+projects/libSDL12/Makefile.bax:
+	@mkdir -p projects
+	cd projects &&	git clone -b master --depth 4  https://github.com/AmigaPorts/libSDL12
+
 
 # =================================================
 # sdk installation
