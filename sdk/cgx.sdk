@@ -9,6 +9,6 @@ CGraphX/C/Include/cybergraphx/cybergraphics.h
 CGraphX/C/Include/pragmas/cybergraphics_pragmas.h
 CGraphX/FD/cybergraphics_lib.fd = cybergraphics.fd 
 fd2sfd : cybergraphics.fd clib/cybergraphics_protos.h
-sfdc : cybergraphics.sfd
+sfdc : cybergraphics.sfd cybergfx cybergraphics
 stubs : cybergraphics.sfd
 symlink : include/cybergraphx include/cybergraphics

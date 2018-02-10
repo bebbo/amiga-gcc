@@ -57,6 +57,13 @@ case $1 in
     			$3/bin/sfdc --mode=macros --target=m68k-amigaos --output=$3/m68k-amigaos/include/inline/$name.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
     			mkdir -p $3/m68k-amigaos/include/lvo/
     			$3/bin/sfdc --mode=lvo --target=m68k-amigaos --output=$3/m68k-amigaos/include/proto/$name.i $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+    			if [ "${a[2]}" != "" ] && [ "${a[3]}" != "" ]; then
+    				echo fixup names from ${a[2]} to ${a[3]}
+    				echo sed -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/proto/$name.h -i
+    				sed -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/proto/$name.h -i
+    				sed -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/proto/$name.i -i
+    				sed -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/inline/$name.h -i
+    			fi
     		;;
     		stubs)
     			sfd=${a[1]}
