@@ -45,7 +45,7 @@ x:
 help:
 	@echo "make help 		display this help"
 	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug"
+	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12"
 	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix	remove all content from the prefix folder"
@@ -612,6 +612,8 @@ CONFIG_LIBSDL12 = PREFX=$(PREFIX) PREF=$(PREFIX)
 libSDL12: build/libSDL12/_done
 
 build/libSDL12/_done: build/libSDL12/Makefile.bax
+	$(MAKE) sdk=ahi
+	$(MAKE) sdk=cgx
 	cd build/libSDL12 && $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
 	rsync -a build/libSDL12/include/*.h $(PREFIX)/m68k-amigaos/include
