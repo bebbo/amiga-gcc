@@ -523,11 +523,11 @@ build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/bi
 	mkdir -p build/libnix
 	echo 'void foo(){}' > build/libnix/x.c
 	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/ncrt0.o ]; then $(PREFIX)/bin/m68k-amigaos-gcc -c build/libnix/x.c -o $(PREFIX)/m68k-amigaos/libnix/lib/libnix/ncrt0.o; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libm.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libm.a; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnixmain.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnixmain.a; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnix.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnix.a; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnix20.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libnix20.a; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libb/libnix/libstubs.a; fi
+	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libm.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libm.a; fi
+	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnixmain.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnixmain.a; fi
+	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnix.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnix.a; fi
+	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnix20.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libnix20.a; fi
+	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libstubs.a; fi
 	mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)
 	if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a; fi
 	cd build/libnix && AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
