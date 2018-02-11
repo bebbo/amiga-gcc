@@ -125,7 +125,7 @@ clean-prefix:
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12
 
 update-gcc: projects/gcc/configure
-	cd projects/gcc && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/gcc && export DEPTH=4; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
