@@ -129,7 +129,8 @@ update-gcc: projects/gcc/configure
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
-	cd projects/binutils && git pull
+	@pushd projects/binutils && a=($$(git remote -v)); if [ "$${a[1]}" == "$(GIT_BINUTILS)" ]; then git pull; else \
+	  cd .. ; rm -rf binutils; popd; $(MAKE) projects/binutils/configure; fi
 
 update-fd2fsd: projects/fd2sfd/configure
 	cd projects/fd2sfd && git pull
@@ -229,9 +230,12 @@ build/binutils/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
 	cd build/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS)
 
+ifeq ($(GIT_BINUTILS),)
+GIT_BINUTILS = https://github.com/bebbo/amigaos-binutils-2.14
+endif
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/amigaos-binutils-2.14 binutils
+	cd projects &&	git clone -b master --depth 4 $(GIT_BINUTILS) binutils
 
 
 # =================================================
@@ -338,7 +342,7 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
 	cp patches/vc.config build/vasm/vc.config
-	sed -e 's/\PREFIX/$(subst /,\/,$(PREFIX))/' -i build/vasm/vc.config
+	sed -e "s|PREFIX|$(PREFIX)|g" -i build/vasm/vc.config
 	mkdir -p $(PREFIX)/m68k-amigaos/etc/
 	install build/vasm/vc.config $(PREFIX)/bin/
 	@echo "done" >$@
