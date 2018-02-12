@@ -475,6 +475,7 @@ projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
 		else cp -pv "$$i" "projects/$${i:8}"; fi ; done
+	touch projects/NDK_3.9.info
 
 download/NDK39.lha:
 	mkdir -p download
