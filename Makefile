@@ -338,9 +338,9 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
 	cp patches/vc.config build/vasm/vc.config
-	sed -e 's/\PREFIX/$(subst /,\/,$(PREFIX))/' -i build/vasm/vc.config
+	sed -e "s|PREFIX|$(PREFIX)|g" -i build/vasm/vc.config
 	mkdir -p $(PREFIX)/m68k-amigaos/etc/
-	install build/vasm/vc.config $(PREFIX)/m68k-amigaos/etc/
+	install build/vasm/vc.config $(PREFIX)/bin/
 	@echo "done" >$@
 	@echo "built $(vasm)"
 
