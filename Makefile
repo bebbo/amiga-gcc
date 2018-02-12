@@ -220,7 +220,7 @@ build/binutils/_done: build/binutils/Makefile $(shell find 2>/dev/null $(BINUTIL
 	touch -d19710101 projects/binutils/binutils/arparse.y
 	touch -d19710101 projects/binutils/binutils/arlex.l
 	touch -d19710101 projects/binutils/ld/ldgram.y
-	cd build/binutils && $(MAKE) 
+	cd build/binutils && $(MAKE)
 	cd build/binutils && $(MAKE) install
 	echo "done" >build/binutils/_done
 	echo "build $(BINUTILS)"
@@ -340,7 +340,7 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	cp patches/vc.config build/vasm/vc.config
 	sed -e 's/\PREFIX/$(subst /,\/,$(PREFIX))/' -i build/vasm/vc.config
 	mkdir -p $(PREFIX)/m68k-amigaos/etc/
-	install build/vasm/vc.config $(PREFIX)/m68k-amigaos/etc/ 
+	install build/vasm/vc.config $(PREFIX)/m68k-amigaos/etc/
 	@echo "done" >$@
 	@echo "built $(vasm)"
 
@@ -417,7 +417,7 @@ SYS_INCLUDE2 = $(filter-out $(SYS_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Inc
 
 sys-include2: build/sys-include/_done2
 
-build/sys-include/_done2: projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INLINE) $(SYS_INCLUDE_LVO) $(SYS_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile 
+build/sys-include/_done2: projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INLINE) $(SYS_INCLUDE_LVO) $(SYS_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
 	mkdir -p $(PREFIX)/m68k-amigaos/sys-include
 	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/sys-include --exclude proto
 	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/sys-include
@@ -437,15 +437,15 @@ build/sys-include/_done2: projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INL
 
 sys-inline: $(SYS_INCLUDE_INLINE)
 $(SYS_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) build/sys-include/_inline build/sys-include/_lvo build/sys-include/_proto
-	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 sys-lvo: $(SYS_INCLUDE_LVO)
 $(SYS_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
-	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 sys-proto: $(SYS_INCLUDE_PROTO)
 $(SYS_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	
-	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) 
+	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 build/sys-include/_inline:
 	mkdir -p $(PREFIX)/m68k-amigaos/sys-include/inline
@@ -462,7 +462,7 @@ build/sys-include/_proto:
 	mkdir -p build/sys-include/
 	echo "done" >$@
 
-projects/NDK_3.9.info: download/NDK39.lha
+projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
 	mkdir -p projects
 	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
 	cd projects && lha x ../download/NDK39.lha
@@ -512,7 +512,7 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 
 libnix: build/libnix/_done
 
-build/libnix/_done: build/libnix/Makefile 
+build/libnix/_done: build/libnix/Makefile
 	cd build/libnix && $(MAKE)
 	cd build/libnix && $(MAKE) install
 	@echo "done" >build/libnix/_done
@@ -572,7 +572,7 @@ build/gcc/_libgcc_done: build/libnix/_done $(LIBAMIGA)
 clib2: build/clib2/_done
 
 build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/Makefile $(LIBAMIGA)
-	mkdir -p build/clib2/ 
+	mkdir -p build/clib2/
 	rsync -a projects/clib2/library/* build/clib2
 	cd build/clib2 && $(MAKE) -f GNUmakefile.68k
 	mkdir -p $(PREFIX)/m68k-amigaos/clib2
@@ -587,7 +587,7 @@ projects/clib2/LICENSE:
 # =================================================
 # libdebug
 # =================================================
-CONFIG_LIBDEBUG = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos 
+CONFIG_LIBDEBUG = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
 
 libdebug: build/libdebug/_done
 
@@ -607,7 +607,7 @@ projects/libdebug/configure:
 # =================================================
 # libsdl
 # =================================================
-CONFIG_LIBSDL12 = PREFX=$(PREFIX) PREF=$(PREFIX)  
+CONFIG_LIBSDL12 = PREFX=$(PREFIX) PREF=$(PREFIX)
 
 libSDL12: build/libSDL12/_done
 
@@ -622,7 +622,7 @@ build/libSDL12/_done: build/libSDL12/Makefile.bax
 build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
 	mkdir -p build/libSDL12
 	rsync -a projects/libSDL12/* build/libSDL12
-	touch build/libSDL12/Makefile.bax 
+	touch build/libSDL12/Makefile.bax
 
 projects/libSDL12/Makefile.bax:
 	@mkdir -p projects
