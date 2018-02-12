@@ -338,7 +338,7 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
 	cp patches/vc.config build/vasm/vc.config
-	sed -e "s|PREFIX|$(PREFIX)|g" -i build/vasm/vc.config
+	sed -e 's/\PREFIX/$(subst /,\/,$(PREFIX))/' -i build/vasm/vc.config
 	mkdir -p $(PREFIX)/m68k-amigaos/etc/
 	install build/vasm/vc.config $(PREFIX)/bin/
 	@echo "done" >$@
@@ -616,7 +616,11 @@ build/libSDL12/_done: build/libSDL12/Makefile.bax
 	$(MAKE) sdk=cgx
 	cd build/libSDL12 && $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
-	rsync -a build/libSDL12/include/*.h $(PREFIX)/m68k-amigaos/include
+	mkdir -p $(PREFIX)/m68k-amigaos/include/GL
+	mkdir -p $(PREFIX)/m68k-amigaos/include/SDL
+	rsync -a build/libSDL12/include/GL/*.i $(PREFIX)/m68k-amigaos/include/GL/
+	rsync -a build/libSDL12/include/GL/*.h $(PREFIX)/m68k-amigaos/include/GL/
+	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
 	echo "done" >build/libSDL12/_done
 
 build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
