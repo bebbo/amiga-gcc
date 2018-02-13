@@ -1,0 +1,63 @@
+Short:        API for TCP/IP stack as shared library
+Author:       amitcp-group@hut.fi (The AmiTCP/IP Group)
+Uploader:     amitcp-group hut fi
+Type:         comm/net
+Version:      2.2
+Architecture: m68k-amigaos
+
+Url: http://aminet.net/comm/tcp/AmiTCP-api-22.lha
+
+AmiTCP-2.2/netinclude/arpa/inet.h
+AmiTCP-2.2/netinclude/bsdsocket.h
+AmiTCP-2.2/netinclude/charread.h
+AmiTCP-2.2/netinclude/clib/
+AmiTCP-2.2/netinclude/clib/socket_inlines.h
+AmiTCP-2.2/netinclude/clib/socket_protos.h
+AmiTCP-2.2/netinclude/devices/
+AmiTCP-2.2/netinclude/devices/sana2.h
+AmiTCP-2.2/netinclude/devices/sana2.i
+AmiTCP-2.2/netinclude/devices/sana2specialstats.h
+AmiTCP-2.2/netinclude/devices/sana2specialstats.i
+AmiTCP-2.2/netinclude/errno.h
+AmiTCP-2.2/netinclude/fd/
+AmiTCP-2.2/netinclude/fd/socket_lib.fd
+AmiTCP-2.2/netinclude/grp.h
+AmiTCP-2.2/netinclude/inetd.h
+AmiTCP-2.2/netinclude/inetdlib.h
+AmiTCP-2.2/netinclude/inline/
+AmiTCP-2.2/netinclude/inline/socket.h
+AmiTCP-2.2/netinclude/lineread.h
+AmiTCP-2.2/netinclude/net/
+AmiTCP-2.2/netinclude/net/if.h
+AmiTCP-2.2/netinclude/net/if_arp.h
+AmiTCP-2.2/netinclude/net/route.h
+AmiTCP-2.2/netinclude/net/sana2errno.h
+AmiTCP-2.2/netinclude/net/sana2tags.h
+AmiTCP-2.2/netinclude/netdb.h
+AmiTCP-2.2/netinclude/netinet/
+AmiTCP-2.2/netinclude/netinet/in.h
+AmiTCP-2.2/netinclude/netinet/in_systm.h
+AmiTCP-2.2/netinclude/netinet/ip.h
+AmiTCP-2.2/netinclude/netinet/ip_icmp.h
+AmiTCP-2.2/netinclude/netinet/ip_var.h
+AmiTCP-2.2/netinclude/netinet/tcp.h
+AmiTCP-2.2/netinclude/netinet/udp.h
+AmiTCP-2.2/netinclude/pragmas/
+AmiTCP-2.2/netinclude/pragmas/socket_pragmas.h
+AmiTCP-2.2/netinclude/proto/
+AmiTCP-2.2/netinclude/proto/socket.h
+AmiTCP-2.2/netinclude/protocols/
+AmiTCP-2.2/netinclude/protocols/dumprestore.h
+AmiTCP-2.2/netinclude/protocols/routed.h
+AmiTCP-2.2/netinclude/protocols/rwhod.h
+AmiTCP-2.2/netinclude/protocols/talkd.h
+AmiTCP-2.2/netinclude/protocols/timed.h
+AmiTCP-2.2/netinclude/pwd.h
+AmiTCP-2.2/netinclude/sys/
+AmiTCP-2.2/netinclude/sys/errno.h
+AmiTCP-2.2/netinclude/sys/ioctl.h
+AmiTCP-2.2/netinclude/sys/param.h
+AmiTCP-2.2/netinclude/sys/socket.h
+AmiTCP-2.2/netinclude/sys/syslog.h
+AmiTCP-2.2/netinclude/sys/time.h
+AmiTCP-2.2/netinclude/sys/types.h
