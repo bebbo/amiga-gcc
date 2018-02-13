@@ -621,11 +621,11 @@ build/libSDL12/_done: build/libSDL12/Makefile.bax
 	$(MAKE) sdk=cgx
 	cd build/libSDL12 && $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
-	mkdir -p $(PREFIX)/m68k-amigaos/include/GL
-	mkdir -p $(PREFIX)/m68k-amigaos/include/SDL
-	rsync -a build/libSDL12/include/GL/*.i $(PREFIX)/m68k-amigaos/include/GL/
-	rsync -a build/libSDL12/include/GL/*.h $(PREFIX)/m68k-amigaos/include/GL/
-	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
+	mkdir -p $(PREFIX)/include/GL
+	mkdir -p $(PREFIX)/include/SDL
+	rsync -a build/libSDL12/include/GL/*.i $(PREFIX)/include/GL/
+	rsync -a build/libSDL12/include/GL/*.h $(PREFIX)/include/GL/
+	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX)/include/SDL/
 	echo "done" >build/libSDL12/_done
 
 build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
