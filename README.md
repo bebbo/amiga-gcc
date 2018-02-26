@@ -17,7 +17,7 @@ Right now these tools are build:
 # Short Guide
 ## Prerequisites
 ### Ubuntu
-`sudo apt install make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex`
+`sudo apt install make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext`
 ## Howto Clone and Download All You Need
 ```
 git clone https://github.com/bebbo/amiga-gcc
