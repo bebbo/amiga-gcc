@@ -8,20 +8,20 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-PREFIX=/opt/amiga
+PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
 SHELL = /bin/bash
 
-GCCBRANCH=gcc-6-branch
-GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
+GCCBRANCH ?= gcc-6-branch
+GCCVERSION = $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
-CFLAGS=-Os
+CFLAGS?=-Os
 CPPFLAGS=$(CFLAGS)
 CXXFLAGS=$(CFLAGS)
-E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+TARGET_C_FLAGS?=-Os -g -fomit-frame-pointer
 
-# cross compile:
-A=CFLAGS="-Os" CPPFLAGS="-Os" CXXFLAGS="-Os"
+E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" TARGET_C_FLAGS="$(TARGET_C_FLAGS)"
+
 
 # =================================================
 # determine exe extension for cygwin
@@ -43,16 +43,17 @@ x:
 # =================================================
 .PHONY: help
 help:
-	@echo "make help 		display this help"
-	@echo "make all 		build and install all"
-	@echo "make <target>		builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12"
-	@echo "make clean		remove the build folder"
+	@echo "make help            display this help"
+	@echo "make info            print prefix and other flags"
+	@echo "make all             build and install all"
+	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12"
+	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
-	@echo "make clean-prefix	remove all content from the prefix folder"
-	@echo "make update		perform git pull for all targets"
-	@echo "make update-<target>	perform git pull for the given target"
-	@echo "make sdk=<sdk>		install the sdk <sdk>"
-	@echo "make all-sdk		install all sdks"
+	@echo "make clean-prefix    remove all content from the prefix folder"
+	@echo "make update          perform git pull for all targets"
+	@echo "make update-<target> perform git pull for the given target"
+	@echo "make sdk=<sdk>       install the sdk <sdk>"
+	@echo "make all-sdk         install all sdks"
 
 # =================================================
 # all
@@ -535,7 +536,7 @@ build/libnix/Makefile: build/sys-include/_done build/sys-include/_done2 build/bi
 	if [ ! -e $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/libnix/lib/libnix/libstubs.a; fi
 	mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)
 	if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/lib/gcc/m68k-amigaos/$(GCCVERSION)/libgcc.a; fi
-	cd build/libnix && AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
+	cd build/libnix && CFLAGS="$(TARGET_C_FLAGS)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX)
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
 	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	touch build/libnix/Makefile
@@ -603,7 +604,7 @@ build/libdebug/_done: build/libdebug/Makefile
 
 build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	mkdir -p build/libdebug
-	cd build/libdebug && $(A) $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG)
+	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG)
 
 projects/libdebug/configure:
 	@mkdir -p projects
@@ -619,7 +620,7 @@ libSDL12: build/libSDL12/_done
 build/libSDL12/_done: build/libSDL12/Makefile.bax
 	$(MAKE) sdk=ahi
 	$(MAKE) sdk=cgx
-	cd build/libSDL12 && $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
+	cd build/libSDL12 && "CFLAGS=$(TARGET_C_FLAGS)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
 	mkdir -p $(PREFIX)/include/GL
 	mkdir -p $(PREFIX)/include/SDL
@@ -652,3 +653,11 @@ all-sdk: $(SDKS)
 
 $(SDKS): libnix
 	$(MAKE) sdk=$@
+	
+info:
+	@echo PREFIX=$(PREFIX)
+	@echo GCCBRANCH=$(GCCBRANCH)
+	@echo GCCVERSION=$(GCCVERSION)
+	@echo CFLAGS=$(CFLAGS)
+	@echo TARGET_C_FLAGS=$(TARGET_C_FLAGS)
+	
