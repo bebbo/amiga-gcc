@@ -620,7 +620,7 @@ libSDL12: build/libSDL12/_done
 build/libSDL12/_done: build/libSDL12/Makefile.bax
 	$(MAKE) sdk=ahi
 	$(MAKE) sdk=cgx
-	cd build/libSDL12 && "CFLAGS=$(TARGET_C_FLAGS)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
+	cd build/libSDL12 && CFLAGS="$(TARGET_C_FLAGS)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12)
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
 	mkdir -p $(PREFIX)/include/GL
 	mkdir -p $(PREFIX)/include/SDL
