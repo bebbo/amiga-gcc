@@ -169,7 +169,7 @@ update-libdebug: projects/libdebug/configure
 update-libSDL12: projects/libSDL12/Makefile.bax
 	cd projects/libSDL12 && git pull
 
-update-ndk: build/sys-include/_done2
+update-ndk: projects/NDK_3.9.info
 
 status-all:
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
@@ -442,15 +442,15 @@ build/sys-include/_done2: projects/NDK_3.9.info $(NDK_INCLUDE) $(SYS_INCLUDE_INL
 	mkdir -p build/sys-include/
 	echo "done" >$@
 
-sys-inline: $(SYS_INCLUDE_INLINE)
+sys-inline: $(SYS_INCLUDE_INLINE) sfdc
 $(SYS_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) build/sys-include/_inline build/sys-include/_lvo build/sys-include/_proto
 	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
-sys-lvo: $(SYS_INCLUDE_LVO)
+sys-lvo: $(SYS_INCLUDE_LVO) sfdc
 $(SYS_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)
 	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
-sys-proto: $(SYS_INCLUDE_PROTO)
+sys-proto: $(SYS_INCLUDE_PROTO) sfdc
 $(SYS_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	
 	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/sys-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
