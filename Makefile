@@ -472,7 +472,7 @@ build/sys-include/_proto:
 projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
 	mkdir -p projects
 	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
-	cd projects && lha x ../download/NDK39.lha
+	cd projects && lha xf ../download/NDK39.lha
 	touch -d19710101 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
