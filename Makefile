@@ -122,8 +122,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk
 
 update-gcc: projects/gcc/configure
 	cd projects/gcc && export DEPTH=4; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -168,7 +168,9 @@ update-libdebug: projects/libdebug/configure
 
 update-libSDL12: projects/libSDL12/Makefile.bax
 	cd projects/libSDL12 && git pull
-	
+
+update-ndk: build/sys-include/_done2
+
 status-all:
 	GCCVERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 # =================================================
