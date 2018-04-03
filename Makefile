@@ -611,6 +611,7 @@ build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell 
 projects/libdebug/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
+	touch -d19710101 projects/libdebug/configure.ac
 
 # =================================================
 # libsdl
