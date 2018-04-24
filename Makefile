@@ -221,9 +221,9 @@ BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 binutils: build/binutils/_done
 
 build/binutils/_done: build/binutils/Makefile $(shell find 2>/dev/null $(BINUTILSD) -maxdepth 1 -type f)
-	touch -d19710101 projects/binutils/binutils/arparse.y
-	touch -d19710101 projects/binutils/binutils/arlex.l
-	touch -d19710101 projects/binutils/ld/ldgram.y
+	touch -t 0001010000 projects/binutils/binutils/arparse.y
+	touch -t 0001010000 projects/binutils/binutils/arlex.l
+	touch -t 0001010000 projects/binutils/ld/ldgram.y
 	cd build/binutils && $(MAKE)
 	cd build/binutils && $(MAKE) install
 	echo "done" >build/binutils/_done
@@ -473,7 +473,7 @@ projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3
 	mkdir -p projects
 	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) /usr/bin; fi
 	cd projects && lha xf ../download/NDK39.lha
-	touch -d19710101 download/NDK39.lha
+	touch -t 0001010000 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
@@ -611,7 +611,7 @@ build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell 
 projects/libdebug/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
-	touch -d19710101 projects/libdebug/configure.ac
+	touch -t 0001010000 projects/libdebug/configure.ac
 
 # =================================================
 # libsdl
