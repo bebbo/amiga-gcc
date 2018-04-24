@@ -200,6 +200,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure projects/ixemul/configure build/binutils/_done
 	@mkdir -p build/gcc
+	[ "$(uname)" != "Darwin" ] && cd build/gcc && contrib/download_prerequisites
 	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC)
 
 projects/gcc/configure:
@@ -345,7 +346,7 @@ build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -no
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
 	cp patches/vc.config build/vasm/vc.config
-	sed -e "s|PREFIX|$(PREFIX)|g" -i build/vasm/vc.config
+	sed -e "s|PREFIX|$(PREFIX)|g" -i.bak build/vasm/vc.config
 	mkdir -p $(PREFIX)/m68k-amigaos/etc/
 	install build/vasm/vc.config $(PREFIX)/bin/
 	@echo "done" >$@
@@ -371,6 +372,7 @@ build/vbcc/_done: build/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -no
 	cd build/vbcc && echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt
 	cd build/vbcc && TARGET=m68k $(MAKE)
 	mkdir -p $(PREFIX)/bin/
+	rm -rf build/vbcc/bin/*.dSYM
 	install build/vbcc/bin/v* $(PREFIX)/bin/
 	@echo "done" >$@
 	@echo "built $(VBCC)"
