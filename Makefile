@@ -200,7 +200,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure projects/ixemul/configure build/binutils/_done
 	@mkdir -p build/gcc
-	[ "$(uname)" != "Darwin" ] && cd build/gcc && contrib/download_prerequisites
+	[ "$(uname)" == "Darwin" ] && cd build/gcc && contrib/download_prerequisites
 	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC)
 
 projects/gcc/configure:
