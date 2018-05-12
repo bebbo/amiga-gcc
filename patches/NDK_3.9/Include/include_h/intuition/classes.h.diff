@@ -1,0 +1,30 @@
+--- /old/Include/include_h/intuition/classes.h	2001-12-17 14:16:30.000000000 +0100
++++ /new/Include/include_h/intuition/classes.h	2018-05-09 20:00:44.813785900 +0200
+@@ -48,7 +48,12 @@
+     ULONG		 cl_ObjectCount;	/* Number of objects */
+     ULONG		 cl_Flags;
+ 
+-} Class;
++}
++#ifdef __OBJC__
++  IntuitionClass;
++#else
++  Class;
++#endif 
+ 
+ #define	CLF_INLIST	0x00000001L
+     /* class is in public class list */
+@@ -106,7 +111,12 @@
+ {
+     struct Library	 cl_Lib;	/* Embedded library */
+     UWORD		 cl_Pad;	/* Align the structure */
+-    Class		*cl_Class;	/* Class pointer */
++#ifdef __OBJC__	
++	IntuitionClass
++#else
++	Class
++#endif 
++			*cl_Class;	/* Class pointer */
+ 
+ };
+ 
