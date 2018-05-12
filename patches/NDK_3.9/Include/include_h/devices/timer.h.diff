@@ -1,20 +1,11 @@
---- NDK_3.9/Include/include_h/devices/timer.h	Wed Aug 30 16:13:01 1995
-+++ NDK_3.9/Include/include_h/devices/timer.h	Sat Aug 10 15:53:59 1996
-@@ -27,10 +27,17 @@
- 
- #define TIMERNAME	"timer.device"
- 
-+#ifndef _SYS_TIME_H_
-+/* Use whatever was included first, standard (sys/time.h) or Amiga
-+ * includes (jch). */
- struct timeval {
+--- /old/Include/include_h/devices/timer.h	2001-12-17 14:03:44.000000000 +0100
++++ /new/Include/include_h/devices/timer.h	2018-05-07 09:55:38.850775200 +0200
+@@ -31,6 +31,8 @@
      ULONG tv_secs;
      ULONG tv_micro;
  };
-+#else
-+#define tv_secs  tv_sec
-+#define tv_micro tv_usec
-+#endif
++#define tv_sec tv_secs
++#define tv_usec tv_micro 
  
  struct EClockVal {
      ULONG ev_hi;
