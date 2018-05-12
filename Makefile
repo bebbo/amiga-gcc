@@ -184,7 +184,7 @@ update-libSDL12: projects/libSDL12/Makefile.bax
 
 update-ndk: projects/NDK_3.9.info
 
-update-newlib: projects/libnix/configure
+update-newlib: projects/newlib-cygwin/newlib/configure
 	cd projects/newlib-cygwin && git pull
 
 
