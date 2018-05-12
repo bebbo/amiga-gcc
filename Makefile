@@ -683,7 +683,7 @@ newlib: build/newlib/_done
 build/newlib/_done: build/newlib/newlib/libc.a
 	echo "done" >$@
 
-build/newlib/newlib/libc.a: build/newlib/newlib/Makefile $(NEWLIB_FILES)
+build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk $(NEWLIB_FILES)
 	cd build/newlib/newlib && $(MAKE)
 	cd build/newlib/newlib && $(MAKE) install
 	touch $@
