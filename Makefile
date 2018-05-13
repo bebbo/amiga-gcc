@@ -699,6 +699,13 @@ projects/newlib-cygwin/newlib/configure:
 	cd projects &&	git clone -b amiga --depth 4  https://github.com/bebbo/newlib-cygwin
 
 # =================================================
+# ixemul
+# =================================================
+projects/ixemul/configure:
+	@mkdir -p projects
+	cd projects &&	git clone https://github.com/bebbo/ixemul
+
+# =================================================
 # sdk installation
 # =================================================
 .PHONY: sdk all-sdk
