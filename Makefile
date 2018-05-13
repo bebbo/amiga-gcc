@@ -513,9 +513,9 @@ download/NDK39.lha:
 
 .PHONY: ndk13
 
-ndk13: build/ndk-include/_ndk
+ndk13: build/ndk-include/_ndk13
 
-build/ndk-include/_ndk:
+build/ndk-include/_ndk13: build/ndk-include/_ndk
 	while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
 	while read p; do \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
