@@ -564,7 +564,7 @@ build/libnix/_done: build/libnix/Makefile
 	@echo "done" >$@
 	@echo "built $(LIBNIX)"
 		
-build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC)
+build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC)
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
 	mkdir -p build/libnix
 	echo 'void foo(){}' > build/libnix/x.c
