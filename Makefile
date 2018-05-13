@@ -533,6 +533,7 @@ ndk13: build/ndk-include/_ndk
 	  sfdc --target=m68k-amigaos --mode=macros --output=$(PREFIX)/m68k-amigaos/ndk13-include/inline/$$(basename $$i _lib.sfd).h $$i; \
 	  sfdc --target=m68k-amigaos --mode=proto --output=$(PREFIX)/m68k-amigaos/ndk13-include/proto/$$(basename $$i _lib.sfd).h $$i; \
 	done
+	echo "done" >$@
 
 # =================================================
 # netinclude
