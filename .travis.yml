@@ -3,8 +3,7 @@ before_install: sudo apt-get install make git gcc g++ lhasa libgmp-dev libmpfr-d
 install: make update -j
 script: 
 - make info PREFIX=$PWD/prefix
-- make all -j4 PREFIX=$PWD/prefix >.build.log
-- make sdk=mui -j4 PREFIX=$PWD/prefix >>.build.log
-- make sdk=mmu -j4 PREFIX=$PWD/prefix >>.build.log
+- make all -j PREFIX=$PWD/prefix >.build.log || tail -n 999 .build.log
+- make sdk=mui -j4 PREFIX=$PWD/prefix >.build.log || tail -n 999 .build.log
+- make sdk=mmu -j4 PREFIX=$PWD/prefix >.build.log || tail -n 999 .build.log
 - echo "done"
-
