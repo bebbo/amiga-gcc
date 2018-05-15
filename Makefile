@@ -495,7 +495,7 @@ build/ndk-include/_proto:
 projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
 	mkdir -p projects
 	mkdir -p build
-	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; install src/lha$(EXEEXT) $(PREFIX)/bin; fi
+	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; mkdir -p $(PREFIX)/bin/; install src/lha$(EXEEXT) $(PREFIX)/bin/lha$(EXEEXT); fi
 	cd projects && lha xf ../download/NDK39.lha
 	touch -t 0001010000 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
