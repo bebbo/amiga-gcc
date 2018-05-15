@@ -26,7 +26,7 @@ TARGET_C_FLAGS?=-Os -g -fomit-frame-pointer
 
 E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR_TARGET="$(TARGET_C_FLAGS)"
 
-LOG = >& $(PWD)/x.log || tail -n 999 $(PWD)/x.log
+#LOG = >& $(PWD)/x.log || tail -n 999 $(PWD)/x.log
 
 # =================================================
 # determine exe extension for cygwin
