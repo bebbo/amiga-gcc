@@ -17,7 +17,19 @@ Right now these tools are build:
 # Short Guide
 ## Prerequisites
 ### Ubuntu
-`sudo apt install make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext`
+`sudo apt install make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext texinfo`
+### Windows with Cygwin
+Install cygwin via setup.exe and add wget. Then open cygwin shell and run:
+
+```
+wget https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg
+install apt-cyg /bin
+apt-cyg install gcc-core gcc-g++ python git perl-Pod-Simple gperf patch automake make makedepend bison flex libncurses-devel python-devel gettext-devel libgmp-devel libmpc-devel libmpfr-devel
+```
+
+### Ubuntu running on the Windows 10 Linux subsystem
+tbd
+
 ## Howto Clone and Download All You Need
 ```
 git clone https://github.com/bebbo/amiga-gcc
@@ -57,4 +69,4 @@ make clean
 make clean-prefix
 date; make all -j3 >&b.log; date
 ```
-takes roughly 10 minutes on my laptop running ubuntu.
+takes roughly 10 minutes on my laptop running ubuntu. takes forever running cygwin on windows^^.
