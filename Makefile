@@ -686,8 +686,38 @@ NEWLIB_FILES = $(shell find 2>/dev/null projects/newlib-cygwin/newlib -type f)
 .PHONY: newlib
 newlib: build/newlib/_done
 
-build/newlib/_done: build/newlib/newlib/libc.a
+COMPLEX_FILES = lib_a-cabs.o   lib_a-cacosf.o   lib_a-cacosl.o  lib_a-casin.o    lib_a-casinhl.o  lib_a-catanh.o   lib_a-ccos.o    lib_a-ccoshl.o        lib_a-cephes_subrl.o  lib_a-cimag.o   lib_a-clog10.o   lib_a-conj.o   lib_a-cpowf.o   lib_a-cprojl.o  lib_a-csin.o    lib_a-csinhl.o  lib_a-csqrtl.o  lib_a-ctanhf.o \
+	lib_a-cabsf.o  lib_a-cacosh.o   lib_a-carg.o    lib_a-casinf.o   lib_a-casinl.o   lib_a-catanhf.o  lib_a-ccosf.o   lib_a-ccosl.o         lib_a-cexp.o          lib_a-cimagf.o  lib_a-clog10f.o  lib_a-conjf.o  lib_a-cpowl.o   lib_a-creal.o   lib_a-csinf.o   lib_a-csinl.o   lib_a-ctan.o    lib_a-ctanhl.o \
+	lib_a-cabsl.o  lib_a-cacoshf.o  lib_a-cargf.o   lib_a-casinh.o   lib_a-catan.o    lib_a-catanhl.o  lib_a-ccosh.o   lib_a-cephes_subr.o   lib_a-cexpf.o         lib_a-cimagl.o  lib_a-clogf.o    lib_a-conjl.o  lib_a-cproj.o   lib_a-crealf.o  lib_a-csinh.o   lib_a-csqrt.o   lib_a-ctanf.o   lib_a-ctanl.o \
+	lib_a-cacos.o  lib_a-cacoshl.o  lib_a-cargl.o   lib_a-casinhf.o  lib_a-catanf.o   lib_a-catanl.o   lib_a-ccoshf.o  lib_a-cephes_subrf.o  lib_a-cexpl.o         lib_a-clog.o    lib_a-clogl.o    lib_a-cpow.o   lib_a-cprojf.o  lib_a-creall.o  lib_a-csinhf.o  lib_a-csqrtf.o  lib_a-ctanh.o 
+
+build/newlib/_done: build/newlib/newlib/libc.a $(PREFIX)/m68k-amigaos/lib/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a
 	echo "done" >$@
+
+$(PREFIX)/m68k-amigaos/lib/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm.a  build/newlib/newlib/libc.a
+	mkdir -p build/newlib/complex
+	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libcomplex.a $(COMPLEX_FILES)
+
+$(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libb/libm.a build/newlib/newlib/libc.a
+	mkdir -p build/newlib/complex/libb
+	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a $(COMPLEX_FILES)
+
+$(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libm.a build/newlib/newlib/libc.a
+	mkdir -p build/newlib/complex/libm020
+	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a $(COMPLEX_FILES)
+
+$(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libb/libm.a build/newlib/newlib/libc.a
+	mkdir -p build/newlib/complex/libm020/libb
+	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a $(COMPLEX_FILES)
+
+$(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a build/newlib/newlib/libc.a
+	mkdir -p build/newlib/complex/libm020/libb32
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a $(COMPLEX_FILES)
 
 build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk $(NEWLIB_FILES)
 	cd build/newlib/newlib && $(MAKE) $(LOG)
