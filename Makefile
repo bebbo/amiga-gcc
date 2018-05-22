@@ -51,7 +51,7 @@ help:
 	@echo "make help            display this help"
 	@echo "make info            print prefix and other flags"
 	@echo "make all             build and install all"
-	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12"
+	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
 	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix    remove all content from the prefix folder"
@@ -64,8 +64,8 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk13
+.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 
 # =================================================
 # clean
@@ -212,9 +212,9 @@ GCCD = $(patsubst %,projects/gcc/%, $(GCC_DIR))
 
 gcc: build/gcc/_done
 
-build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f ) build/binutils/_done
-	cd build/gcc && $(MAKE) all-gcc $(LOG)
-	cd build/gcc && $(MAKE) install-gcc $(LOG)
+build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f )
+	$(MAKE) -C build/gcc all-gcc $(LOG)
+	$(MAKE) -C build/gcc install-gcc $(LOG)
 	echo "done" >$@
 	@echo "built $(GCC)"
 
@@ -241,16 +241,16 @@ BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 
 binutils: build/binutils/_done
 
-build/binutils/_done: build/binutils/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -type f)
+build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -type f)
 	touch -t 0001010000 projects/binutils/binutils/arparse.y
 	touch -t 0001010000 projects/binutils/binutils/arlex.l
 	touch -t 0001010000 projects/binutils/ld/ldgram.y
-	cd build/binutils && $(MAKE) all-gas all-binutils all-ld $(LOG)
-	cd build/binutils && $(MAKE) install-gas install-binutils install-ld $(LOG)
+	$(MAKE) -C build/binutils all-gas all-binutils all-ld $(LOG)
+	$(MAKE) -C build/binutils install-gas install-binutils install-ld $(LOG)
 	echo "done" >$@
 	echo "build $(BINUTILS)"
 
-build/binutils/Makefile: projects/binutils/configure
+build/binutils/gas/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
 	cd build/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
 
@@ -271,9 +271,9 @@ build/fd2sfd/_done: $(PREFIX)/bin/fd2sfd
 	@echo "done" >$@
 
 $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
-	cd build/fd2sfd && $(MAKE) all $(LOG)
+	$(MAKE) -C build/fd2sfd all $(LOG)
 	mkdir -p $(PREFIX)/bin/
-	cd build/fd2sfd && $(MAKE) install $(LOG)
+	$(MAKE) -C build/fd2sfd install $(LOG)
 build/fd2sfd/Makefile: projects/fd2sfd/configure
 	@mkdir -p build/fd2sfd
 	cd build/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
@@ -336,7 +336,7 @@ build/sfdc/_done: $(PREFIX)/bin/sfdc
 	@echo "done" >$@
 
 $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
-	cd build/sfdc && $(MAKE) sfdc $(LOG)
+	$(MAKE) -C build/sfdc sfdc $(LOG)
 	mkdir -p $(PREFIX)/bin/
 	install build/sfdc/sfdc $(PREFIX)/bin
 
@@ -357,7 +357,7 @@ VASM = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VASM_CMD))
 vasm: build/vasm/_done
 
 build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
-	cd build/vasm && $(MAKE) CPU=m68k SYNTAX=mot $(LOG)
+	$(MAKE) -C build/vasm CPU=m68k SYNTAX=mot $(LOG)
 	mkdir -p $(PREFIX)/bin/
 	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
 	install build/vasm/vobjdump $(PREFIX)/bin/
@@ -437,9 +437,9 @@ NDK_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)
 NDK_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
 SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
 
-.PHONY: ndk-include2 ndk-inline ndk-lvo ndk-proto
+.PHONY: ndk-inline ndk-lvo ndk-proto
 
-ndk-include2: build/ndk-include/_ndk 
+ndk: build/ndk-include/_ndk 
 
 build/ndk-include/_ndk: build/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCLUDE_LVO) $(NDK_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
 	mkdir -p build/ndk-include/
@@ -512,8 +512,6 @@ download/NDK39.lha:
 # NDK1.3 - emulated from NDK
 # =================================================
 
-.PHONY: ndk13
-
 ndk13: build/ndk-include/_ndk13
 
 build/ndk-include/_ndk13: build/ndk-include/_ndk
@@ -560,8 +558,13 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 libnix: build/libnix/_done
 
 build/libnix/_done: build/libnix/Makefile
-	cd build/libnix && $(MAKE) $(LOG)
-	cd build/libnix && $(MAKE) install $(LOG)
+	$(MAKE) -C build/libnix $(LOG)
+	$(MAKE) -C build/libnix install $(LOG)
+	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	@echo "done" >$@
 	@echo "built $(LIBNIX)"
 		
@@ -603,8 +606,8 @@ LIBGCCS= $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCCS_
 libgcc: build/gcc/_libgcc_done
 
 build/gcc/_libgcc_done: build/libnix/_done $(LIBAMIGA)
-	cd build/gcc && $(MAKE) all-target $(LOG)
-	cd build/gcc && $(MAKE) install-target $(LOG)
+	$(MAKE) -C build/gcc all-target $(LOG)
+	$(MAKE) -C build/gcc install-target $(LOG)
 	echo "done" >$@
 	echo "$(LIBGCCS)"
 
@@ -617,10 +620,15 @@ clib2: build/clib2/_done
 build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/Makefile $(LIBAMIGA)
 	mkdir -p build/clib2/
 	rsync -a projects/clib2/library/* build/clib2
-	cd build/clib2 && $(MAKE) -f GNUmakefile.68k $(LOG)
+	$(MAKE) -C build/clib2 -f GNUmakefile.68k $(LOG)
 	mkdir -p $(PREFIX)/m68k-amigaos/clib2
 	rsync -a build/clib2/include $(PREFIX)/m68k-amigaos/clib2
 	rsync -a build/clib2/lib $(PREFIX)/m68k-amigaos/clib2
+	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	echo "done" >$@	
 
 projects/clib2/LICENSE:
@@ -635,7 +643,7 @@ CONFIG_LIBDEBUG = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
 libdebug: build/libdebug/_done
 
 build/libdebug/_done: build/libdebug/Makefile
-	cd build/libdebug && $(MAKE) $(LOG)
+	$(MAKE) -C build/libdebug $(LOG)
 	cp build/libdebug/libdebug.a $(PREFIX)/m68k-amigaos/lib/
 	echo "done" >$@
 
@@ -691,37 +699,22 @@ COMPLEX_FILES = lib_a-cabs.o   lib_a-cacosf.o   lib_a-cacosl.o  lib_a-casin.o   
 	lib_a-cabsl.o  lib_a-cacoshf.o  lib_a-cargf.o   lib_a-casinh.o   lib_a-catan.o    lib_a-catanhl.o  lib_a-ccosh.o   lib_a-cephes_subr.o   lib_a-cexpf.o         lib_a-cimagl.o  lib_a-clogf.o    lib_a-conjl.o  lib_a-cproj.o   lib_a-crealf.o  lib_a-csinh.o   lib_a-csqrt.o   lib_a-ctanf.o   lib_a-ctanl.o \
 	lib_a-cacos.o  lib_a-cacoshl.o  lib_a-cargl.o   lib_a-casinhf.o  lib_a-catanf.o   lib_a-catanl.o   lib_a-ccoshf.o  lib_a-cephes_subrf.o  lib_a-cexpl.o         lib_a-clog.o    lib_a-clogl.o    lib_a-cpow.o   lib_a-cprojf.o  lib_a-creall.o  lib_a-csinhf.o  lib_a-csqrtf.o  lib_a-ctanh.o 
 
-build/newlib/_done: build/newlib/newlib/libc.a $(PREFIX)/m68k-amigaos/lib/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a
+build/newlib/_done: build/newlib/newlib/libc.a 
 	echo "done" >$@
 
-$(PREFIX)/m68k-amigaos/lib/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm.a  build/newlib/newlib/libc.a
+build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk $(NEWLIB_FILES)
+	$(MAKE) -C build/newlib/newlib $(LOG)
+	$(MAKE) -C build/newlib/newlib install $(LOG)
 	mkdir -p build/newlib/complex
 	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libcomplex.a $(COMPLEX_FILES)
-
-$(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libb/libm.a build/newlib/newlib/libc.a
 	mkdir -p build/newlib/complex/libb
 	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libb/libcomplex.a $(COMPLEX_FILES)
-
-$(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libm.a build/newlib/newlib/libc.a
 	mkdir -p build/newlib/complex/libm020
 	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libcomplex.a $(COMPLEX_FILES)
-
-$(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libb/libm.a build/newlib/newlib/libc.a
 	mkdir -p build/newlib/complex/libm020/libb
 	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libb/libcomplex.a $(COMPLEX_FILES)
-
-$(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a: $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a build/newlib/newlib/libc.a
 	mkdir -p build/newlib/complex/libm020/libb32
 	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libcomplex.a $(COMPLEX_FILES)
-
-build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk $(NEWLIB_FILES)
-	cd build/newlib/newlib && $(MAKE) $(LOG)
-	cd build/newlib/newlib && $(MAKE) install $(LOG)
 	touch $@
 
 build/newlib/newlib/Makefile: projects/newlib-cygwin/configure build/binutils/_done build/gcc/_done 
