@@ -717,7 +717,11 @@ build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk 
 	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	touch $@
 
-build/newlib/newlib/Makefile: projects/newlib-cygwin/configure build/binutils/_done build/gcc/_done 
+ifeq (,$(wildcard build/gcc/_done))
+build/newlib/newlib/Makefile: build/gcc/_done
+endif
+
+build/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	mkdir -p build/newlib/newlib
 	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
 
@@ -749,6 +753,7 @@ $(SDKS): libnix
 # =================================================
 # info
 # =================================================
+.PHONY: info v
 info:
 	@echo $@
 	@echo PREFIX=$(PREFIX)
@@ -759,3 +764,7 @@ info:
 	@echo TARGET_C_FLAGS=$(TARGET_C_FLAGS)
 	@echo BINUTILS_GIT=$(BINUTILS_GIT)
 	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
+
+v:
+	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 | grep commit) && cd ../..; done
+	@echo "." && git log -n1 | grep commit
