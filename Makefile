@@ -622,6 +622,7 @@ clib2: build/clib2/_done
 build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) build/libnix/Makefile $(LIBAMIGA)
 	mkdir -p build/clib2/
 	rsync -a projects/clib2/library/* build/clib2
+	cd build/clib2 && find * -name lib\*.a -delete
 	$(MAKE) -C build/clib2 -f GNUmakefile.68k $(LOG)
 	mkdir -p $(PREFIX)/m68k-amigaos/clib2
 	rsync -a build/clib2/include $(PREFIX)/m68k-amigaos/clib2
