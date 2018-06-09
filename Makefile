@@ -570,12 +570,11 @@ build/libnix/_done: build/libnix/Makefile
 	@echo "done" >$@
 	@echo "built $(LIBNIX)"
 		
-build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC)
+build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC) $(LIBAMIGA)
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
 	mkdir -p build/libnix
 	echo 'void foo(){}' > build/libnix/x.c
 	if [ ! -e $(PREFIX)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/lib/libstubs.a; fi
-	if [ ! -e $(PREFIX)/m68k-amigaos/lib/libamiga.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/lib/libamiga.a; fi
 	mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
 	cd build/libnix && CFLAGS="$(TARGET_C_FLAGS)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(LOG)
