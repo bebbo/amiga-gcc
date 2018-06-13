@@ -549,6 +549,20 @@ build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(
 projects/amiga-netinclude/README.md: 
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/amiga-netinclude
+
+# =================================================
+# libamiga
+# =================================================
+LIBAMIGA=$(PREFIX)/m68k-amigaos/lib/libamiga.a $(PREFIX)/m68k-amigaos/lib/libb/libamiga.a
+
+libamiga: $(LIBAMIGA)
+	@echo "built $(LIBAMIGA)"
+
+$(LIBAMIGA):
+	mkdir -p $(@D)
+	cp -p $(patsubst $(PREFIX)/m68k-amigaos/%,%,$@) $(@D)
+
+
 # =================================================
 # libnix
 # =================================================
@@ -585,18 +599,6 @@ build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-inclu
 projects/libnix/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libnix
-
-# =================================================
-# libamiga
-# =================================================
-LIBAMIGA=$(PREFIX)/m68k-amigaos/lib/libamiga.a $(PREFIX)/m68k-amigaos/lib/libb/libamiga.a
-
-libamiga: $(LIBAMIGA)
-	@echo "built $(LIBAMIGA)"
-
-$(LIBAMIGA):
-	mkdir -p $(@D)
-	cp -p $(patsubst $(PREFIX)/m68k-amigaos/%,%,$@) $(@D)
 
 # =================================================
 # gcc libs
