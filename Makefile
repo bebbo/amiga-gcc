@@ -16,8 +16,8 @@ GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
 GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
-BINUTILS_GIT ?= https://github.com/bebbo/amigaos-binutils-2.14
-BINUTILS_BRANCH ?= master
+BINUTILS_GIT ?= https://github.com/bebbo/binutils-gdb
+BINUTILS_BRANCH ?= amiga
 
 CFLAGS?=-Os
 CPPFLAGS=$(CFLAGS)
@@ -141,10 +141,15 @@ clean-prefix:
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
 
 update-gcc: projects/gcc/configure
-	cd projects/gcc && export DEPTH=4; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/gcc && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
+	a=($$(cd projects/binutils && git remote -v | grep origin | grep '(fetch)')); echo $${a[1]} ; \
+	if [[ "$${a[1]}" != "$(BINUTILS_GIT)x" ]]; then \
+	  rm -rf projects/binutils; \
+	  $(MAKE) projects/binutils/configure; \
+	fi
 	cd projects/binutils && git pull
 
 update-fd2fsd: projects/fd2sfd/configure
@@ -227,7 +232,7 @@ build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 
 projects/gcc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(GCC_BRANCH) --depth 4 https://github.com/bebbo/gcc
+	cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 https://github.com/bebbo/gcc
 
 # =================================================
 # binutils
@@ -247,8 +252,8 @@ build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null proje
 	touch -t 0001010000 projects/binutils/binutils/arparse.y
 	touch -t 0001010000 projects/binutils/binutils/arlex.l
 	touch -t 0001010000 projects/binutils/ld/ldgram.y
-	$(MAKE) -C build/binutils all-gas all-binutils all-ld $(LOG)
-	$(MAKE) -C build/binutils install-gas install-binutils install-ld $(LOG)
+	$(MAKE) -C build/binutils all-gas all-binutils all-ld all-gdb $(LOG)
+	$(MAKE) -C build/binutils install-gas install-binutils install-ld install-gdb $(LOG)
 	echo "done" >$@
 	echo "build $(BINUTILS)"
 
@@ -258,7 +263,7 @@ build/binutils/gas/Makefile: projects/binutils/configure
 
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 4 $(BINUTILS_GIT) binutils
+	cd projects &&	git clone -b $(BINUTILS_BRANCH) $(BINUTILS_GIT) binutils
 
 
 # =================================================
