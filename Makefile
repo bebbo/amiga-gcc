@@ -146,7 +146,7 @@ update-gcc: projects/gcc/configure
 
 update-binutils: projects/binutils/configure
 	a=($$(cd projects/binutils && git remote -v | grep origin | grep '(fetch)')); echo $${a[1]} ; \
-	if [[ "$${a[1]}" != "$(BINUTILS_GIT)x" ]]; then \
+	if [[ "$${a[1]}" != "$(BINUTILS_GIT)" ]]; then \
 	  rm -rf projects/binutils; \
 	  $(MAKE) projects/binutils/configure; \
 	fi
