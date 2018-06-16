@@ -201,7 +201,7 @@ status-all:
 # gcc
 # =================================================
 CONFIG_GCC=--prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
 
 
 GCC_CMD = m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
@@ -562,7 +562,6 @@ $(LIBAMIGA):
 	mkdir -p $(@D)
 	cp -p $(patsubst $(PREFIX)/m68k-amigaos/%,%,$@) $(@D)
 
-
 # =================================================
 # libnix
 # =================================================
@@ -584,7 +583,7 @@ build/libnix/_done: build/libnix/Makefile
 	@echo "done" >$@
 	@echo "built $(LIBNIX)"
 		
-build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBNIX_SRC) $(LIBAMIGA)
+build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC) 
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
 	mkdir -p build/libnix
 	echo 'void foo(){}' > build/libnix/x.c
