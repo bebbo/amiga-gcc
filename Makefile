@@ -149,8 +149,9 @@ update-binutils: projects/binutils/configure
 	if [[ "$${a[1]}" != "$(BINUTILS_GIT)" ]]; then \
 	  rm -rf projects/binutils; \
 	  $(MAKE) projects/binutils/configure; \
+	  $(MAKE) clean-binutils; \
 	fi
-	cd projects/binutils && git pull
+	cd projects/binutils && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 
 update-fd2fsd: projects/fd2sfd/configure
 	cd projects/fd2sfd && git pull
@@ -263,7 +264,7 @@ build/binutils/gas/Makefile: projects/binutils/configure
 
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(BINUTILS_BRANCH) $(BINUTILS_GIT) binutils
+	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(BINUTILS_GIT) binutils
 
 
 # =================================================
