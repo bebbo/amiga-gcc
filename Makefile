@@ -16,8 +16,8 @@ GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
 GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
-BINUTILS_GIT ?= https://github.com/bebbo/amigaos-binutils-2.14
-BINUTILS_BRANCH ?= master
+BINUTILS_GIT ?= https://github.com/bebbo/binutils-gdb
+BINUTILS_BRANCH ?= amiga
 
 CFLAGS?=-Os
 CPPFLAGS=$(CFLAGS)
@@ -253,8 +253,8 @@ build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null proje
 	touch -t 0001010000 projects/binutils/binutils/arparse.y
 	touch -t 0001010000 projects/binutils/binutils/arlex.l
 	touch -t 0001010000 projects/binutils/ld/ldgram.y
-	$(MAKE) -C build/binutils all-gas all-binutils all-ld $(LOG)
-	$(MAKE) -C build/binutils install-gas install-binutils install-ld $(LOG)
+	$(MAKE) -C build/binutils all-gas all-binutils all-ld all-gdb $(LOG)
+	$(MAKE) -C build/binutils install-gas install-binutils install-ld install-gdb $(LOG)
 	echo "done" >$@
 	echo "build $(BINUTILS)"
 
