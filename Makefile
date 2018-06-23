@@ -153,7 +153,7 @@ update-binutils: projects/binutils/configure
 	fi
 	cd projects/binutils && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 
-update-fd2fsd: projects/fd2sfd/configure
+update-fd2sfd: projects/fd2sfd/configure
 	cd projects/fd2sfd && git pull
 
 update-fd2pragma: projects/fd2pragma/makefile
