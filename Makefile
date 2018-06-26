@@ -231,7 +231,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
-	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
+#	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
 	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
 projects/gcc/configure:
