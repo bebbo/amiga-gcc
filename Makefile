@@ -31,8 +31,11 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR
 # =================================================
 # determine exe extension for cygwin
 $(eval MYMAKE = $(shell which make) )
-$(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)") )
+$(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)" 2>/dev/null) )
 EXEEXT=$(MYMAKEEXE:%=.exe)
+
+UNAME_S := $(shell uname -s)
+
 # =================================================
 
 .PHONY: x
@@ -228,7 +231,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
-	if [ "$(uname)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
+	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
 	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
 projects/gcc/configure:
@@ -247,14 +250,19 @@ BINUTILS = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 BINUTILS_DIR = . bfd gas ld binutils opcodes
 BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 
+ifneq ($(UNAME_S),"Darwin")
+ALL_GDB = all-gdb
+INSTALL_GDB = install-gdb
+endif
+
 binutils: build/binutils/_done
 
 build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -type f)
 	touch -t 0001010000 projects/binutils/binutils/arparse.y
 	touch -t 0001010000 projects/binutils/binutils/arlex.l
 	touch -t 0001010000 projects/binutils/ld/ldgram.y
-	$(MAKE) -C build/binutils all-gas all-binutils all-ld all-gdb $(LOG)
-	$(MAKE) -C build/binutils install-gas install-binutils install-ld install-gdb $(LOG)
+	$(MAKE) -C build/binutils all-gas all-binutils all-ld $(ALL_GDB) $(LOG)
+	$(MAKE) -C build/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(LOG)
 	echo "done" >$@
 	echo "build $(BINUTILS)"
 
