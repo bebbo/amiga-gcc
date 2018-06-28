@@ -316,7 +316,7 @@ $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
-	cd projects/fd2pragma && $(CC) -o ./$@ $(CFLAGS) fd2pragma.c
+	cd projects/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
