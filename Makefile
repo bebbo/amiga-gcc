@@ -337,7 +337,7 @@ $(PREFIX)/bin/ira: build/ira/ira
 
 build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
-	cd projects/ira && $(CC) -o ./$@ $(CFLAGS) *.c -std=c99
+	cd projects/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99
 
 projects/ira/Makefile:
 	@mkdir -p projects
