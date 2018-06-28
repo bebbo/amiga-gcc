@@ -210,7 +210,7 @@ status-all:
 # gcc
 # =================================================
 CONFIG_GCC=--prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
+	--with-headers=../../projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
 
 
 GCC_CMD = m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
@@ -232,7 +232,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
 #	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
-	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(LOG)
+	cd build/gcc && $(E) ../../projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
 projects/gcc/configure:
 	@mkdir -p projects
@@ -268,7 +268,7 @@ build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null proje
 
 build/binutils/gas/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
-	cd build/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
+	cd build/binutils && $(E) ../../projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
 
 projects/binutils/configure:
 	@mkdir -p projects
@@ -296,7 +296,7 @@ build/fd2sfd/Makefile: projects/fd2sfd/configure
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
+	cd projects &&	git clone -b master --depth 4 https://github.com/SteveMoody73/fd2sfd
 
 # =================================================
 # fd2pragma
@@ -740,7 +740,7 @@ endif
 
 build/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	mkdir -p build/newlib/newlib
-	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
+	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" ../../../projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
