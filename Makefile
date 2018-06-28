@@ -291,12 +291,15 @@ $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd
 	mkdir -p $(PREFIX)/bin/
 	$(MAKE) -C build/fd2sfd install $(LOG)
 build/fd2sfd/Makefile: projects/fd2sfd/configure
+	for i in $$(find patches/fd2sfd/ -type f); \
+	do if [[ "$$i" == *.diff ]] ; \
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
 	@mkdir -p build/fd2sfd
-	cd build/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
+	cd build/fd2sfd && $(E) ../../projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/SteveMoody73/fd2sfd
+	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
 
 # =================================================
 # fd2pragma
@@ -313,7 +316,7 @@ $(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
-	cd projects/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c
+	cd projects/fd2pragma && $(CC) -o ./$@ $(CFLAGS) fd2pragma.c
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
@@ -334,7 +337,7 @@ $(PREFIX)/bin/ira: build/ira/ira
 
 build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
-	cd projects/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99
+	cd projects/ira && $(CC) -o ./$@ $(CFLAGS) *.c -std=c99
 
 projects/ira/Makefile:
 	@mkdir -p projects
@@ -357,8 +360,12 @@ $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -
 	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
+	for i in $$(find patches/sfdc/ -type f); \
+	do if [[ "$$i" == *.diff ]] ; \
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
+
 	rsync -a projects/sfdc build --exclude .git
-	cd build/sfdc && $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC) $(LOG)
+	cd build/sfdc && $(E) ./configure $(CONFIG_SFDC) $(LOG)
 
 projects/sfdc/configure:
 	@mkdir -p projects
@@ -463,12 +470,12 @@ build/ndk-include/_ndk: build/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCL
 
 build/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
-	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a ./projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
+	rsync -a ./projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
@@ -557,7 +564,7 @@ build/ndk-include/_ndk13: build/ndk-include/_ndk
 # =================================================
 build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	echo "done" >$@
 
 projects/amiga-netinclude/README.md: 
@@ -666,7 +673,7 @@ build/libdebug/_done: build/libdebug/Makefile
 
 build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	mkdir -p build/libdebug
-	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
+	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" ../../projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
 
 projects/libdebug/configure:
 	@mkdir -p projects
