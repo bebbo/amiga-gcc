@@ -291,15 +291,15 @@ $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd
 	mkdir -p $(PREFIX)/bin/
 	$(MAKE) -C build/fd2sfd install $(LOG)
 build/fd2sfd/Makefile: projects/fd2sfd/configure
-	for i in $$(find patches/fd2sfd/ -type f); \
-	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
 	@mkdir -p build/fd2sfd
 	cd build/fd2sfd && $(E) ../../projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
+	for i in $$(find patches/fd2sfd/ -type f); \
+	do if [[ "$$i" == *.diff ]] ; \
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
 
 # =================================================
 # fd2pragma
@@ -360,16 +360,15 @@ $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -
 	install build/sfdc/sfdc $(PREFIX)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
-	for i in $$(find patches/sfdc/ -type f); \
-	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
-
 	rsync -a projects/sfdc build --exclude .git
 	cd build/sfdc && $(E) ./configure $(CONFIG_SFDC) $(LOG)
 
 projects/sfdc/configure:
 	@mkdir -p projects
 	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/sfdc
+	for i in $$(find patches/sfdc/ -type f); \
+	do if [[ "$$i" == *.diff ]] ; \
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
 
 # =================================================
 # vasm
