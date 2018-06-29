@@ -52,7 +52,7 @@ var
 procedure InitializeWizard;
 begin
   OptionPage := CreateInputOptionPage(wpSelectDir, 'Add to PATH?', '', '', False, False);
-  OptionPage.Add('Add CGG m68k elf tools to PATH?');
+  OptionPage.Add('Add Amiga GCC tools to PATH?');
 
   OptionPage.Values[0] := True;
 end;
