@@ -36,6 +36,15 @@ EXEEXT=$(MYMAKEEXE:%=.exe)
 
 UNAME_S := $(shell uname -s)
 
+# Files for GMP, MPC and MPFR
+
+GMP = gmp-6.1.2
+GMPFILE = $(GMP).tar.bz2
+MPC = mpc-1.0.3
+MPCFILE = $(MPC).tar.gz
+MPFR = mpfr-3.1.6
+MPFRFILE = $(MPFR).tar.bz2
+
 # =================================================
 
 .PHONY: x
@@ -73,12 +82,21 @@ all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
 	rm -rf build
 
 clean-gcc:
 	rm -rf build/gcc
+
+clean-gmp:
+	rm -rf projects/gcc/gmp
+
+clean-mpc:
+	rm -rf projects/gcc/mpc
+
+clean-mpfr:
+	rm -rf projects/gcc/mpfr
 
 clean-libgcc:
 	rm -rf build/gcc/m68k-amigaos
@@ -140,8 +158,8 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude update-gmp update-mpc update-mpfr
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude update-gmp update-mpc update-mpfr
 
 update-gcc: projects/gcc/configure
 	cd projects/gcc && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -200,6 +218,30 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
+update-gmp:
+	@mkdir -p download
+	if [ -a download/$(GMPFILE) ]; \
+	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
+	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
+	fi;
+	cd projects && tar xf ../download/$(GMPFILE)
+	
+update-mpc:
+	@mkdir -p download
+	if [ -a download/$(MPCFILE) ]; \
+	then rm -rf projcts/$(MPC); rm -rf projects/gcc/mpc; \
+	else cd download && wget ftp://ftp.gnu.org/gnu/mpc/$(MPCFILE); \
+	fi;
+	cd projects && tar xf ../download/$(MPCFILE)
+
+update-mpfr:
+	@mkdir -p download
+	if [ -a download/$(MPFRFILE) ]; \
+	then rm -rf projects/$(MPFR); rm -rf projects/gcc/mpfr; \
+	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
+	fi;
+	cd projects && tar xf ../download/$(MPFRFILE)
+
 status-all:
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 # =================================================
@@ -231,6 +273,13 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
+	@mkdir -p projects/gcc/gmp
+	@mkdir -p projects/gcc/mpc
+	@mkdir -p projects/gcc/mpfr
+
+	rsync -a projects/$(GMP)/* projects/gcc/gmp
+	rsync -a projects/$(MPC)/* projects/gcc/mpc
+	rsync -a projects/$(MPFR)/* projects/gcc/mpfr
 #	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
 	cd build/gcc && $(E) ../../projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
@@ -529,6 +578,7 @@ projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3
 download/NDK39.lha:
 	mkdir -p download
 	cd download && wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha
+
 
 # =================================================
 # NDK1.3 - emulated from NDK
