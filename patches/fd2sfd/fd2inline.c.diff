@@ -1,0 +1,14 @@
+--- fd2sfd/fd2inline.c	2018-06-28 14:37:19.772087300 +0100
++++ fd2sfd-patched/fd2inline.c	2018-06-28 09:06:12.977739500 +0100
+@@ -46,6 +46,11 @@
+ #define REGS 16	 /* d0=0,...,a7=15 */
+ #define FDS 1000
+ 
++
++#ifdef __MINGW32__
++#define bcopy(s1, s2, n) memmove((s2), (s1), (n))
++#endif
++
+ typedef enum
+ {
+    d0, d1, d2, d3, d4, d5, d6, d7, a0, a1, a2, a3, a4, a5, a6, a7, illegal
