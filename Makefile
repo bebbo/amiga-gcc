@@ -250,7 +250,7 @@ BINUTILS = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 BINUTILS_DIR = . bfd gas ld binutils opcodes
 BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 
-ifneq ($(UNAME_S),"Darwin")
+ifneq ($(UNAME_S),Darwin)
 ALL_GDB = all-gdb
 INSTALL_GDB = install-gdb
 endif
@@ -772,7 +772,7 @@ $(SDKS): libnix
 # =================================================
 .PHONY: info v
 info:
-	@echo $@
+	@echo $@ $(UNAME_S)
 	@echo PREFIX=$(PREFIX)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
