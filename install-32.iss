@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Amiga GCC"
-#define MyAppVersion "6.4.1"
+#define MyAppVersion "6.4.1b"
 #define MyAppPublisher "Stephen Moody"
 #define MyAppURL "https://github.com/SteveMoody73/"
-#define MinGWFolder "D:\Dev\Shell\msys64"
+#define MinGWFolder "C:\Dev\msys64"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -37,13 +37,19 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 [Files]
 Source: "{#MinGWFolder}\opt\amiga-gcc-32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\8.1.0"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
-    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; \
-    Check: NeedsAddPath(ExpandConstant('{app}'))
+    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin"; \
+    Check: NeedsAddPath(ExpandConstant('{app}\bin'))
 
 [Code]
 var
