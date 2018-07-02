@@ -45,6 +45,19 @@ MPCFILE = $(MPC).tar.gz
 MPFR = mpfr-3.1.6
 MPFRFILE = $(MPFR).tar.bz2
 
+DETECTED_CC = $(CC)
+ifeq ($(CC),cc)
+DETECTED_VERSION =  $(shell $(CC) -v |& grep version)
+ifneq ($(findstring clang,$(DETECTED_VERSION)),)
+DETECTED_CC = clang
+endif
+ifneq ($(findstring gcc,$(DETECTED_VERSION)),)
+DETECTED_CC = gcc
+endif
+endif
+
+USED_CC_VERSION = $(shell $(DETECTED_CC) -v |& grep Target)
+
 # =================================================
 
 .PHONY: x
@@ -82,7 +95,12 @@ all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc
 # =================================================
 # clean
 # =================================================
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
+ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+.PHONY: clean-gmp clean-mpc clean-mpfr
+clean: clean-gmp clean-mpc clean-mpfr
+endif
+
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk
 clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
 	rm -rf build
 
@@ -158,8 +176,13 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude update-gmp update-mpc update-mpfr
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude update-gmp update-mpc update-mpfr
+ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+.PHONY: update-gmp update-mpc update-mpfr
+update: update-gmp update-mpc update-mpfr
+endif
+
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
 
 update-gcc: projects/gcc/configure
 	cd projects/gcc && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
@@ -218,6 +241,7 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
+ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
 	if [ -a download/$(GMPFILE) ]; \
@@ -241,6 +265,7 @@ update-mpfr:
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
 	fi;
 	cd projects && tar xf ../download/$(MPFRFILE)
+endif
 
 status-all:
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
@@ -273,13 +298,14 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
+ifneq ($(findstring mingw,$(USED_CC_VERSION)),)	
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
-
 	rsync -a projects/$(GMP)/* projects/gcc/gmp
 	rsync -a projects/$(MPC)/* projects/gcc/mpc
 	rsync -a projects/$(MPFR)/* projects/gcc/mpfr
+endif	
 #	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
 	cd build/gcc && $(E) ../../projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
@@ -829,6 +855,7 @@ $(SDKS): libnix
 .PHONY: info v
 info:
 	@echo $@ $(UNAME_S)
+	@echo CC = $(DETECTED_CC) $(USED_CC_VERSION)
 	@echo PREFIX=$(PREFIX)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
