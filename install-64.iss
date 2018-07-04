@@ -44,9 +44,9 @@ Source: "{#MinGWFolder}\mingw64\bin\libwinpthread-1.dll"; DestDir: "{app}\m68k-a
 Source: "{#MinGWFolder}\mingw64\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw64\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw64\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw64\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
