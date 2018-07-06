@@ -36,12 +36,12 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Files]
 Source: "C:\amiga-gcc\*.*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
-;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
 
 ; Add make.exe to the folder
 Source: "{#MinGWFolder}\usr\bin\make.exe"; DestDir: "{app}\bin"; Flags: ignoreversion 
