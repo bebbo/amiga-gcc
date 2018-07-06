@@ -5,7 +5,7 @@
 #define MyAppVersion "6.4.1b"
 #define MyAppPublisher "Stephen Moody"
 #define MyAppURL "https://github.com/SteveMoody73/"
-#define MinGWFolder "C:\Dev\msys64"
+#define MinGWFolder "D:\Dev\shell\msys64"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -25,7 +25,7 @@ OutputBaseFilename=setup-amiga-gcc-{#MyAppVersion}-32
 Compression=lzma
 SolidCompression=yes
 ChangesEnvironment=yes
-DisableDirPage=no
+DisableDirPage=yes
 SetupIconFile=icon.ico
 
 [Languages]
@@ -35,16 +35,20 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Files]
-Source: "{#MinGWFolder}\opt\amiga-gcc-32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libwinpthread-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
-Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+Source: "C:\amiga-gcc\*.*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+;Source: "{#MinGWFolder}\mingw32\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
+;Source: "{#MinGWFolder}\mingw32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+
+; Add make.exe to the folder
+Source: "{#MinGWFolder}\usr\bin\make.exe"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-2.0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-intl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-iconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \

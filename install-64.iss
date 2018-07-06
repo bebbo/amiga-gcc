@@ -25,7 +25,7 @@ OutputBaseFilename=setup-amiga-gcc-{#MyAppVersion}-64
 Compression=lzma
 SolidCompression=yes
 ChangesEnvironment=yes
-DisableDirPage=no
+DisableDirPage=yes
 SetupIconFile=icon.ico
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
@@ -37,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Files]
-Source: "{#MinGWFolder}\opt\amiga-gcc-64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "c:\amiga-gcc\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MinGWFolder}\mingw64\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libwinpthread-1.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libwinpthread-1.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
@@ -47,6 +47,12 @@ Source: "{#MinGWFolder}\mingw64\bin\libintl-8.dll"; DestDir: "{app}\m68k-amigaos
 Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\libexec\gcc\m68k-amigaos\{#MyAppVersion}"; Flags: ignoreversion 
 Source: "{#MinGWFolder}\mingw64\bin\libiconv-2.dll"; DestDir: "{app}\m68k-amigaos\bin"; Flags: ignoreversion 
+
+; Add make.exe to the folder
+Source: "{#MinGWFolder}\usr\bin\make.exe"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-2.0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-intl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "{#MinGWFolder}\usr\bin\msys-iconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion 
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
