@@ -8,8 +8,9 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-PREFIX ?= /opt/amiga
-export PATH := $(PREFIX)/bin:$(PATH)
+PREFIX ?= C:/amiga-gcc
+PREFIX_MINGW = /c/amiga-gcc
+export PATH := $(PREFIX_MINGW)/bin:$(PATH)
 SHELL = /bin/bash
 
 GCC_GIT ?= https://github.com/bebbo/gcc
@@ -244,6 +245,7 @@ update-netinclude: projects/amiga-netinclude/README.md
 ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
+	@mkdir -p projects
 	if [ -a download/$(GMPFILE) ]; \
 	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
@@ -544,12 +546,12 @@ build/ndk-include/_ndk: build/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCL
 
 build/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a ./projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
-	rsync -a ./projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a ./projects/NDK_3.9/Include/include_h/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include --exclude proto
+	rsync -a ./projects/NDK_3.9/Include/include_i/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/fd $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/sfd $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
+	rsync -a ./projects/NDK_3.9/Include/linker_libs $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
@@ -639,7 +641,7 @@ build/ndk-include/_ndk13: build/ndk-include/_ndk
 # =================================================
 build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a projects/amiga-netinclude/include/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include
 	echo "done" >$@
 
 projects/amiga-netinclude/README.md: 
@@ -688,7 +690,7 @@ build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-inclu
 	if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
 	cd build/libnix && CFLAGS="$(TARGET_C_FLAGS)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(LOG)
 	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
-	rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
+	rsync -a projects/libnix/sources/headers/* $(PREFIX_MINGW)/m68k-amigaos/libnix/include/
 	touch build/libnix/Makefile
 	
 projects/libnix/configure:
@@ -721,8 +723,8 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 	cd build/clib2 && find * -name lib\*.a -delete
 	$(MAKE) -C build/clib2 -f GNUmakefile.68k $(LOG)
 	mkdir -p $(PREFIX)/m68k-amigaos/clib2
-	rsync -a build/clib2/include $(PREFIX)/m68k-amigaos/clib2
-	rsync -a build/clib2/lib $(PREFIX)/m68k-amigaos/clib2
+	rsync -a build/clib2/include $(PREFIX_MINGW)/m68k-amigaos/clib2
+	rsync -a build/clib2/lib $(PREFIX_MINGW)/m68k-amigaos/clib2
 	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm.a $(COMPLEX_FILES)
 	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libb/libm.a $(COMPLEX_FILES)
 	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libm.a $(COMPLEX_FILES)
@@ -769,9 +771,9 @@ build/libSDL12/_done: build/libSDL12/Makefile.bax
 	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
 	mkdir -p $(PREFIX)/include/GL
 	mkdir -p $(PREFIX)/include/SDL
-	rsync -a build/libSDL12/include/GL/*.i $(PREFIX)/include/GL/
-	rsync -a build/libSDL12/include/GL/*.h $(PREFIX)/include/GL/
-	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX)/include/SDL/
+	rsync -a build/libSDL12/include/GL/*.i $(PREFIX_MINGW)/include/GL/
+	rsync -a build/libSDL12/include/GL/*.h $(PREFIX_MINGW)/include/GL/
+	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX_MINGW)/include/SDL/
 	echo "done" >$@
 
 build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
