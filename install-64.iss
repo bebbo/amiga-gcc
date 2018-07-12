@@ -5,7 +5,8 @@
 #define MyAppVersion "6.4.1b"
 #define MyAppPublisher "Stephen Moody"
 #define MyAppURL "https://github.com/SteveMoody73/"
-#define MinGWFolder "D:\Dev\Shell\msys64"
+#define MinGWFolder "C:\Dev\Shell\msys64"
+#define ToolsFolder "C:\Dev\Tools"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
