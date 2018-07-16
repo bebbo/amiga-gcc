@@ -95,7 +95,7 @@ all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc
 # =================================================
 # clean
 # =================================================
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
 .PHONY: clean-gmp clean-mpc clean-mpfr
 clean: clean-gmp clean-mpc clean-mpfr
 endif
@@ -176,7 +176,7 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
 .PHONY: update-gmp update-mpc update-mpfr
 update: update-gmp update-mpc update-mpfr
 endif
@@ -241,7 +241,7 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
 	if [ -a download/$(GMPFILE) ]; \
@@ -277,7 +277,7 @@ status-all:
 # gcc
 # =================================================
 CONFIG_GCC=--prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=../../projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
 
 
 GCC_CMD = m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
@@ -298,7 +298,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)	
+ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)	
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
@@ -307,7 +307,7 @@ ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 	rsync -a projects/$(MPFR)/* projects/gcc/mpfr
 endif	
 #	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
-	cd build/gcc && $(E) ../../projects/gcc/configure $(CONFIG_GCC) $(LOG)
+	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
 projects/gcc/configure:
 	@mkdir -p projects
@@ -343,7 +343,7 @@ build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null proje
 
 build/binutils/gas/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
-	cd build/binutils && $(E) ../../projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
+	cd build/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
 
 projects/binutils/configure:
 	@mkdir -p projects
@@ -367,7 +367,7 @@ $(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd
 	$(MAKE) -C build/fd2sfd install $(LOG)
 build/fd2sfd/Makefile: projects/fd2sfd/configure
 	@mkdir -p build/fd2sfd
-	cd build/fd2sfd && $(E) ../../projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
+	cd build/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
@@ -436,7 +436,7 @@ $(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -
 
 build/sfdc/Makefile: projects/sfdc/configure
 	rsync -a projects/sfdc build --exclude .git
-	cd build/sfdc && $(E) ./configure $(CONFIG_SFDC) $(LOG)
+	cd build/sfdc && $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC) $(LOG)
 
 projects/sfdc/configure:
 	@mkdir -p projects
@@ -544,12 +544,12 @@ build/ndk-include/_ndk: build/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCL
 
 build/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a ./projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
-	rsync -a ./projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
@@ -639,7 +639,7 @@ build/ndk-include/_ndk13: build/ndk-include/_ndk
 # =================================================
 build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
 	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
+	rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	echo "done" >$@
 
 projects/amiga-netinclude/README.md: 
@@ -748,7 +748,7 @@ build/libdebug/_done: build/libdebug/Makefile
 
 build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	mkdir -p build/libdebug
-	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" ../../projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
+	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
 
 projects/libdebug/configure:
 	@mkdir -p projects
@@ -822,7 +822,7 @@ endif
 
 build/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	mkdir -p build/newlib/newlib
-	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" ../../../projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
+	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
