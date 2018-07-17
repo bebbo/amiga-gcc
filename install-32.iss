@@ -12,7 +12,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{B9C65862-2CF4-46A3-BE75-546BEFFFAEB2}
+AppId={{288DEAAA-0B9B-4399-B831-F1A2160CB73F}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -20,8 +20,9 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+DefaultGroupName={#MyAppName}
 DefaultDirName=C:\amiga-gcc
-OutputBaseFilename=setup-amiga-gcc-{#MyAppVersion}-32
+OutputBaseFilename=setup-amiga-gcc-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 ChangesEnvironment=yes
