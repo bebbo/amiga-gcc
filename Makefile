@@ -82,10 +82,6 @@ x:
 # =================================================
 .PHONY: help
 help:
-	@echo "USED_CC_VERSION=$(USED_CC_VERSION)"
-	@echo "PREFIX=$(PREFIX)"
-	@echo "PREFIX_PATH=$(PREFIX_PATH)"
-	@echo "PREFIX_TARGET=$(PREFIX_TARGET)"
 	@echo "make help            display this help"
 	@echo "make info            print PREFIX_PATH and other flags"
 	@echo "make all             build and install all"
@@ -257,6 +253,7 @@ update-netinclude: projects/amiga-netinclude/README.md
 ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
+	@mkdir -p projects
 	if [ -a download/$(GMPFILE) ]; \
 	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
@@ -265,6 +262,7 @@ update-gmp:
 	
 update-mpc:
 	@mkdir -p download
+	@mkdir -p projects
 	if [ -a download/$(MPCFILE) ]; \
 	then rm -rf projcts/$(MPC); rm -rf projects/gcc/mpc; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpc/$(MPCFILE); \
@@ -273,6 +271,7 @@ update-mpc:
 
 update-mpfr:
 	@mkdir -p download
+	@mkdir -p projects
 	if [ -a download/$(MPFRFILE) ]; \
 	then rm -rf projects/$(MPFR); rm -rf projects/gcc/mpfr; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
@@ -574,7 +573,6 @@ build/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	echo "done" >$@
 
 ndk-inline: $(NDK_INCLUDE_INLINE) sfdc build/ndk-include/_inline 
-	echo "PREFIX_PATH=$(PREFIX_PATH)"
 $(NDK_INCLUDE_INLINE): $(PREFIX_PATH)/bin/sfdc $(NDK_INCLUDE_SFD) build/ndk-include/_inline build/ndk-include/_lvo build/ndk-include/_proto build/ndk-include/_ndk0
 	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
