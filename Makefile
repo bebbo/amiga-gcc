@@ -8,9 +8,7 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-PREFIX ?= C:/amiga-gcc
-PREFIX_MINGW = /c/amiga-gcc
-export PATH := $(PREFIX_MINGW)/bin:$(PATH)
+PREFIX ?= /opt/amiga
 SHELL = /bin/bash
 
 GCC_GIT ?= https://github.com/bebbo/gcc
@@ -28,6 +26,7 @@ TARGET_C_FLAGS?=-Os -g -fomit-frame-pointer
 E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR_TARGET="$(TARGET_C_FLAGS)"
 
 #LOG = >& $(PWD)/x.log || tail -n 999 $(PWD)/x.log
+
 
 # =================================================
 # determine exe extension for cygwin
@@ -59,6 +58,15 @@ endif
 
 USED_CC_VERSION = $(shell $(DETECTED_CC) -v |& grep Target)
 
+PREFIX_TARGET = $(PREFIX)
+ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+PREFIX_PATH = /$(subst \,/,$(subst :,,$(PREFIX)))
+else
+PREFIX_PATH = $(PREFIX)
+endif
+
+export PATH := $(PREFIX_PATH)/bin:$(PATH)
+
 # =================================================
 
 .PHONY: x
@@ -74,13 +82,17 @@ x:
 # =================================================
 .PHONY: help
 help:
+	@echo "USED_CC_VERSION=$(USED_CC_VERSION)"
+	@echo "PREFIX=$(PREFIX)"
+	@echo "PREFIX_PATH=$(PREFIX_PATH)"
+	@echo "PREFIX_TARGET=$(PREFIX_TARGET)"
 	@echo "make help            display this help"
-	@echo "make info            print prefix and other flags"
+	@echo "make info            print PREFIX_PATH and other flags"
 	@echo "make all             build and install all"
 	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
 	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
-	@echo "make clean-prefix    remove all content from the prefix folder"
+	@echo "make clean-prefix    remove all content from the PREFIX_PATH folder"
 	@echo "make update          perform git pull for all targets"
 	@echo "make update-<target> perform git pull for the given target"
 	@echo "make sdk=<sdk>       install the sdk <sdk>"
@@ -166,13 +178,13 @@ clean-libSDL12:
 clean-newlib:
 	rm -rf build/newlib
 
-# clean-prefix drops the files from prefix folder
+# clean-prefix drops the files from PREFIX_PATH folder
 clean-prefix:
-	rm -rf $(PREFIX)/bin
-	rm -rf $(PREFIX)/libexec
-	rm -rf $(PREFIX)/lib/gcc
-	rm -rf $(PREFIX)/m68k-amigaos
-	mkdir -p $(PREFIX)/bin
+	rm -rf $(PREFIX_PATH)/bin
+	rm -rf $(PREFIX_PATH)/libexec
+	rm -rf $(PREFIX_PATH)/lib/gcc
+	rm -rf $(PREFIX_PATH)/m68k-amigaos
+	mkdir -p $(PREFIX_PATH)/bin
 
 # =================================================
 # update all projects
@@ -186,7 +198,7 @@ endif
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
 
 update-gcc: projects/gcc/configure
-	cd projects/gcc && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/gcc && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
@@ -196,7 +208,7 @@ update-binutils: projects/binutils/configure
 	  $(MAKE) projects/binutils/configure; \
 	  $(MAKE) clean-binutils; \
 	fi
-	cd projects/binutils && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/binutils && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 
 update-fd2sfd: projects/fd2sfd/configure
 	cd projects/fd2sfd && git pull
@@ -245,7 +257,6 @@ update-netinclude: projects/amiga-netinclude/README.md
 ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
-	@mkdir -p projects
 	if [ -a download/$(GMPFILE) ]; \
 	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
@@ -278,14 +289,14 @@ status-all:
 # =================================================
 # gcc
 # =================================================
-CONFIG_GCC=--prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=../../projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
+CONFIG_GCC=--prefix=$(PREFIX_TARGET) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --src=../../projects/gcc
 
 
 GCC_CMD = m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
 	m68k-amigaos-gcov m68k-amigaos-gcov-tool m68k-amigaos-cpp m68k-amigaos-gcc m68k-amigaos-gcc-ar \
 	m68k-amigaos-gcc-ranlib m68k-amigaos-gcov-dump
-GCC = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(GCC_CMD))
+GCC = $(patsubst %,$(PREFIX_PATH)/bin/%$(EXEEXT), $(GCC_CMD))
 
 GCC_DIR = . gcc gcc/c gcc/c-family gcc/cp gcc/objc gcc/config/m68k libiberty libcpp libdecnumber
 GCCD = $(patsubst %,projects/gcc/%, $(GCC_DIR))
@@ -309,20 +320,20 @@ ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
 	rsync -a projects/$(MPFR)/* projects/gcc/mpfr
 endif	
 #	if [ "$(UNAME_S)" == "Darwin" ]; then cd build/gcc && contrib/download_prerequisites; fi
-	cd build/gcc && $(E) ../../projects/gcc/configure $(CONFIG_GCC) $(LOG)
+	cd build/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(LOG)
 
 projects/gcc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 https://github.com/bebbo/gcc
+	cd projects &&	git clone -b $(GCC_BRANCH) --depth 1 https://github.com/bebbo/gcc
 
 # =================================================
 # binutils
 # =================================================
-CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --disable-plugins --disable-werror
+CONFIG_BINUTILS=--prefix=$(PREFIX_TARGET) --target=m68k-amigaos --disable-plugins --disable-werror
 BINUTILS_CMD = m68k-amigaos-addr2line m68k-amigaos-ar m68k-amigaos-as m68k-amigaos-c++filt \
 	m68k-amigaos-ld m68k-amigaos-nm m68k-amigaos-objcopy m68k-amigaos-objdump m68k-amigaos-ranlib \
 	m68k-amigaos-readelf m68k-amigaos-size m68k-amigaos-strings m68k-amigaos-strip
-BINUTILS = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
+BINUTILS = $(patsubst %,$(PREFIX_PATH)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 
 BINUTILS_DIR = . bfd gas ld binutils opcodes
 BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
@@ -345,35 +356,35 @@ build/binutils/_done: build/binutils/gas/Makefile $(shell find 2>/dev/null proje
 
 build/binutils/gas/Makefile: projects/binutils/configure
 	@mkdir -p build/binutils
-	cd build/binutils && $(E) ../../projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
+	cd build/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(LOG)
 
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(BINUTILS_GIT) binutils
+	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 1 $(BINUTILS_GIT) binutils
 
 
 # =================================================
 # fd2sfd
 # =================================================
-CONFIG_FD2SFD = --prefix=$(PREFIX) --target=m68k-amigaos
+CONFIG_FD2SFD = --prefix=$(PREFIX_TARGET) --target=m68k-amigaos
 
 fd2sfd: build/fd2sfd/_done
 
-build/fd2sfd/_done: $(PREFIX)/bin/fd2sfd
-	@echo "built $(PREFIX)/bin/fd2sfd"
+build/fd2sfd/_done: $(PREFIX_PATH)/bin/fd2sfd
+	@echo "built $(PREFIX_PATH)/bin/fd2sfd"
 	@echo "done" >$@
 
-$(PREFIX)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
+$(PREFIX_PATH)/bin/fd2sfd: build/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
 	$(MAKE) -C build/fd2sfd all $(LOG)
-	mkdir -p $(PREFIX)/bin/
+	mkdir -p $(PREFIX_PATH)/bin/
 	$(MAKE) -C build/fd2sfd install $(LOG)
 build/fd2sfd/Makefile: projects/fd2sfd/configure
 	@mkdir -p build/fd2sfd
-	cd build/fd2sfd && $(E) ../../projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
+	cd build/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(LOG)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
+	cd projects &&	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -383,13 +394,13 @@ projects/fd2sfd/configure:
 # =================================================
 fd2pragma: build/fd2pragma/_done
 
-build/fd2pragma/_done: $(PREFIX)/bin/fd2pragma
-	@echo "built $(PREFIX)/bin/fd2pragma"
+build/fd2pragma/_done: $(PREFIX_PATH)/bin/fd2pragma
+	@echo "built $(PREFIX_PATH)/bin/fd2pragma"
 	@echo "done" >$@
 
-$(PREFIX)/bin/fd2pragma: build/fd2pragma/fd2pragma
-	mkdir -p $(PREFIX)/bin/
-	install build/fd2pragma/fd2pragma $(PREFIX)/bin/
+$(PREFIX_PATH)/bin/fd2pragma: build/fd2pragma/fd2pragma
+	mkdir -p $(PREFIX_PATH)/bin/
+	install build/fd2pragma/fd2pragma $(PREFIX_PATH)/bin/
 
 build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
 	@mkdir -p build/fd2pragma
@@ -397,20 +408,20 @@ build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null 
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/fd2pragma
+	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/fd2pragma
 
 # =================================================
 # ira
 # =================================================
 ira: build/ira/_done
 
-build/ira/_done: $(PREFIX)/bin/ira
-	@echo "built $(PREFIX)/bin/ira"
+build/ira/_done: $(PREFIX_PATH)/bin/ira
+	@echo "built $(PREFIX_PATH)/bin/ira"
 	@echo "done" >$@
 
-$(PREFIX)/bin/ira: build/ira/ira
-	mkdir -p $(PREFIX)/bin/
-	install build/ira/ira $(PREFIX)/bin/
+$(PREFIX_PATH)/bin/ira: build/ira/ira
+	mkdir -p $(PREFIX_PATH)/bin/
+	install build/ira/ira $(PREFIX_PATH)/bin/
 
 build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
 	@mkdir -p build/ira
@@ -418,31 +429,31 @@ build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not 
 
 projects/ira/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/ira
+	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/ira
 
 # =================================================
 # sfdc
 # =================================================
-CONFIG_SFDC = --prefix=$(PREFIX) --target=m68k-amigaos
+CONFIG_SFDC = --prefix=$(PREFIX_PATH) --target=m68k-amigaos
 
 sfdc: build/sfdc/_done
 
-build/sfdc/_done: $(PREFIX)/bin/sfdc
-	@echo "built $(PREFIX)/bin/sfdc"
+build/sfdc/_done: $(PREFIX_PATH)/bin/sfdc
+	@echo "built $(PREFIX_PATH)/bin/sfdc"
 	@echo "done" >$@
 
-$(PREFIX)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
+$(PREFIX_PATH)/bin/sfdc: build/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
 	$(MAKE) -C build/sfdc sfdc $(LOG)
-	mkdir -p $(PREFIX)/bin/
-	install build/sfdc/sfdc $(PREFIX)/bin
+	mkdir -p $(PREFIX_PATH)/bin/
+	install build/sfdc/sfdc $(PREFIX_PATH)/bin
 
 build/sfdc/Makefile: projects/sfdc/configure
 	rsync -a projects/sfdc build --exclude .git
-	cd build/sfdc && $(E) ./configure $(CONFIG_SFDC) $(LOG)
+	cd build/sfdc && $(E) $(PWD)/build/sfdc/configure $(CONFIG_SFDC) $(LOG)
 
 projects/sfdc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/sfdc
+	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/sfdc
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -451,19 +462,19 @@ projects/sfdc/configure:
 # vasm
 # =================================================
 VASM_CMD = vasmm68k_mot
-VASM = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VASM_CMD))
+VASM = $(patsubst %,$(PREFIX_PATH)/bin/%$(EXEEXT), $(VASM_CMD))
 
 vasm: build/vasm/_done
 
 build/vasm/_done: build/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
 	$(MAKE) -C build/vasm CPU=m68k SYNTAX=mot $(LOG)
-	mkdir -p $(PREFIX)/bin/
-	install build/vasm/vasmm68k_mot $(PREFIX)/bin/
-	install build/vasm/vobjdump $(PREFIX)/bin/
+	mkdir -p $(PREFIX_PATH)/bin/
+	install build/vasm/vasmm68k_mot $(PREFIX_PATH)/bin/
+	install build/vasm/vobjdump $(PREFIX_PATH)/bin/
 	cp patches/vc.config build/vasm/vc.config
-	sed -e "s|PREFIX|$(PREFIX)|g" -i.bak build/vasm/vc.config
-	mkdir -p $(PREFIX)/m68k-amigaos/etc/
-	install build/vasm/vc.config $(PREFIX)/bin/
+	sed -e "s|PREFIX_PATH|$(PREFIX_PATH)|g" -i.bak build/vasm/vc.config
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/etc/
+	install build/vasm/vc.config $(PREFIX_PATH)/bin/
 	@echo "done" >$@
 	@echo "built $(vasm)"
 
@@ -472,13 +483,13 @@ build/vasm/Makefile: projects/vasm/Makefile
 
 projects/vasm/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vasm
+	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vasm
 
 # =================================================
 # vbcc
 # =================================================
 VBCC_CMD = vbccm68k vprof vc
-VBCC = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VBCC_CMD))
+VBCC = $(patsubst %,$(PREFIX_PATH)/bin/%$(EXEEXT), $(VBCC_CMD))
 
 vbcc: build/vbcc/_done
 
@@ -486,9 +497,9 @@ build/vbcc/_done: build/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -no
 	cd build/vbcc && TARGET=m68k $(MAKE) bin/dtgen $(LOG)
 	cd build/vbcc && echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt; bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt
 	cd build/vbcc && TARGET=m68k $(MAKE) $(LOG)
-	mkdir -p $(PREFIX)/bin/
+	mkdir -p $(PREFIX_PATH)/bin/
 	rm -rf build/vbcc/bin/*.dSYM
-	install build/vbcc/bin/v* $(PREFIX)/bin/
+	install build/vbcc/bin/v* $(PREFIX_PATH)/bin/
 	@echo "done" >$@
 	@echo "built $(VBCC)"
 
@@ -498,20 +509,20 @@ build/vbcc/Makefile: projects/vbcc/Makefile
 
 projects/vbcc/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vbcc
+	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vbcc
 
 # =================================================
 # vlink
 # =================================================
 VLINK_CMD = vlink
-VLINK = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VLINK_CMD))
+VLINK = $(patsubst %,$(PREFIX_PATH)/bin/%$(EXEEXT), $(VLINK_CMD))
 
 vlink: build/vlink/_done
 
 build/vlink/_done: build/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	cd build/vlink && TARGET=m68k $(MAKE) $(LOG)
-	mkdir -p $(PREFIX)/bin/
-	install build/vlink/vlink $(PREFIX)/bin/
+	mkdir -p $(PREFIX_PATH)/bin/
+	install build/vlink/vlink $(PREFIX_PATH)/bin/
 	@echo "done" >$@
 	@echo "built $(VLINK)"
 
@@ -520,7 +531,7 @@ build/vlink/Makefile: projects/vlink/Makefile
 
 projects/vlink/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vlink
+	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vlink
 
 # =================================================
 # L I B R A R I E S
@@ -531,10 +542,10 @@ projects/vlink/Makefile:
 
 NDK_INCLUDE = $(shell find 2>/dev/null projects/NDK_3.9/Include/include_h -type f)
 NDK_INCLUDE_SFD = $(shell find 2>/dev/null projects/NDK_3.9/Include/sfd -type f -name *.sfd)
-NDK_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
-SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
+NDK_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX_PATH)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX_PATH)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX_PATH)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX_PATH)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
 
 .PHONY: ndk-inline ndk-lvo ndk-proto
 
@@ -545,56 +556,57 @@ build/ndk-include/_ndk: build/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCL
 	echo "done" >$@
 
 build/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a ./projects/NDK_3.9/Include/include_h/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include --exclude proto
-	rsync -a ./projects/NDK_3.9/Include/include_i/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/fd $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/sfd $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
-	rsync -a ./projects/NDK_3.9/Include/linker_libs $(PREFIX_MINGW)/m68k-amigaos/ndk/lib
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
-	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
-	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
-	cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/ndk-include/inline
-	cp -p projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/ndk-include/inline
-	cp -p projects/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/ndk-include/inline
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX_PATH)/m68k-amigaos/ndk-include --exclude proto
+	rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX_PATH)/m68k-amigaos/ndk-include
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX_PATH)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX_PATH)/m68k-amigaos/ndk/lib
+	rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX_PATH)/m68k-amigaos/ndk/lib
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include/proto
+	cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX_PATH)/m68k-amigaos/ndk-include/proto
+	cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX_PATH)/m68k-amigaos/ndk-include/proto
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline
+	cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline
+	cp -p projects/fd2pragma/Include/inline/stubs.h $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline
+	cp -p projects/fd2pragma/Include/inline/macros.h $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline
 	mkdir -p build/ndk-include/
 	echo "done" >$@
 
 ndk-inline: $(NDK_INCLUDE_INLINE) sfdc build/ndk-include/_inline 
-$(NDK_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) build/ndk-include/_inline build/ndk-include/_lvo build/ndk-include/_proto build/ndk-include/_ndk0
-	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
+	echo "PREFIX_PATH=$(PREFIX_PATH)"
+$(NDK_INCLUDE_INLINE): $(PREFIX_PATH)/bin/sfdc $(NDK_INCLUDE_SFD) build/ndk-include/_inline build/ndk-include/_lvo build/ndk-include/_proto build/ndk-include/_ndk0
+	sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 ndk-lvo: $(NDK_INCLUDE_LVO) sfdc
-$(NDK_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) build/ndk-include/_lvo build/ndk-include/_ndk0
-	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
+$(NDK_INCLUDE_LVO): $(PREFIX_PATH)/bin/sfdc $(NDK_INCLUDE_SFD) build/ndk-include/_lvo build/ndk-include/_ndk0
+	sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX_PATH)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 ndk-proto: $(NDK_INCLUDE_PROTO) sfdc
-$(NDK_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	build/ndk-include/_proto build/ndk-include/_ndk0
-	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
+$(NDK_INCLUDE_PROTO): $(PREFIX_PATH)/bin/sfdc $(NDK_INCLUDE_SFD)	build/ndk-include/_proto build/ndk-include/_ndk0
+	sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX_PATH)/m68k-amigaos/ndk-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@)
 
 build/ndk-include/_inline:
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include/inline
 	mkdir -p build/ndk-include/
 	echo "done" >$@
 
 build/ndk-include/_lvo:
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/lvo
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/lvo
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include/lvo
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/lvo
 	mkdir -p build/ndk-include/
 	echo "done" >$@
 
 build/ndk-include/_proto:
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/proto
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include/proto
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/proto
 	mkdir -p build/ndk-include/
 	echo "done" >$@
 
 projects/NDK_3.9.info: download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
 	mkdir -p projects
 	mkdir -p build
-	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; mkdir -p $(PREFIX)/bin/; install src/lha$(EXEEXT) $(PREFIX)/bin/lha$(EXEEXT); fi
+	if [ ! -e "$$(which lha)" ]; then cd build && rm -rf lha; git clone https://github.com/jca02266/lha; cd lha; aclocal; autoheader; automake -a; autoconf; ./configure; make all; mkdir -p $(PREFIX_PATH)/bin/; install src/lha$(EXEEXT) $(PREFIX_PATH)/bin/lha$(EXEEXT); fi
 	cd projects && lha xf ../download/NDK39.lha
 	touch -t 0001010000 download/NDK39.lha
 	for i in $$(find patches/NDK_3.9/ -type f); \
@@ -615,24 +627,24 @@ download/NDK39.lha:
 ndk13: build/ndk-include/_ndk13
 
 build/ndk-include/_ndk13: build/ndk-include/_ndk
-	while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
+	while read p; do mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX_PATH)/m68k-amigaos/ndk-include/$$p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
 	while read p; do \
-	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
-	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
-	  LC_CTYPE=C sed -n -e '/#ifndef  CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
-	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
-	  else cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; fi \
+	  mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
+	  if grep V36 $(PREFIX_PATH)/m68k-amigaos/ndk-include/$$p; then \
+	  LC_CTYPE=C sed -n -e '/#ifndef  CLIB/,/V36/p' $(PREFIX_PATH)/m68k-amigaos/ndk-include/$$p >$(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$p; \
+	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$p; \
+	  else cp $(PREFIX_PATH)/m68k-amigaos/ndk-include/$$p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$p; fi \
 	done < patches/ndk13/chfiles
-	while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
-	echo '#undef	EXECNAME' > $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
-	echo '#define	EXECNAME	"exec.library"' >> $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd13
-	while read p; do LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd13
-	for i in $(PREFIX)/m68k-amigaos/ndk/lib/fd13/*; do fd2sfd $$i $(PREFIX)/m68k-amigaos/ndk13-include/clib/$$(basename $$i _lib.fd)_protos.h > $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/$$(basename $$i .fd).sfd; done
-	for i in $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/*; do \
-	  sfdc --target=m68k-amigaos --mode=macros --output=$(PREFIX)/m68k-amigaos/ndk13-include/inline/$$(basename $$i _lib.sfd).h $$i; \
-	  sfdc --target=m68k-amigaos --mode=proto --output=$(PREFIX)/m68k-amigaos/ndk13-include/proto/$$(basename $$i _lib.sfd).h $$i; \
+	while read p; do mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX_PATH)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
+	echo '#undef	EXECNAME' > $(PREFIX_PATH)/m68k-amigaos/ndk13-include/exec/execname.h
+	echo '#define	EXECNAME	"exec.library"' >> $(PREFIX_PATH)/m68k-amigaos/ndk13-include/exec/execname.h
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk/lib/fd13
+	while read p; do LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX_PATH)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX_PATH)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk/lib/sfd13
+	for i in $(PREFIX_PATH)/m68k-amigaos/ndk/lib/fd13/*; do fd2sfd $$i $(PREFIX_PATH)/m68k-amigaos/ndk13-include/clib/$$(basename $$i _lib.fd)_protos.h > $(PREFIX_PATH)/m68k-amigaos/ndk/lib/sfd13/$$(basename $$i .fd).sfd; done
+	for i in $(PREFIX_PATH)/m68k-amigaos/ndk/lib/sfd13/*; do \
+	  sfdc --target=m68k-amigaos --mode=macros --output=$(PREFIX_PATH)/m68k-amigaos/ndk13-include/inline/$$(basename $$i _lib.sfd).h $$i; \
+	  sfdc --target=m68k-amigaos --mode=proto --output=$(PREFIX_PATH)/m68k-amigaos/ndk13-include/proto/$$(basename $$i _lib.sfd).h $$i; \
 	done
 	echo "done" >$@
 
@@ -640,31 +652,31 @@ build/ndk-include/_ndk13: build/ndk-include/_ndk
 # netinclude
 # =================================================
 build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
-	mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	rsync -a projects/amiga-netinclude/include/* $(PREFIX_MINGW)/m68k-amigaos/ndk-include
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/ndk-include
+	rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX_PATH)/m68k-amigaos/ndk-include
 	echo "done" >$@
 
 projects/amiga-netinclude/README.md: 
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/amiga-netinclude
+	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/amiga-netinclude
 
 # =================================================
 # libamiga
 # =================================================
-LIBAMIGA=$(PREFIX)/m68k-amigaos/lib/libamiga.a $(PREFIX)/m68k-amigaos/lib/libb/libamiga.a
+LIBAMIGA=$(PREFIX_PATH)/m68k-amigaos/lib/libamiga.a $(PREFIX_PATH)/m68k-amigaos/lib/libb/libamiga.a
 
 libamiga: $(LIBAMIGA)
 	@echo "built $(LIBAMIGA)"
 
 $(LIBAMIGA):
 	mkdir -p $(@D)
-	cp -p $(patsubst $(PREFIX)/m68k-amigaos/%,%,$@) $(@D)
+	cp -p $(patsubst $(PREFIX_PATH)/m68k-amigaos/%,%,$@) $(@D)
 
 # =================================================
 # libnix
 # =================================================
 
-CONFIG_LIBNIX = --prefix=$(PREFIX)/m68k-amigaos/libnix --target=m68k-amigaos --host=m68k-amigaos
+CONFIG_LIBNIX = --prefix=$(PREFIX_TARGET)/m68k-amigaos/libnix --target=m68k-amigaos --host=m68k-amigaos
 
 LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/libnix/.git -prune \) -not \( -path projects/libnix/sources/stubs/libbases -prune \) -not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
 
@@ -673,35 +685,35 @@ libnix: build/libnix/_done
 build/libnix/_done: build/libnix/Makefile
 	$(MAKE) -C build/libnix $(LOG)
 	$(MAKE) -C build/libnix install $(LOG)
-	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	@echo "done" >$@
 	@echo "built $(LIBNIX)"
 		
 build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-include/_ndk13 build/_netinclude build/binutils/_done build/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC) 
-	mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/libnix/lib/libnix 
 	mkdir -p build/libnix
 	echo 'void foo(){}' > build/libnix/x.c
-	if [ ! -e $(PREFIX)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/m68k-amigaos/lib/libstubs.a; fi
-	mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
-	if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar r $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
+	if [ ! -e $(PREFIX_PATH)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX_PATH)/bin/m68k-amigaos-ar r $(PREFIX_PATH)/m68k-amigaos/lib/libstubs.a; fi
+	mkdir -p $(PREFIX_PATH)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
+	if [ ! -e $(PREFIX_PATH)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX_PATH)/bin/m68k-amigaos-ar r $(PREFIX_PATH)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
 	cd build/libnix && CFLAGS="$(TARGET_C_FLAGS)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(LOG)
-	mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
-	rsync -a projects/libnix/sources/headers/* $(PREFIX_MINGW)/m68k-amigaos/libnix/include/
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/libnix/include/
+	rsync -a projects/libnix/sources/headers/* $(PREFIX_PATH)/m68k-amigaos/libnix/include/
 	touch build/libnix/Makefile
 	
 projects/libnix/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libnix
+	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libnix
 
 # =================================================
 # gcc libs
 # =================================================
 LIBGCCS_NAMES=libgcov.a libstdc++.a libsupc++.a
-LIBGCCS= $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCCS_NAMES))
+LIBGCCS= $(patsubst %,$(PREFIX_PATH)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCCS_NAMES))
 
 libgcc: build/gcc/_libgcc_done
 
@@ -722,45 +734,45 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 	rsync -a projects/clib2/library/* build/clib2
 	cd build/clib2 && find * -name lib\*.a -delete
 	$(MAKE) -C build/clib2 -f GNUmakefile.68k $(LOG)
-	mkdir -p $(PREFIX)/m68k-amigaos/clib2
-	rsync -a build/clib2/include $(PREFIX_MINGW)/m68k-amigaos/clib2
-	rsync -a build/clib2/lib $(PREFIX_MINGW)/m68k-amigaos/clib2
-	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb/libm.a $(COMPLEX_FILES)
-	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
+	mkdir -p $(PREFIX_PATH)/m68k-amigaos/clib2
+	rsync -a build/clib2/include $(PREFIX_PATH)/m68k-amigaos/clib2
+	rsync -a build/clib2/lib $(PREFIX_PATH)/m68k-amigaos/clib2
+	cd build/newlib/complex && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/clib2/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/clib2/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/clib2/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/clib2/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX_PATH)/bin/m68k-amigaos-ar rcs $(PREFIX_PATH)/m68k-amigaos/clib2/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	echo "done" >$@	
 
 projects/clib2/LICENSE:
 	@mkdir -p projects
-	cd projects && git clone -b master --depth 4 https://github.com/bebbo/clib2
+	cd projects && git clone -b master --depth 1 https://github.com/bebbo/clib2
 
 # =================================================
 # libdebug
 # =================================================
-CONFIG_LIBDEBUG = --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
+CONFIG_LIBDEBUG = --prefix=$(PREFIX_TARGET) --target=m68k-amigaos --host=m68k-amigaos
 
 libdebug: build/libdebug/_done
 
 build/libdebug/_done: build/libdebug/Makefile
 	$(MAKE) -C build/libdebug $(LOG)
-	cp build/libdebug/libdebug.a $(PREFIX)/m68k-amigaos/lib/
+	cp build/libdebug/libdebug.a $(PREFIX_PATH)/m68k-amigaos/lib/
 	echo "done" >$@
 
 build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	mkdir -p build/libdebug
-	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" ../../projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
+	cd build/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(LOG)
 
 projects/libdebug/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
+	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libdebug
 	touch -t 0001010000 projects/libdebug/configure.ac
 
 # =================================================
 # libsdl
 # =================================================
-CONFIG_LIBSDL12 = PREFX=$(PREFIX) PREF=$(PREFIX)
+CONFIG_LIBSDL12 = PREFX=$(PREFIX_PATH) PREF=$(PREFIX_PATH)
 
 libSDL12: build/libSDL12/_done
 
@@ -768,12 +780,12 @@ build/libSDL12/_done: build/libSDL12/Makefile.bax
 	$(MAKE) sdk=ahi $(LOG)
 	$(MAKE) sdk=cgx $(LOG)
 	cd build/libSDL12 && CFLAGS="$(TARGET_C_FLAGS)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(LOG)
-	cp build/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/
-	mkdir -p $(PREFIX)/include/GL
-	mkdir -p $(PREFIX)/include/SDL
-	rsync -a build/libSDL12/include/GL/*.i $(PREFIX_MINGW)/include/GL/
-	rsync -a build/libSDL12/include/GL/*.h $(PREFIX_MINGW)/include/GL/
-	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX_MINGW)/include/SDL/
+	cp build/libSDL12/libSDL.a $(PREFIX_PATH)/m68k-amigaos/lib/
+	mkdir -p $(PREFIX_PATH)/include/GL
+	mkdir -p $(PREFIX_PATH)/include/SDL
+	rsync -a build/libSDL12/include/GL/*.i $(PREFIX_PATH)/include/GL/
+	rsync -a build/libSDL12/include/GL/*.h $(PREFIX_PATH)/include/GL/
+	rsync -a build/libSDL12/include/SDL/*.h $(PREFIX_PATH)/include/SDL/
 	echo "done" >$@
 
 build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
@@ -783,7 +795,7 @@ build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $
 
 projects/libSDL12/Makefile.bax:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 4  https://github.com/AmigaPorts/libSDL12
+	cd projects &&	git clone -b master --depth 1  https://github.com/AmigaPorts/libSDL12
 
 
 # =================================================
@@ -807,15 +819,15 @@ build/newlib/newlib/libc.a: build/newlib/newlib/Makefile build/ndk-include/_ndk 
 	$(MAKE) -C build/newlib/newlib $(LOG)
 	$(MAKE) -C build/newlib/newlib install $(LOG)
 	mkdir -p build/newlib/complex
-	cd build/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex && $(PREFIX_PATH)/bin/m68k-amigaos-ar x $(PREFIX_PATH)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
 	mkdir -p build/newlib/complex/libb
-	cd build/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar x $(PREFIX_PATH)/m68k-amigaos/lib/libb/libm.a $(COMPLEX_FILES)
 	mkdir -p build/newlib/complex/libm020
-	cd build/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020 && $(PREFIX_PATH)/bin/m68k-amigaos-ar x $(PREFIX_PATH)/m68k-amigaos/lib/libm020/libm.a $(COMPLEX_FILES)
 	mkdir -p build/newlib/complex/libm020/libb
-	cd build/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb && $(PREFIX_PATH)/bin/m68k-amigaos-ar x $(PREFIX_PATH)/m68k-amigaos/lib/libm020/libb/libm.a $(COMPLEX_FILES)
 	mkdir -p build/newlib/complex/libm020/libb32
-	cd build/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
+	cd build/newlib/complex/libm020/libb32 && $(PREFIX_PATH)/bin/m68k-amigaos-ar x $(PREFIX_PATH)/m68k-amigaos/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	touch $@
 
 ifeq (,$(wildcard build/gcc/_done))
@@ -824,11 +836,11 @@ endif
 
 build/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	mkdir -p build/newlib/newlib
-	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" ../../../projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(LOG)
+	cd build/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" ../../../projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX_TARGET) $(LOG)
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
-	cd projects &&	git clone -b amiga --depth 4  https://github.com/bebbo/newlib-cygwin
+	cd projects &&	git clone -b amiga --depth 1  https://github.com/bebbo/newlib-cygwin
 
 # =================================================
 # ixemul
@@ -842,7 +854,7 @@ projects/ixemul/configure:
 # =================================================
 .PHONY: sdk all-sdk
 sdk: libnix
-	@$(PWD)/sdk/install install $(sdk) $(PREFIX)
+	@$(PWD)/sdk/install install $(sdk) $(PREFIX_PATH)
 
 SDKS0=$(shell find sdk/*.sdk)
 SDKS=$(patsubst sdk/%.sdk,%,$(SDKS0))
@@ -858,7 +870,7 @@ $(SDKS): libnix
 info:
 	@echo $@ $(UNAME_S)
 	@echo CC = $(DETECTED_CC) $(USED_CC_VERSION)
-	@echo PREFIX=$(PREFIX)
+	@echo PREFIX_PATH=$(PREFIX_PATH)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
 	@echo GCC_VERSION=$(GCC_VERSION)
