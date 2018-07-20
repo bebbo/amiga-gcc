@@ -27,7 +27,6 @@ E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR
 
 #LOG = >& $(PWD)/x.log || tail -n 999 $(PWD)/x.log
 
-
 # =================================================
 # determine exe extension for cygwin
 $(eval MYMAKE = $(shell which make) )
@@ -83,12 +82,12 @@ x:
 .PHONY: help
 help:
 	@echo "make help            display this help"
-	@echo "make info            print PREFIX_PATH and other flags"
+	@echo "make info            print prefix and other flags"
 	@echo "make all             build and install all"
 	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
 	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
-	@echo "make clean-prefix    remove all content from the PREFIX_PATH folder"
+	@echo "make clean-prefix    remove all content from the prefix folder"
 	@echo "make update          perform git pull for all targets"
 	@echo "make update-<target> perform git pull for the given target"
 	@echo "make sdk=<sdk>       install the sdk <sdk>"
@@ -104,7 +103,7 @@ all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc
 # =================================================
 # clean
 # =================================================
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring msys,$(USED_CC_VERSION)),)
 .PHONY: clean-gmp clean-mpc clean-mpfr
 clean: clean-gmp clean-mpc clean-mpfr
 endif
@@ -174,7 +173,7 @@ clean-libSDL12:
 clean-newlib:
 	rm -rf build/newlib
 
-# clean-prefix drops the files from PREFIX_PATH folder
+# clean-prefix drops the files from prefix folder
 clean-prefix:
 	rm -rf $(PREFIX_PATH)/bin
 	rm -rf $(PREFIX_PATH)/libexec
@@ -185,7 +184,7 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring msys,$(USED_CC_VERSION)),)
 .PHONY: update-gmp update-mpc update-mpfr
 update: update-gmp update-mpc update-mpfr
 endif
@@ -194,7 +193,7 @@ endif
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
 
 update-gcc: projects/gcc/configure
-	cd projects/gcc && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/gcc && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
@@ -204,7 +203,7 @@ update-binutils: projects/binutils/configure
 	  $(MAKE) projects/binutils/configure; \
 	  $(MAKE) clean-binutils; \
 	fi
-	cd projects/binutils && export DEPTH=1; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
+	cd projects/binutils && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 
 update-fd2sfd: projects/fd2sfd/configure
 	cd projects/fd2sfd && git pull
@@ -250,7 +249,7 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+ifneq ($(findstring msys,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
 	@mkdir -p projects
@@ -310,7 +309,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)	
+ifneq ($(findstring msys,$(USED_CC_VERSION)),)	
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
@@ -323,7 +322,7 @@ endif
 
 projects/gcc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(GCC_BRANCH) --depth 1 https://github.com/bebbo/gcc
+	cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 https://github.com/bebbo/gcc
 
 # =================================================
 # binutils
@@ -359,7 +358,7 @@ build/binutils/gas/Makefile: projects/binutils/configure
 
 projects/binutils/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 1 $(BINUTILS_GIT) binutils
+	cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(BINUTILS_GIT) binutils
 
 
 # =================================================
@@ -383,7 +382,7 @@ build/fd2sfd/Makefile: projects/fd2sfd/configure
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/cahirwpz/fd2sfd
+	cd projects &&	git clone -b master --depth 4 https://github.com/cahirwpz/fd2sfd
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -407,7 +406,7 @@ build/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null 
 
 projects/fd2pragma/makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/fd2pragma
+	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/fd2pragma
 
 # =================================================
 # ira
@@ -428,7 +427,7 @@ build/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not 
 
 projects/ira/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/ira
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/ira
 
 # =================================================
 # sfdc
@@ -452,7 +451,7 @@ build/sfdc/Makefile: projects/sfdc/configure
 
 projects/sfdc/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/adtools/sfdc
+	cd projects &&	git clone -b master --depth 4 https://github.com/adtools/sfdc
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -482,7 +481,7 @@ build/vasm/Makefile: projects/vasm/Makefile
 
 projects/vasm/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vasm
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vasm
 
 # =================================================
 # vbcc
@@ -508,7 +507,7 @@ build/vbcc/Makefile: projects/vbcc/Makefile
 
 projects/vbcc/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vbcc
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vbcc
 
 # =================================================
 # vlink
@@ -530,7 +529,7 @@ build/vlink/Makefile: projects/vlink/Makefile
 
 projects/vlink/Makefile:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/leffmann/vlink
+	cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vlink
 
 # =================================================
 # L I B R A R I E S
@@ -656,7 +655,7 @@ build/_netinclude: projects/amiga-netinclude/README.md build/ndk-include/_ndk $(
 
 projects/amiga-netinclude/README.md: 
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/amiga-netinclude
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/amiga-netinclude
 
 # =================================================
 # libamiga
@@ -705,7 +704,7 @@ build/libnix/Makefile: build/newlib/_done build/ndk-include/_ndk build/ndk-inclu
 	
 projects/libnix/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libnix
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libnix
 
 # =================================================
 # gcc libs
@@ -744,7 +743,7 @@ build/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib
 
 projects/clib2/LICENSE:
 	@mkdir -p projects
-	cd projects && git clone -b master --depth 1 https://github.com/bebbo/clib2
+	cd projects && git clone -b master --depth 4 https://github.com/bebbo/clib2
 
 # =================================================
 # libdebug
@@ -764,7 +763,7 @@ build/libdebug/Makefile: build/libnix/_done projects/libdebug/configure $(shell 
 
 projects/libdebug/configure:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1 https://github.com/bebbo/libdebug
+	cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/libdebug
 	touch -t 0001010000 projects/libdebug/configure.ac
 
 # =================================================
@@ -793,7 +792,7 @@ build/libSDL12/Makefile.bax: build/libnix/_done projects/libSDL12/Makefile.bax $
 
 projects/libSDL12/Makefile.bax:
 	@mkdir -p projects
-	cd projects &&	git clone -b master --depth 1  https://github.com/AmigaPorts/libSDL12
+	cd projects &&	git clone -b master --depth 4  https://github.com/AmigaPorts/libSDL12
 
 
 # =================================================
@@ -838,7 +837,7 @@ build/newlib/newlib/Makefile: projects/newlib-cygwin/configure
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
-	cd projects &&	git clone -b amiga --depth 1  https://github.com/bebbo/newlib-cygwin
+	cd projects &&	git clone -b amiga --depth 4  https://github.com/bebbo/newlib-cygwin
 
 # =================================================
 # ixemul
@@ -868,7 +867,7 @@ $(SDKS): libnix
 info:
 	@echo $@ $(UNAME_S)
 	@echo CC = $(DETECTED_CC) $(USED_CC_VERSION)
-	@echo PREFIX_PATH=$(PREFIX_PATH)
+	@echo PREFIX=$(PREFIX)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
 	@echo GCC_VERSION=$(GCC_VERSION)
