@@ -56,10 +56,21 @@ endif
 endif
 
 USED_CC_VERSION = $(shell $(DETECTED_CC) -v |& grep Target)
+BUILD_TARGET=unix
+ifneq ($(findstring msys,$(USED_CC_VERSION)),)
+BUILD_TARGET=msys
+  else
+  ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
+BUILD_TARGET=msys
+  endif
+endif
 
 PREFIX_TARGET = $(PREFIX)
-ifneq ($(findstring mingw,$(USED_CC_VERSION)),)
-PREFIX_PATH = /$(subst \,/,$(subst :,,$(PREFIX)))
+ifneq ($(findstring :,$(PREFIX)),)
+# Under mingw convert paths such as c:/gcc to /c/gcc
+# Quotes added to work around a broken pipe error when running under MinGW
+PREFIX_SUB = "/$(subst \,/,$(subst :,,$(PREFIX)))"
+PREFIX_PATH = $(subst ",,$(PREFIX_SUB))
 else
 PREFIX_PATH = $(PREFIX)
 endif
@@ -97,13 +108,18 @@ help:
 # =================================================
 # all
 # =================================================
+ifeq ($(BUILD_TARGET),msys)
+.PHONY: install-dll
+all: install-dll
+endif
+
 .PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 
 # =================================================
 # clean
 # =================================================
-ifneq ($(findstring msys,$(USED_CC_VERSION)),)
+ifeq ($(BUILD_TARGET),msys)
 .PHONY: clean-gmp clean-mpc clean-mpfr
 clean: clean-gmp clean-mpc clean-mpfr
 endif
@@ -184,7 +200,7 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-ifneq ($(findstring msys,$(USED_CC_VERSION)),)
+ifeq ($(BUILD_TARGET),msys)
 .PHONY: update-gmp update-mpc update-mpfr
 update: update-gmp update-mpc update-mpfr
 endif
@@ -249,7 +265,7 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
-ifneq ($(findstring msys,$(USED_CC_VERSION)),)
+ifeq ($(BUILD_TARGET),msys)
 update-gmp:
 	@mkdir -p download
 	@mkdir -p projects
@@ -309,7 +325,7 @@ build/gcc/_done: build/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1
 
 build/gcc/Makefile: projects/gcc/configure build/binutils/_done
 	@mkdir -p build/gcc
-ifneq ($(findstring msys,$(USED_CC_VERSION)),)	
+ifeq ($(BUILD_TARGET),msys)
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
@@ -860,6 +876,39 @@ all-sdk: $(SDKS)
 
 $(SDKS): libnix
 	$(MAKE) sdk=$@ $(LOG)
+
+# =================================================
+# Copy needed dll files
+# =================================================
+
+ifeq ($(BUILD_TARGET),msys)
+ifneq ($(findstring MINGW32,$(UNAME_S)),)
+MINGW_PATH = /mingw32
+else
+MINGW_PATH = /mingw64
+endif
+endif
+
+install-dll: build/_installdll_done
+
+build/_installdll_done: build/newlib/_done
+ifeq ($(BUILD_TARGET),msys)
+	rsync $(MINGW_PATH)/bin/libwinpthread-1.dll $(PREFIX_PATH)/bin
+	rsync $(MINGW_PATH)/bin/libwinpthread-1.dll $(PREFIX_PATH)/libexec/gcc/m68k-elf/$(GCC_VERSION)
+	rsync $(MINGW_PATH)/bin/libwinpthread-1.dll $(PREFIX_PATH)/m68k-elf/bin
+	rsync $(MINGW_PATH)/bin/libintl-8.dll $(PREFIX_PATH)/bin
+	rsync $(MINGW_PATH)/bin/libintl-8.dll $(PREFIX_PATH)/libexec/gcc/m68k-elf/$(GCC_VERSION)
+	rsync $(MINGW_PATH)/bin/libintl-8.dll $(PREFIX_PATH)/m68k-elf/bin
+	rsync $(MINGW_PATH)/bin/libiconv-2.dll $(PREFIX_PATH)/bin
+	rsync $(MINGW_PATH)/bin/libiconv-2.dll $(PREFIX_PATH)/libexec/gcc/m68k-elf/$(GCC_VERSION)
+	rsync $(MINGW_PATH)/bin/libiconv-2.dll $(PREFIX_PATH)/m68k-elf/bin
+	rsync $(MINGW_PATH)/bin/libgcc_s_dw2-1.dll $(PREFIX_PATH)/bin
+	rsync $(MINGW_PATH)/bin/libgcc_s_dw2-1.dll $(PREFIX_PATH)/libexec/gcc/m68k-elf/$(GCC_VERSION)
+	rsync $(MINGW_PATH)/bin/libgcc_s_dw2-1.dll $(PREFIX_PATH)/m68k-elf/bin
+endif
+	echo "done" >$@
+	touch $@
+
 # =================================================
 # info
 # =================================================
