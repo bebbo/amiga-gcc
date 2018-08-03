@@ -23,7 +23,7 @@ Right now these tools are build:
 ### macOS
 Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
 
-`brew install bash make lhasa gmp mpfr mpc fles gettext texinfo`
+`brew install bash make lhasa gmp mpfr mpc flex gettext texinfo`
 
 By default macOS uses an outdated version of bash. Therefore, on macOS host always pass the the SHELL=/usr/local/bin/bash parameter (or any other valid path pointing to bash), e.g.:
 ```
@@ -33,6 +33,8 @@ On macOS it may be also necessary to point to the correct compiler version (ther
 ```
 CC=clang CXX=clang++ make all SHELL=/usr/local/bin/bash
 ```
+
+**ALSO NOTE** If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
 
 ### Windows with Cygwin
 Install cygwin via setup.exe and add wget. Then open cygwin shell and run:
