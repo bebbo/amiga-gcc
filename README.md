@@ -20,6 +20,20 @@ Right now these tools are build:
 `sudo yum install gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo`
 ### Ubuntu
 `sudo apt install make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext texinfo`
+### macOS
+Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
+
+`brew install bash make lhasa gmp mpfr mpc fles gettext texinfo`
+
+By default macOS uses an outdated version of bash. Therefore, on macOS host always pass the the SHELL=/usr/local/bin/bash parameter (or any other valid path pointing to bash), e.g.:
+```
+make all SHELL=/usr/local/bin/bash
+```
+On macOS it may be also necessary to point to the correct compiler version (there is a gcc wrapper for clang, which can produce compile errors!), e.g.:
+```
+CC=clang CXX=clang++ make all SHELL=/usr/local/bin/bash
+```
+
 ### Windows with Cygwin
 Install cygwin via setup.exe and add wget. Then open cygwin shell and run:
 
