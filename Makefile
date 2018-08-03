@@ -10,7 +10,7 @@ include disable_implicite_rules.mk
 # =================================================
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
-SHELL ?= /bin/bash
+SHELL = /bin/bash
 
 GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
