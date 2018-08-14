@@ -241,7 +241,6 @@ update-newlib: projects/newlib-cygwin/newlib/configure
 update-netinclude: projects/amiga-netinclude/README.md
 	cd projects/amiga-netinclude && git pull
 
-ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
 update-gmp:
 	@mkdir -p download
 	if [ -a download/$(GMPFILE) ]; \
@@ -265,7 +264,6 @@ update-mpfr:
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
 	fi;
 	cd projects && tar xf ../download/$(MPFRFILE)
-endif
 
 status-all:
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
