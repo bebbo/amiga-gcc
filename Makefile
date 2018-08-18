@@ -337,6 +337,7 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/gas/Makefile $(shell find 2>/dev/null
 	touch -t 0001010000 projects/binutils/binutils/arparse.y
 	touch -t 0001010000 projects/binutils/binutils/arlex.l
 	touch -t 0001010000 projects/binutils/ld/ldgram.y
+	touch -t 0001010000 projects/binutils/intl/plural.y
 	$(MAKE) -C $(BUILD)/binutils all-gas all-binutils all-ld $(ALL_GDB) $(LOG)
 	$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(LOG)
 	echo "done" >$@
