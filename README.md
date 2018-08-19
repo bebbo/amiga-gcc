@@ -45,6 +45,11 @@ install apt-cyg /bin
 apt-cyg install gcc-core gcc-g++ python git perl-Pod-Simple gperf patch automake make makedepend bison flex libncurses-devel python-devel gettext-devel libgmp-devel libmpc-devel libmpfr-devel
 ```
 
+### Windows with msys2
+```
+pacman -S git base-devel gcc flex gmp-devel mpc-devel mpfr-devel
+```
+
 ### Ubuntu running on the Windows 10 Linux subsystem
 tbd
 
