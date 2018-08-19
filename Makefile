@@ -23,11 +23,10 @@ BINUTILS_GIT ?= https://github.com/bebbo/binutils-gdb
 BINUTILS_BRANCH ?= amiga
 
 CFLAGS?=-Os
-CPPFLAGS=$(CFLAGS)
-CXXFLAGS=$(CFLAGS)
-TARGET_C_FLAGS?=-Os -g -fomit-frame-pointer
+CXXFLAGS?=$(CFLAGS)
+TARGET_C_FLAGS?=-Os -fomit-frame-pointer
 
-E=CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR_TARGET="$(TARGET_C_FLAGS)"
+E=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR_TARGET="$(TARGET_C_FLAGS)"
 
 #LOG = >& $(PWD)/x.log || tail -n 999 $(PWD)/x.log
 
@@ -47,19 +46,6 @@ MPC = mpc-1.0.3
 MPCFILE = $(MPC).tar.gz
 MPFR = mpfr-3.1.6
 MPFRFILE = $(MPFR).tar.bz2
-
-DETECTED_CC = $(CC)
-ifeq ($(CC),cc)
-DETECTED_VERSION =  $(shell $(CC) -v |& grep version)
-ifneq ($(findstring clang,$(DETECTED_VERSION)),)
-DETECTED_CC = clang
-endif
-ifneq ($(findstring gcc,$(DETECTED_VERSION)),)
-DETECTED_CC = gcc
-endif
-endif
-
-USED_CC_VERSION = $(shell $(DETECTED_CC) -v |& grep Target)
 
 # =================================================
 
@@ -98,7 +84,7 @@ all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc
 # =================================================
 # clean
 # =================================================
-ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
+ifneq ($(OWNMPC),)
 .PHONY: clean-gmp clean-mpc clean-mpfr
 clean: clean-gmp clean-mpc clean-mpfr
 endif
@@ -179,10 +165,6 @@ clean-prefix:
 # =================================================
 # update all projects
 # =================================================
-ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)
-.PHONY: update-gmp update-mpc update-mpfr
-update: update-gmp update-mpc update-mpfr
-endif
 
 .PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
@@ -299,7 +281,7 @@ $(BUILD)/gcc/_done: $(BUILD)/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxd
 
 $(BUILD)/gcc/Makefile: projects/gcc/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/gcc
-ifneq ($(findstring MSYS,$(USED_CC_VERSION)),)	
+ifneq ($(OWNGMP),)	
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
@@ -857,7 +839,7 @@ $(SDKS): libnix
 .PHONY: info v
 info:
 	@echo $@ $(UNAME_S)
-	@echo CC = $(DETECTED_CC) $(USED_CC_VERSION)
+	@echo CC = $(CC)
 	@echo PREFIX=$(PREFIX)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
