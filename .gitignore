@@ -2,3 +2,6 @@ build*
 projects
 download
 Output
+*.log
+.lock
+.state

@@ -30,10 +30,10 @@ case $1 in
 	    				echo wget ${a[1]}:${a[2]} -O download/$file
 	    				wget ${a[1]}:${a[2]} -O download/$file || (rm download/$file; exit 1)
 	    			fi
-	    			if [ ! -e "build/$2" ]; then
-		    			mkdir build/$2
+	    			if [ ! -e "build/$2" ] || [ "$(ls -l build/$2)" == "total 0" ]; then
+		    			mkdir -p build/$2
 		    			pushd build/$2
-		    				lha x "../../download/$file"
+		    				lha x "../../download/$file" && $3/bin/lha x "../../download/$file"
 		    			popd
 	    			fi
 	    		fi
