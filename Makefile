@@ -86,7 +86,7 @@ help:
 	@echo "make help            display this help"
 	@echo "make info            print prefix and other flags"
 	@echo "make all             build and install all"
-	@echo "make <target>        builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
+	@echo "make <target>        builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
 	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix    remove all content from the prefix folder"
@@ -99,8 +99,8 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
-all: gcc binutils fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+.PHONY: all gcc gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+all: gcc binutils gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 
 # =================================================
 # clean
@@ -133,6 +133,9 @@ clean-libgcc:
 
 clean-binutils:
 	rm -rf $(BUILD)/binutils
+
+clean-gprof:
+	rm -rf $(BUILD)/binutils/gprof
 
 clean-fd2sfd:
 	rm -rf $(BUILD)/fd2sfd
@@ -297,7 +300,7 @@ endif
 
 binutils: $(BUILD)/binutils/_done
 
-$(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -type f)
+$(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -not \( -path projects/binutils/gprof -prune \) -type f)
 	@touch -t 0001010000 projects/binutils/binutils/arparse.y
 	@touch -t 0001010000 projects/binutils/binutils/arlex.l
 	@touch -t 0001010000 projects/binutils/ld/ldgram.y
@@ -353,7 +356,21 @@ projects/gcc/configure:
 	@mkdir -p projects
 	@cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 https://github.com/bebbo/gcc
 
+# =================================================
+# gprof
+# =================================================
+CONFIG_GRPOF = --prefix=$(PREFIX) --target=m68k-amigaos --disable-werror
 
+gprof: $(BUILD)/binutils/_gprof
+
+$(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null projects/binutils/gprof -type f)
+	$(L0)"make gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof all $(L2)
+	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2) 
+	@echo "done" >$@
+
+$(BUILD)/binutils/gprof/Makefile: projects/binutils/gprof/configure $(BUILD)/binutils/_done
+	@mkdir -p $(BUILD)/binutils/gprof
+	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/projects/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
 # =================================================
 # fd2sfd
@@ -715,7 +732,7 @@ LIBGCCS= $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCCS_
 
 libgcc: $(BUILD)/gcc/_libgcc_done
 
-$(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(LIBAMIGA)
+$(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(LIBAMIGA) $(shell find 2>/dev/null projects/gcc/libgcc -type f)
 	$(L0)"make libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-target $(L2) 
 	$(L0)"install libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-target $(L2)
 	@echo "done" >$@
@@ -759,7 +776,7 @@ $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
 
 $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libdebug
-	@cd $(BUILD)/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) 
+	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 projects/libdebug/configure:
 	@mkdir -p projects
