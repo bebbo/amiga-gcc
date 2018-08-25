@@ -57,7 +57,7 @@ endif
 L0 = @__p=
 L00 = __p=
 ifeq ($(verbose),)
-L1 = ; (flock 200; echo -e \\e[33m$$__p... >>.state; echo -ne \\e[33m$$__p... ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
+L1 = ; (flock 200; echo -e \\e[33m$$__p...\\e[39m >>.state; echo -ne \\e[33m$$__p...\\e[39m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; (flock 200; if (( $$__r > 0 )); then \
   echo -e \\r\\e[K\\e[31m$$__p...failed\\e[39m; \
   tail -n 20 "$$__l"; \
@@ -538,9 +538,9 @@ projects/vlink/Makefile:
 	@cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vlink
 
 .PHONY: lha
-lha: $(BUILD)/lha/_done
+lha: $(BUILD)/_lha_done
 
-$(BUILD)/lha/_done:
+$(BUILD)/_lha_done:
 	@if [ ! -e "$$(which lha)" ]; then \
 	  cd $(BUILD) && rm -rf lha; \
 	  git clone https://github.com/jca02266/lha; \
@@ -620,7 +620,7 @@ $(BUILD)/ndk-include/_proto:
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-projects/NDK_3.9.info: $(BUILD)/lha/_done download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
+projects/NDK_3.9.info: $(BUILD)/_lha_done download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
 	@mkdir -p projects
 	@mkdir -p $(BUILD)/
 	$(L0)"unpack ndk"$(L1) cd projects && lha xf ../download/NDK39.lha $(L2)
@@ -867,7 +867,7 @@ projects/ixemul/configure:
 # sdk installation
 # =================================================
 .PHONY: sdk all-sdk
-sdk: libnix $(BUILD)/lha/_done
+sdk: libnix $(BUILD)/_lha_done
 	$(L0)"sdk $(sdk)"$(L1) $(PWD)/sdk/install install $(sdk) $(PREFIX) $(L2)
 
 SDKS0=$(shell find sdk/*.sdk)
