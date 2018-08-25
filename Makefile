@@ -51,7 +51,7 @@ MPFRFILE = $(MPFR).tar.bz2
 TEEEE ?= >&
 
 ifeq ($(sdk),)
-__LINIT := $(shell rm .state 2>/dev/nul)
+__LINIT := $(shell rm .state 2>/dev/null)
 endif
 
 L0 = @__p=
