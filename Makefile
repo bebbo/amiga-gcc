@@ -24,9 +24,9 @@ BINUTILS_BRANCH ?= amiga
 
 CFLAGS?=-Os
 CXXFLAGS?=$(CFLAGS)
-TARGET_C_FLAGS?=-Os -fomit-frame-pointer
+CFLAGS_FOR_TARGET?=-Os -fomit-frame-pointer
 
-E=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LIBCFLAGS_FOR_TARGET="$(TARGET_C_FLAGS)"
+E=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
 
 # =================================================
 # determine exe extension for cygwin
@@ -57,13 +57,14 @@ endif
 L0 = @__p=
 L00 = __p=
 ifeq ($(verbose),)
-L1 = ; (flock 200; echo -e \\e[33m$$__p...\\e[39m >>.state; echo -ne \\e[33m$$__p...\\e[39m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
+L1 = ; (flock 200; echo -e \\e[33m$$__p...\\e[0m >>.state; echo -ne \\e[33m$$__p...\\e[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; (flock 200; if (( $$__r > 0 )); then \
-  echo -e \\r\\e[K\\e[31m$$__p...failed\\e[39m; \
+  echo -e \\r\\e[K\\e[31m$$__p...failed\\e[0m; \
   tail -n 20 "$$__l"; \
-  echo -e \\e[31m$$__p...failed\\e[39m; \
-  else echo -e \\r\\e[K\\e[32m$$__p...done\\e[39m; fi \
-  ;grep -v "$$__p" .state >.state0; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
+  echo -e \\e[31m$$__p...failed\\e[0m; \
+  echo -e \\e[1mless \"$$__l\"\\e[0m; \
+  else echo -e \\r\\e[K\\e[32m$$__p...done\\e[0m; fi \
+  ;grep -v "$$__p" .state >.state0 2>/dev/null; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
 else
 L1 = ;
 endif
@@ -284,7 +285,7 @@ status-all:
 # =================================================
 # binutils
 # =================================================
-CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --disable-plugins --disable-werror
+CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --disable-plugins --disable-werror --enable-tui --disable-nls
 BINUTILS_CMD = m68k-amigaos-addr2line m68k-amigaos-ar m68k-amigaos-as m68k-amigaos-c++filt \
 	m68k-amigaos-ld m68k-amigaos-nm m68k-amigaos-objcopy m68k-amigaos-objdump m68k-amigaos-ranlib \
 	m68k-amigaos-readelf m68k-amigaos-size m68k-amigaos-strings m68k-amigaos-strip
@@ -322,7 +323,8 @@ projects/binutils/configure:
 # gcc
 # =================================================
 CONFIG_GCC=--prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared \
+	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"
 
 
 GCC_CMD = m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
@@ -715,7 +717,7 @@ $(BUILD)/libnix/Makefile: $(BUILD)/newlib/_done $(BUILD)/ndk-include/_ndk $(BUIL
 	@if [ ! -e $(PREFIX)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libstubs.a; fi
 	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"configure libnix"$(L1) cd $(BUILD)/libnix && CFLAGS="$(TARGET_C_FLAGS)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(L2) 
+	$(L0)"configure libnix"$(L1) cd $(BUILD)/libnix && CFLAGS="$(CFLAGS_FOR_TARGET)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(L2) 
 	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
 	@rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@touch $(BUILD)/libnix/Makefile
@@ -776,7 +778,7 @@ $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
 
 $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libdebug
-	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
+	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 projects/libdebug/configure:
 	@mkdir -p projects
@@ -793,7 +795,7 @@ libSDL12: $(BUILD)/libSDL12/_done
 $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile.bax
 	$(MAKE) sdk=ahi 
 	$(MAKE) sdk=cgx 
-	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(TARGET_C_FLAGS)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2) 
+	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2) 
 	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
 	@mkdir -p $(PREFIX)/include/GL
 	@mkdir -p $(PREFIX)/include/SDL
@@ -850,7 +852,7 @@ endif
 
 $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	@mkdir -p $(BUILD)/newlib/newlib
-	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(TARGET_C_FLAGS)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
+	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
@@ -889,7 +891,7 @@ info:
 	@echo GCC_BRANCH=$(GCC_BRANCH)
 	@echo GCC_VERSION=$(GCC_VERSION)
 	@echo CFLAGS=$(CFLAGS)
-	@echo TARGET_C_FLAGS=$(TARGET_C_FLAGS)
+	@echo CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)
 	@echo BINUTILS_GIT=$(BINUTILS_GIT)
 	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
 
