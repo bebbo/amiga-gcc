@@ -474,19 +474,16 @@ VASM = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VASM_CMD))
 
 vasm: $(BUILD)/vasm/_done
 
-$(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
+$(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile 
 	$(L0)"make vasm"$(L1) $(MAKE) -C $(BUILD)/vasm CPU=m68k SYNTAX=mot $(L2) 
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install vasm"$(L1) install $(BUILD)/vasm/vasmm68k_mot $(PREFIX)/bin/ ;\
-	install $(BUILD)/vasm/vobjdump $(PREFIX)/bin/ ;\
-	cp patches/vc.config $(BUILD)/vasm/vc.config ;\
-	sed -e "s|PREFIX|$(PREFIX)|g" -i.bak $(BUILD)/vasm/vc.config ;\
-	@mkdir -p $(PREFIX)/m68k-amigaos/etc/ ;\
-	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2)
+	install $(BUILD)/vasm/vobjdump $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
 
-$(BUILD)/vasm/Makefile: projects/vasm/Makefile
+$(BUILD)/vasm/Makefile: projects/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
 	@rsync -a projects/vasm $(BUILD)/ --exclude .git
+	@touch $(BUILD)/vasm/Makefile
 
 projects/vasm/Makefile:
 	@mkdir -p projects
@@ -500,7 +497,7 @@ VBCC = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VBCC_CMD))
 
 vbcc: $(BUILD)/vbcc/_done
 
-$(BUILD)/vbcc/_done: $(BUILD)/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
+$(BUILD)/vbcc/_done: $(BUILD)/vbcc/Makefile
 	$(L0)"make vbcc dtgen"$(L1) TARGET=m68k $(MAKE) -C $(BUILD)/vbcc bin/dtgen $(L2)
 	@cd $(BUILD)/vbcc && echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt
 	$(L0)"run vbcc dtgen"$(L1) cd $(BUILD)/vbcc && bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt $(L2)
@@ -510,13 +507,14 @@ $(BUILD)/vbcc/_done: $(BUILD)/vbcc/Makefile $(shell find 2>/dev/null projects/vb
 	$(L0)"install vbcc"$(L1) install $(BUILD)/vbcc/bin/v* $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
 
-$(BUILD)/vbcc/Makefile: projects/vbcc/Makefile
+$(BUILD)/vbcc/Makefile: projects/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
 	@rsync -a projects/vbcc $(BUILD)/ --exclude .git
 	@mkdir -p $(BUILD)/vbcc/bin
+	@touch $(BUILD)/vbcc/Makefile
 
 projects/vbcc/Makefile:
 	@mkdir -p projects
-	@cd projects &&	git clone -b master --depth 4 https://github.com/leffmann/vbcc
+	@cd projects &&	git clone -b master --depth 4 https://github.com/bebbo/vbcc
 
 # =================================================
 # vlink
@@ -524,7 +522,7 @@ projects/vbcc/Makefile:
 VLINK_CMD = vlink
 VLINK = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VLINK_CMD))
 
-vlink: $(BUILD)/vlink/_done
+vlink: $(BUILD)/vlink/_done vbcc-target
 
 $(BUILD)/vlink/_done: $(BUILD)/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
 	$(L0)"make vlink"$(L1) cd $(BUILD)/vlink && TARGET=m68k $(MAKE) $(L2) 
@@ -552,6 +550,27 @@ $(BUILD)/_lha_done:
 	  $(L00)"install lha"$(L1) mkdir -p $(PREFIX)/bin/; install src/lha$(EXEEXT) $(PREFIX)/bin/lha$(EXEEXT); $(L2); \
 	fi
 	@echo "done" >$@ 
+
+
+.PHONY: vbcc-target
+vbcc-target: $(BUILD)/vbcc_target_m68k-amigaos/_done
+
+$(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info patches/vc.config
+	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/include
+	$(L0)"copying vbcc headers"$(L1) rsync $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/include/* $(PREFIX)/m68k-amigaos/vbcc/include $(L2)
+	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/lib
+	$(L0)"copying vbcc headers"$(L1) rsync $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/lib/* $(PREFIX)/m68k-amigaos/vbcc/lib $(L2)
+	@echo "done" >$@
+	$(L0)"creating vbcc config"$(L1) sed -e "s|PREFIX|$(PREFIX)|g" patches/vc.config >$(BUILD)/vasm/vc.config ;\
+	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2) 
+	
+
+$(BUILD)/vbcc_target_m68k-amigaos.info: download/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
+	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf ../download/vbcc_target_m68k-amigaos.lha $(L2)
+	@touch $(BUILD)/vbcc_target_m68k-amigaos.info
+
+download/vbcc_target_m68k-amigaos.lha:
+	$(L0)"downloading vbcc_target"$(L1) cd download && wget http://server.owl.de/~frank/vbcc/2017-08-14/vbcc_target_m68k-amigaos.lha $(L2)
 
 # =================================================
 # L I B R A R I E S
