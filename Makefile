@@ -54,16 +54,23 @@ ifeq ($(sdk),)
 __LINIT := $(shell rm .state 2>/dev/null)
 endif
 
+$(eval has_flock = $(shell which flock 2>/dev/null))
+ifeq ($(has_flock),)
+FLOCK = echo >/dev/null
+else
+FLOCK = $(has_flock)
+endif
+
 L0 = @__p=
 L00 = __p=
 ifeq ($(verbose),)
-L1 = ; (flock 200; echo -e \\e[33m$$__p...\\e[0m >>.state; echo -ne \\e[33m$$__p...\\e[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
-L2 = )$(TEEEE) "$$__l"; __r=$$?; (flock 200; if (( $$__r > 0 )); then \
-  echo -e \\r\\e[K\\e[31m$$__p...failed\\e[0m; \
+L1 = ; ($(FLOCK) 200; echo -e \\033[33m$$__p...\\033[0m >>.state; echo -ne \\033[33m$$__p...\\033[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
+L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
+  echo -e \\r\\033[K\\033[31m$$__p...failed\\033[0m; \
   tail -n 20 "$$__l"; \
-  echo -e \\e[31m$$__p...failed\\e[0m; \
-  echo -e \\e[1mless \"$$__l\"\\e[0m; \
-  else echo -e \\r\\e[K\\e[32m$$__p...done\\e[0m; fi \
+  echo -e \\033[31m$$__p...failed\\033[0m; \
+  echo -e \\033[1mless \"$$__l\"\\033[0m; \
+  else echo -e \\r\\033[K\\033[32m$$__p...done\\033[0m; fi \
   ;grep -v "$$__p" .state >.state0 2>/dev/null; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
 else
 L1 = ;
@@ -904,7 +911,6 @@ $(SDKS): libnix
 .PHONY: info v
 info:
 	@echo $@ $(UNAME_S)
-	@echo CC = $(CC)
 	@echo PREFIX=$(PREFIX)
 	@echo GCC_GIT=$(GCC_GIT)
 	@echo GCC_BRANCH=$(GCC_BRANCH)
@@ -913,6 +919,8 @@ info:
 	@echo CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)
 	@echo BINUTILS_GIT=$(BINUTILS_GIT)
 	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
+	$(CC) -v -E - </dev/null
+	$(CXX) -v -E - </dev/null
 
 v:
 	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 | grep commit) && cd ../..; done
