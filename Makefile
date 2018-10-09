@@ -301,7 +301,7 @@ BINUTILS = $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 BINUTILS_DIR = . bfd gas ld binutils opcodes
 BINUTILSD = $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 
-ifeq ($(findstring clang,$(CC)),)
+ifeq ($(findstring Darwin,$(shell uname)),)
 ALL_GDB = all-gdb
 INSTALL_GDB = install-gdb
 endif
