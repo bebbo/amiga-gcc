@@ -550,7 +550,7 @@ lha: $(BUILD)/_lha_done
 $(BUILD)/_lha_done:
 	@if [ ! -e "$$(which lha)" ]; then \
 	  cd $(BUILD) && rm -rf lha; \
-	  git clone https://github.com/jca02266/lha; \
+	  $(L0)"clone lha"$(L1) git clone https://github.com/jca02266/lha; $(L2); \
 	  cd lha; \
 	  $(L00)"configure lha"$(L1) aclocal; autoheader; automake -a; autoconf; ./configure; $(L2); \
 	  $(L00)"make lha"$(L1) make all; $(L2); \
@@ -919,8 +919,8 @@ info:
 	@echo CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)
 	@echo BINUTILS_GIT=$(BINUTILS_GIT)
 	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
-	$(CC) -v -E - </dev/null
-	$(CXX) -v -E - </dev/null
+	@$(CC) -v -E - </dev/null |& grep " version "
+	@$(CXX) -v -E - </dev/null |& grep " version "
 
 v:
 	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 | grep commit) && cd ../..; done
