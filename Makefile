@@ -13,7 +13,7 @@ SHELL = /bin/bash
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
 
-BUILD ?= build-$(shell uname -o)
+BUILD ?= build-$(shell uname)
 
 GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
