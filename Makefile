@@ -13,7 +13,7 @@ SHELL = /bin/bash
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
 
-BUILD ?= build
+BUILD ?= build-$(shell uname -o)
 
 GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
@@ -292,7 +292,7 @@ status-all:
 # =================================================
 # binutils
 # =================================================
-CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --disable-plugins --disable-werror --enable-tui --disable-nls
+CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --enable-plugins --disable-werror --enable-tui --disable-nls
 BINUTILS_CMD = m68k-amigaos-addr2line m68k-amigaos-ar m68k-amigaos-as m68k-amigaos-c++filt \
 	m68k-amigaos-ld m68k-amigaos-nm m68k-amigaos-objcopy m68k-amigaos-objdump m68k-amigaos-ranlib \
 	m68k-amigaos-readelf m68k-amigaos-size m68k-amigaos-strings m68k-amigaos-strip
@@ -921,7 +921,12 @@ info:
 	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
 	@$(CC) -v -E - </dev/null |& grep " version "
 	@$(CXX) -v -E - </dev/null |& grep " version "
+	@echo $(BUILD)
 
 v:
-	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 | grep commit) && cd ../..; done
-	@echo "." && git log -n1 | grep commit
+	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 --pretty=oneline) && cd ../..; done
+	@echo "." && git log -n1 --pretty=oneline
+
+r:
+	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git remote -v) && cd ../..; done
+	@echo "." && git remote -v
