@@ -13,7 +13,8 @@ SHELL = /bin/bash
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
 
-BUILD ?= build-$(shell uname)
+UNAME_S := $(shell uname -s)
+BUILD ?= build-$(UNAME_S)
 
 GCC_GIT ?= https://github.com/bebbo/gcc
 GCC_BRANCH ?= gcc-6-branch
@@ -26,7 +27,7 @@ CFLAGS?=-Os
 CXXFLAGS?=$(CFLAGS)
 CFLAGS_FOR_TARGET?=-Os -fomit-frame-pointer
 
-E=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
+E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
 
 # =================================================
 # determine exe extension for cygwin
@@ -34,16 +35,14 @@ $(eval MYMAKE = $(shell which make) )
 $(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)" 2>/dev/null) )
 EXEEXT=$(MYMAKEEXE:%=.exe)
 
-UNAME_S := $(shell uname -s)
-
 # Files for GMP, MPC and MPFR
 
-GMP = gmp-6.1.2
-GMPFILE = $(GMP).tar.bz2
-MPC = mpc-1.0.3
-MPCFILE = $(MPC).tar.gz
-MPFR = mpfr-3.1.6
-MPFRFILE = $(MPFR).tar.bz2
+GMP ?= gmp-6.1.2
+GMPFILE := $(GMP).tar.bz2
+MPC ?= mpc-1.0.3
+MPCFILE := $(MPC).tar.gz
+MPFR ?= mpfr-3.1.6
+MPFRFILE := $(MPFR).tar.bz2
 
 # =================================================
 # pretty output ^^
@@ -292,7 +291,7 @@ status-all:
 # =================================================
 # binutils
 # =================================================
-CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --enable-plugins --disable-werror --enable-tui --disable-nls
+CONFIG_BINUTILS=--prefix=$(PREFIX) --target=m68k-amigaos --disable-plugins --disable-werror --enable-tui --disable-nls
 BINUTILS_CMD = m68k-amigaos-addr2line m68k-amigaos-ar m68k-amigaos-as m68k-amigaos-c++filt \
 	m68k-amigaos-ld m68k-amigaos-nm m68k-amigaos-objcopy m68k-amigaos-objdump m68k-amigaos-ranlib \
 	m68k-amigaos-readelf m68k-amigaos-size m68k-amigaos-strings m68k-amigaos-strip
