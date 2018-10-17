@@ -803,7 +803,7 @@ $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
 
 $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libdebug
-	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
+	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 projects/libdebug/configure:
 	@mkdir -p projects
