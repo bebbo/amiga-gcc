@@ -250,7 +250,7 @@ update-libdebug: projects/libdebug/configure
 update-libSDL12: projects/libSDL12/Makefile.bax
 	@cd projects/libSDL12 && git pull
 
-update-ndk: projects/NDK_3.9.info
+update-ndk: download/NDK39.lha
 
 update-newlib: projects/newlib-cygwin/newlib/configure
 	@cd projects/newlib-cygwin && git pull
