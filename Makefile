@@ -66,7 +66,7 @@ ifeq ($(verbose),)
 L1 = ; ($(FLOCK) 200; echo -e \\033[33m$$__p...\\033[0m >>.state; echo -ne \\033[33m$$__p...\\033[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
   echo -e \\r\\033[K\\033[31m$$__p...failed\\033[0m; \
-  tail -n 20 "$$__l"; \
+  tail -n 100 "$$__l"; \
   echo -e \\033[31m$$__p...failed\\033[0m; \
   echo -e \\033[1mless \"$$__l\"\\033[0m; \
   else echo -e \\r\\033[K\\033[32m$$__p...done\\033[0m; fi \
