@@ -206,12 +206,6 @@ update-gcc: projects/gcc/configure
 	GCC_VERSION=$(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 update-binutils: projects/binutils/configure
-	a=($$(cd projects/binutils && git remote -v | grep origin | grep '(fetch)')); echo $${a[1]} ; \
-	if [[ "$${a[1]}" != "$(BINUTILS_GIT)" ]]; then \
-	  rm -rf projects/binutils; \
-	  $(MAKE) projects/binutils/configure; \
-	  $(MAKE) clean-binutils; \
-	fi
 	@cd projects/binutils && export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done
 
 update-fd2sfd: projects/fd2sfd/configure
