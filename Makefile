@@ -166,7 +166,7 @@ clean-vlink:
 	rm -rf $(BUILD)/vlink
 
 clean-ndk:
-	rm -rf $(BUILD)/ndk-include
+	rm -rf $(BUILD)/ndk*
 
 clean-libnix:
 	rm -rf $(BUILD)/libnix
@@ -588,13 +588,13 @@ SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Inc
 
 .PHONY: ndk-inline ndk-lvo ndk-proto
 
-ndk: $(BUILD)/ndk-include/_ndk 
+ndk: $(BUILD)/ndk-include_ndk
 
-$(BUILD)/ndk-include/_ndk: $(BUILD)/ndk-include/_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCLUDE_LVO) $(NDK_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
+$(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCLUDE_LVO) $(NDK_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
+$(BUILD)/ndk-include_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
 	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
 	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
@@ -612,30 +612,30 @@ $(BUILD)/ndk-include/_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-ndk-inline: $(NDK_INCLUDE_INLINE) sfdc $(BUILD)/ndk-include/_inline 
-$(NDK_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include/_inline $(BUILD)/ndk-include/_lvo $(BUILD)/ndk-include/_proto $(BUILD)/ndk-include/_ndk0
+ndk-inline: $(NDK_INCLUDE_INLINE) sfdc $(BUILD)/ndk-include_inline
+$(NDK_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_inline $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
 	$(L0)"sfdc inline $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
 
 ndk-lvo: $(NDK_INCLUDE_LVO) sfdc
-$(NDK_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include/_lvo $(BUILD)/ndk-include/_ndk0
+$(NDK_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_ndk0
 	$(L0)"sfdc lvo $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
 
 ndk-proto: $(NDK_INCLUDE_PROTO) sfdc
-$(NDK_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	$(BUILD)/ndk-include/_proto $(BUILD)/ndk-include/_ndk0
+$(NDK_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	$(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
 	$(L0)"sfdc proto $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
 
-$(BUILD)/ndk-include/_inline:
+$(BUILD)/ndk-include_inline:
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include/_lvo:
+$(BUILD)/ndk-include_lvo:
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/lvo
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/lvo
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include/_proto:
+$(BUILD)/ndk-include_proto:
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/proto
 	@mkdir -p $(BUILD)/ndk-include/
@@ -660,10 +660,10 @@ download/NDK39.lha:
 # =================================================
 # NDK1.3 - emulated from NDK
 # =================================================
+.PHONY: ndk_13
+ndk13: $(BUILD)/ndk-include_ndk13
 
-ndk13: $(BUILD)/ndk-include/_ndk13
-
-$(BUILD)/ndk-include/_ndk13: $(BUILD)/ndk-include/_ndk
+$(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk
 	@while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
 	$(L0)"extract ndk13"$(L1) while read p; do \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
@@ -688,7 +688,7 @@ $(BUILD)/ndk-include/_ndk13: $(BUILD)/ndk-include/_ndk
 # =================================================
 # netinclude
 # =================================================
-$(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include/_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
+$(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
 	@rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	@echo "done" >$@
@@ -729,7 +729,7 @@ $(BUILD)/libnix/_done: $(BUILD)/libnix/Makefile
 	@cd $(BUILD)/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	@echo "done" >$@
 		
-$(BUILD)/libnix/Makefile: $(BUILD)/newlib/_done $(BUILD)/ndk-include/_ndk $(BUILD)/ndk-include/_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC) 
+$(BUILD)/libnix/Makefile: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC)
 	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
 	@mkdir -p $(BUILD)/libnix
 	@echo 'void foo(){}' > $(BUILD)/libnix/x.c
@@ -850,7 +850,7 @@ COMPLEX_FILES = lib_a-cabs.o   lib_a-cacosf.o   lib_a-cacosl.o  lib_a-casin.o   
 $(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a 
 	@echo "done" >$@
 
-$(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(BUILD)/ndk-include/_ndk $(NEWLIB_FILES)
+$(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(BUILD)/ndk-include_ndk $(NEWLIB_FILES)
 	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2) 
 	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2) 
 	@mkdir -p $(BUILD)/newlib/complex
