@@ -1,0 +1,23 @@
+Short: Powerful unarchiving tool
+Version: V12.1
+Url: http://aminet.net/util/arc/xadmasterdev.lha
+
+xad/xadmaster.guide
+xad/xadmaster.guide.info
+xad/xadmasterdev.readme
+xad/Include/Autodocs/xadmaster.doc
+xad/Include/Autodocs/xadsub.doc
+xad/Include/ReadMe.TXT
+xad/Include/ASM/libraries/xadmaster.i
+xad/Include/ASM/lvo/xadmaster_lib.i
+xad/Include/C/clib/xadmaster_protos.h
+xad/Include/C/inline/xadmaster.h
+xad/Include/C/inline/xadmaster_protos.h
+xad/Include/C/libraries/xadmaster.h
+xad/Include/C/pragma/xadmaster_lib.h
+xad/Include/C/proto/xadmaster.h
+xad/Include/FD/xadmaster_lib.fd
+xad/Include/SFD/xadmaster_lib.sfd
+
+sfdc : xadmaster_lib.sfd
+
