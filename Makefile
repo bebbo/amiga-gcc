@@ -558,7 +558,7 @@ $(BUILD)/_lha_done:
 .PHONY: vbcc-target
 vbcc-target: $(BUILD)/vbcc_target_m68k-amigaos/_done
 
-$(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info patches/vc.config
+$(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info patches/vc.config $(BUILD)/vasm/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/include
 	$(L0)"copying vbcc headers"$(L1) rsync $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/include/* $(PREFIX)/m68k-amigaos/vbcc/include $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/lib
