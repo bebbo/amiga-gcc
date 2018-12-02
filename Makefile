@@ -61,7 +61,8 @@ update-repos:
 
 CFLAGS := -Os
 CXXFLAGS := $(CFLAGS)
-CFLAGS_FOR_TARGET := -Os -fomit-frame-pointer
+CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
+CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
 
 E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
 
@@ -915,7 +916,7 @@ endif
 
 $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	@mkdir -p $(BUILD)/newlib/newlib
-	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
+	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
 
 projects/newlib-cygwin/newlib/configure: 
 	@mkdir -p projects
