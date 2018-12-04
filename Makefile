@@ -49,7 +49,7 @@ update-repos:
 	@cd projects/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
 	@cd projects/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
 	@cd projects/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
-	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
+#	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
 	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
 	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
 	@cd projects/libsdl12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
@@ -916,6 +916,7 @@ endif
 
 $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
 	@mkdir -p $(BUILD)/newlib/newlib
+	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
 
 projects/newlib-cygwin/newlib/configure: 
