@@ -39,26 +39,6 @@ GIT_VASM             := https://github.com/leffmann/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/leffmann/vlink
 
-.PHONY: update-repos
-update-repos:
-	@cd projects/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
-	@cd projects/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
-	@cd projects/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
-	@cd projects/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
-	@cd projects/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
-	@cd projects/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
-	@cd projects/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
-	@cd projects/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
-#	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
-	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
-	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
-	@cd projects/libsdl12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
-	@cd projects/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
-	@cd projects/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
-	@cd projects/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
-	@cd projects/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
-	@cd projects/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
-
 CFLAGS := -Os
 CXXFLAGS := $(CFLAGS)
 CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
@@ -944,10 +924,35 @@ all-sdk: $(SDKS)
 
 $(SDKS): libnix
 	$(MAKE) sdk=$@ 
+
+# =================================================
+# update repos
+# =================================================
+.PHONY: update-repos
+update-repos:
+	@cd projects/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
+	@cd projects/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
+	@cd projects/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
+	@cd projects/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
+	@cd projects/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
+	@cd projects/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
+	@cd projects/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
+	@cd projects/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
+#	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
+	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
+	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
+	@cd projects/libsdl12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
+	@cd projects/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
+	@cd projects/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
+	@cd projects/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
+	@cd projects/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
+	@cd projects/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
+
+
 # =================================================
 # info
 # =================================================
-.PHONY: info v
+.PHONY: info v r
 info:
 	@echo $@ $(UNAME_S)
 	@echo PREFIX=$(PREFIX)
