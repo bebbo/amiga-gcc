@@ -196,10 +196,10 @@ clean-ndk:
 
 clean-libnix:
 	rm -rf $(BUILD)/libnix
-	
+
 clean-ixemul:
 	rm -rf $(BUILD)/ixemul
-	
+
 clean-clib2:
 	rm -rf $(BUILD)/clib2
 
@@ -256,7 +256,7 @@ update-vlink: projects/vlink/Makefile
 
 update-libnix: projects/libnix/configure
 	@cd projects/libnix && git pull
-	
+
 update-ixemul: projects/ixemul/configure
 	@cd projects/ixemul && git pull
 
@@ -286,7 +286,7 @@ update-gmp:
 	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
 	fi;
 	@cd projects && tar xf ../download/$(GMPFILE)
-	
+
 update-mpc:
 	@mkdir -p download
 	if [ -a download/$(MPCFILE) ]; \
@@ -306,7 +306,7 @@ update-mpfr:
 # =================================================
 # B I N
 # =================================================
-	
+
 # =================================================
 # binutils
 # =================================================
@@ -332,13 +332,13 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null pro
 	@touch -t 0001010000 projects/binutils/ld/ldgram.y
 	@touch -t 0001010000 projects/binutils/intl/plural.y
 	$(L0)"make binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas all-binutils all-ld $(ALL_GDB) $(L2)
-	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2) 
+	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
 	@echo "done" >$@
 
 $(BUILD)/binutils/Makefile: projects/binutils/configure
 	@mkdir -p $(BUILD)/binutils
 	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(L2)
-	 
+
 
 projects/binutils/configure:
 	@mkdir -p projects
@@ -363,21 +363,21 @@ GCCD := $(patsubst %,projects/gcc/%, $(GCC_DIR))
 gcc: $(BUILD)/gcc/_done
 
 $(BUILD)/gcc/_done: $(BUILD)/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxdepth 1 -type f )
-	$(L0)"make gcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-gcc $(L2) 
-	$(L0)"install gcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-gcc $(L2) 
+	$(L0)"make gcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-gcc $(L2)
+	$(L0)"install gcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-gcc $(L2)
 	@echo "done" >$@
 
 $(BUILD)/gcc/Makefile: projects/gcc/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/gcc
-ifneq ($(OWNGMP),)	
+ifneq ($(OWNGMP),)
 	@mkdir -p projects/gcc/gmp
 	@mkdir -p projects/gcc/mpc
 	@mkdir -p projects/gcc/mpfr
 	@rsync -a projects/$(GMP)/* projects/gcc/gmp
 	@rsync -a projects/$(MPC)/* projects/gcc/mpc
 	@rsync -a projects/$(MPFR)/* projects/gcc/mpfr
-endif	
-	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(L2) 
+endif
+	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(L2)
 
 projects/gcc/configure:
 	@mkdir -p projects
@@ -392,7 +392,7 @@ gprof: $(BUILD)/binutils/_gprof
 
 $(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null projects/binutils/gprof -type f)
 	$(L0)"make gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof all $(L2)
-	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2) 
+	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2)
 	@echo "done" >$@
 
 $(BUILD)/binutils/gprof/Makefile: projects/binutils/gprof/configure $(BUILD)/binutils/_done
@@ -413,10 +413,10 @@ $(PREFIX)/bin/fd2sfd: $(BUILD)/fd2sfd/Makefile $(shell find 2>/dev/null projects
 	$(L0)"make fd2sfd"$(L1) $(MAKE) -C $(BUILD)/fd2sfd all $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install fd2sfd"$(L1) $(MAKE) -C $(BUILD)/fd2sfd install $(L2)
- 
+
 $(BUILD)/fd2sfd/Makefile: projects/fd2sfd/configure
 	@mkdir -p $(BUILD)/fd2sfd
-	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(L2) 
+	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
 projects/fd2sfd/configure:
 	@mkdir -p projects
@@ -476,13 +476,13 @@ $(BUILD)/sfdc/_done: $(PREFIX)/bin/sfdc
 	@echo "done" >$@
 
 $(PREFIX)/bin/sfdc: $(BUILD)/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
-	$(L0)"make sfdc"$(L1) $(MAKE) -C $(BUILD)/sfdc sfdc $(L2) 
+	$(L0)"make sfdc"$(L1) $(MAKE) -C $(BUILD)/sfdc sfdc $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install sfdc"$(L1) install $(BUILD)/sfdc/sfdc $(PREFIX)/bin $(L2)
 
 $(BUILD)/sfdc/Makefile: projects/sfdc/configure
 	@rsync -a projects/sfdc $(BUILD)/ --exclude .git
-	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2) 
+	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
 projects/sfdc/configure:
 	@mkdir -p projects
@@ -499,8 +499,8 @@ VASM := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VASM_CMD))
 
 vasm: $(BUILD)/vasm/_done
 
-$(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile 
-	$(L0)"make vasm"$(L1) $(MAKE) -C $(BUILD)/vasm CPU=m68k SYNTAX=mot $(L2) 
+$(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile
+	$(L0)"make vasm"$(L1) $(MAKE) -C $(BUILD)/vasm CPU=m68k SYNTAX=mot $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install vasm"$(L1) install $(BUILD)/vasm/vasmm68k_mot $(PREFIX)/bin/ ;\
 	install $(BUILD)/vasm/vobjdump $(PREFIX)/bin/ $(L2)
@@ -526,7 +526,7 @@ $(BUILD)/vbcc/_done: $(BUILD)/vbcc/Makefile
 	$(L0)"make vbcc dtgen"$(L1) TARGET=m68k $(MAKE) -C $(BUILD)/vbcc bin/dtgen $(L2)
 	@cd $(BUILD)/vbcc && echo -e "y\\ny\\nsigned char\\ny\\nunsigned char\\nn\\ny\\nsigned short\\nn\\ny\\nunsigned short\\nn\\ny\\nsigned int\\nn\\ny\\nunsigned int\\nn\\ny\\nsigned long long\\nn\\ny\\nunsigned long long\\nn\\ny\\nfloat\\nn\\ny\\ndouble\\n" >c.txt
 	$(L0)"run vbcc dtgen"$(L1) cd $(BUILD)/vbcc && bin/dtgen machines/m68k/machine.dt machines/m68k/dt.h machines/m68k/dt.c <c.txt $(L2)
-	$(L0)"make vbcc"$(L1) TARGET=m68k $(MAKE) -C $(BUILD)/vbcc $(L2) 
+	$(L0)"make vbcc"$(L1) TARGET=m68k $(MAKE) -C $(BUILD)/vbcc $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	@rm -rf $(BUILD)/vbcc/bin/*.dSYM
 	$(L0)"install vbcc"$(L1) install $(BUILD)/vbcc/bin/v* $(PREFIX)/bin/ $(L2)
@@ -550,7 +550,7 @@ VLINK := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VLINK_CMD))
 vlink: $(BUILD)/vlink/_done vbcc-target
 
 $(BUILD)/vlink/_done: $(BUILD)/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
-	$(L0)"make vlink"$(L1) cd $(BUILD)/vlink && TARGET=m68k $(MAKE) $(L2) 
+	$(L0)"make vlink"$(L1) cd $(BUILD)/vlink && TARGET=m68k $(MAKE) $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install vlink"$(L1) install $(BUILD)/vlink/vlink $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
@@ -574,7 +574,7 @@ $(BUILD)/_lha_done:
 	  $(L00)"make lha"$(L1) make all; $(L2); \
 	  $(L00)"install lha"$(L1) mkdir -p $(PREFIX)/bin/; install src/lha$(EXEEXT) $(PREFIX)/bin/lha$(EXEEXT); $(L2); \
 	fi
-	@echo "done" >$@ 
+	@echo "done" >$@
 
 
 .PHONY: vbcc-target
@@ -587,8 +587,8 @@ $(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info 
 	$(L0)"copying vbcc headers"$(L1) rsync $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/lib/* $(PREFIX)/m68k-amigaos/vbcc/lib $(L2)
 	@echo "done" >$@
 	$(L0)"creating vbcc config"$(L1) sed -e "s|PREFIX|$(PREFIX)|g" patches/vc.config >$(BUILD)/vasm/vc.config ;\
-	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2) 
-	
+	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2)
+
 
 $(BUILD)/vbcc_target_m68k-amigaos.info: download/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
 	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf ../download/vbcc_target_m68k-amigaos.lha $(L2)
@@ -718,7 +718,7 @@ $(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_n
 	@rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	@echo "done" >$@
 
-projects/amiga-netinclude/README.md: 
+projects/amiga-netinclude/README.md:
 	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
 
@@ -745,7 +745,7 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 libnix: $(BUILD)/libnix/_done
 
 $(BUILD)/libnix/_done: $(BUILD)/libnix/Makefile
-	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix $(L2) 
+	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix $(L2)
 	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix install $(L2)
 	@cd $(BUILD)/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libb/libm.a $(COMPLEX_FILES)
@@ -753,19 +753,19 @@ $(BUILD)/libnix/_done: $(BUILD)/libnix/Makefile
 	@cd $(BUILD)/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	@echo "done" >$@
-		
+
 $(BUILD)/libnix/Makefile: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC)
-	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix 
+	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
 	@mkdir -p $(BUILD)/libnix
 	@echo 'void foo(){}' > $(BUILD)/libnix/x.c
 	@if [ ! -e $(PREFIX)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libstubs.a; fi
 	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"configure libnix"$(L1) cd $(BUILD)/libnix && CFLAGS="$(CFLAGS_FOR_TARGET)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(L2) 
+	$(L0)"configure libnix"$(L1) cd $(BUILD)/libnix && CFLAGS="$(CFLAGS_FOR_TARGET)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
 	@rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@touch $(BUILD)/libnix/Makefile
-	
+
 projects/libnix/configure:
 	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBNIX)
@@ -779,7 +779,7 @@ LIBGCCS := $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCC
 libgcc: $(BUILD)/gcc/_libgcc_done
 
 $(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(LIBAMIGA) $(shell find 2>/dev/null projects/gcc/libgcc -type f)
-	$(L0)"make libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-target $(L2) 
+	$(L0)"make libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-target $(L2)
 	$(L0)"install libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-target $(L2)
 	@echo "done" >$@
 
@@ -793,7 +793,7 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@mkdir -p $(BUILD)/clib2/
 	@rsync -a projects/clib2/library/* $(BUILD)/clib2
 	@cd $(BUILD)/clib2 && find * -name lib\*.a -delete
-	$(L0)"make clib2"$(L1) $(MAKE) -C $(BUILD)/clib2 -f GNUmakefile.68k $(L2) 
+	$(L0)"make clib2"$(L1) $(MAKE) -C $(BUILD)/clib2 -f GNUmakefile.68k $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/clib2
 	@rsync -a $(BUILD)/clib2/include $(PREFIX)/m68k-amigaos/clib2
 	@rsync -a $(BUILD)/clib2/lib $(PREFIX)/m68k-amigaos/clib2
@@ -802,7 +802,7 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@cd $(BUILD)/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/clib2/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
-	@echo "done" >$@	
+	@echo "done" >$@
 
 projects/clib2/LICENSE:
 	@mkdir -p projects
@@ -816,7 +816,7 @@ CONFIG_LIBDEBUG := --prefix=$(PREFIX) --target=m68k-amigaos --host=m68k-amigaos
 libdebug: $(BUILD)/libdebug/_done
 
 $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
-	$(L0)"make libdebug"$(L1) $(MAKE) -C $(BUILD)/libdebug $(L2) 
+	$(L0)"make libdebug"$(L1) $(MAKE) -C $(BUILD)/libdebug $(L2)
 	@cp $(BUILD)/libdebug/libdebug.a $(PREFIX)/m68k-amigaos/lib/
 	@echo "done" >$@
 
@@ -837,9 +837,9 @@ CONFIG_LIBSDL12 := PREFX=$(PREFIX) PREF=$(PREFIX)
 libSDL12: $(BUILD)/libSDL12/_done
 
 $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile.bax
-	$(MAKE) sdk=ahi 
-	$(MAKE) sdk=cgx 
-	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2) 
+	$(MAKE) sdk=ahi
+	$(MAKE) sdk=cgx
+	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2)
 	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
 	@mkdir -p $(PREFIX)/include/GL
 	@mkdir -p $(PREFIX)/include/SDL
@@ -870,14 +870,14 @@ newlib: $(BUILD)/newlib/_done
 COMPLEX_FILES = lib_a-cabs.o   lib_a-cacosf.o   lib_a-cacosl.o  lib_a-casin.o    lib_a-casinhl.o  lib_a-catanh.o   lib_a-ccos.o    lib_a-ccoshl.o        lib_a-cephes_subrl.o  lib_a-cimag.o   lib_a-clog10.o   lib_a-conj.o   lib_a-cpowf.o   lib_a-cprojl.o  lib_a-csin.o    lib_a-csinhl.o  lib_a-csqrtl.o  lib_a-ctanhf.o \
 	lib_a-cabsf.o  lib_a-cacosh.o   lib_a-carg.o    lib_a-casinf.o   lib_a-casinl.o   lib_a-catanhf.o  lib_a-ccosf.o   lib_a-ccosl.o         lib_a-cexp.o          lib_a-cimagf.o  lib_a-clog10f.o  lib_a-conjf.o  lib_a-cpowl.o   lib_a-creal.o   lib_a-csinf.o   lib_a-csinl.o   lib_a-ctan.o    lib_a-ctanhl.o \
 	lib_a-cabsl.o  lib_a-cacoshf.o  lib_a-cargf.o   lib_a-casinh.o   lib_a-catan.o    lib_a-catanhl.o  lib_a-ccosh.o   lib_a-cephes_subr.o   lib_a-cexpf.o         lib_a-cimagl.o  lib_a-clogf.o    lib_a-conjl.o  lib_a-cproj.o   lib_a-crealf.o  lib_a-csinh.o   lib_a-csqrt.o   lib_a-ctanf.o   lib_a-ctanl.o \
-	lib_a-cacos.o  lib_a-cacoshl.o  lib_a-cargl.o   lib_a-casinhf.o  lib_a-catanf.o   lib_a-catanl.o   lib_a-ccoshf.o  lib_a-cephes_subrf.o  lib_a-cexpl.o         lib_a-clog.o    lib_a-clogl.o    lib_a-cpow.o   lib_a-cprojf.o  lib_a-creall.o  lib_a-csinhf.o  lib_a-csqrtf.o  lib_a-ctanh.o 
+	lib_a-cacos.o  lib_a-cacoshl.o  lib_a-cargl.o   lib_a-casinhf.o  lib_a-catanf.o   lib_a-catanl.o   lib_a-ccoshf.o  lib_a-cephes_subrf.o  lib_a-cexpl.o         lib_a-clog.o    lib_a-clogl.o    lib_a-cpow.o   lib_a-cprojf.o  lib_a-creall.o  lib_a-csinhf.o  lib_a-csqrtf.o  lib_a-ctanh.o
 
-$(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a 
+$(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a
 	@echo "done" >$@
 
 $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(BUILD)/ndk-include_ndk $(NEWLIB_FILES)
-	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2) 
-	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2) 
+	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2)
+	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2)
 	@mkdir -p $(BUILD)/newlib/complex
 	@cd $(BUILD)/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
 	@mkdir -p $(BUILD)/newlib/complex/libb
@@ -894,12 +894,12 @@ ifeq (,$(wildcard $(BUILD)/gcc/_done))
 $(BUILD)/newlib/newlib/Makefile: $(BUILD)/gcc/_done
 endif
 
-$(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure  
+$(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure
 	@mkdir -p $(BUILD)/newlib/newlib
 	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
-	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) $(L2) 
+	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb $(L2)
 
-projects/newlib-cygwin/newlib/configure: 
+projects/newlib-cygwin/newlib/configure:
 	@mkdir -p projects
 	@cd projects &&	git clone -b amiga --depth 4  $(GIT_NEWLIB_CYGWIN)
 
@@ -923,7 +923,7 @@ SDKS=$(patsubst sdk/%.sdk,%,$(SDKS0))
 all-sdk: $(SDKS)
 
 $(SDKS): libnix
-	$(MAKE) sdk=$@ 
+	$(MAKE) sdk=$@
 
 # =================================================
 # update repos
