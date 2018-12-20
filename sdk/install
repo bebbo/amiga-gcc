@@ -24,7 +24,7 @@ case $1 in
     				pushd projects/$file
     				git pull
     				popd
-    				rsync -s projects/$file/* build/$2/
+    				rsync projects/$file/* build/$2/
     			else
 	    			if [ ! -e "download/$file" ]; then
 	    				echo wget ${a[1]}:${a[2]} -O download/$file
