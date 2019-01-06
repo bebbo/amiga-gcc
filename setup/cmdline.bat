@@ -1,4 +1,5 @@
 @for /f %%i in ('cd') do @path %path%;%%i\bin
+@for /f %%i in ('cd') do @set PREFIX=%%i
 
 @echo *******************************************************************************
 @echo *                              Welcome to amiga-gcc                           *
