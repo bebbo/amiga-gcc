@@ -39,7 +39,7 @@ GIT_VASM             := https://github.com/leffmann/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/leffmann/vlink
 
-CFLAGS ?= -Os
+CFLAGS ?= -g
 CXXFLAGS ?= $(CFLAGS)
 CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
@@ -877,6 +877,7 @@ $(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a
 
 $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(BUILD)/ndk-include_ndk $(NEWLIB_FILES)
 	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2)
+	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2)
 	@mkdir -p $(BUILD)/newlib/complex
 	@cd $(BUILD)/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar x $(PREFIX)/m68k-amigaos/lib/libm.a $(COMPLEX_FILES)
@@ -896,7 +897,6 @@ endif
 
 $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure
 	@mkdir -p $(BUILD)/newlib/newlib
-	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb $(L2)
 
 projects/newlib-cygwin/newlib/configure:
