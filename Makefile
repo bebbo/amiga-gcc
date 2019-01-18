@@ -39,7 +39,7 @@ GIT_VASM             := https://github.com/leffmann/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/leffmann/vlink
 
-CFLAGS ?= -g
+CFLAGS ?= -Os
 CXXFLAGS ?= $(CFLAGS)
 CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
