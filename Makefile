@@ -985,12 +985,24 @@ b:
 
 # checkout for a given date
 v:
-	@[[ "$(date)" != "" ]] && pushd projects >/dev/null &&\
-	for i in * ; do pushd . >/dev/null; cd $$i 2>/dev/null; [[ -d ".git" ]] && (echo $$i;\
+	@D=$(date); \
+	pushd projects >/dev/null; \
+	for i in * ; do \
+	pushd . >/dev/null; \
+	cd $$i 2>/dev/null; \
+	if [ -d ".git" ]; then \
+	echo $$i;\
 	B=master;\
-	([[ "$$i" == "binutils" ]] && B=amiga);\
-	([[ "$$i" == "newlib-cygwin" ]] && B=amiga);\
-	([[ "$$i" == "gcc" ]] && B=gcc-6-branch);\
-	git checkout $$B;\
-	git checkout `git rev-list -n 1 --first-parent --before="$(date)" $$(git branch | grep '*' | cut -b3-)`\
-	); popd >/dev/null; done; popd >/dev/null
+	if [ "$$i" == "binutils" ] || [ "$$i" == "newlib-cygwin" ]; then B=amiga; fi;\
+	if [ "$$i" == "gcc" ]; then  B="gcc-6-branch"; fi;\
+	git checkout $$B; \
+	if [ "$$D" != "" ]; then git checkout `git rev-list -n 1 --first-parent --before="$$D" $$B`; fi;\
+	fi;\
+	popd >/dev/null; \
+	done; \
+	popd >/dev/null; \
+	echo .; \
+	git checkout master; \
+	if [ "$$D" != "" ]; then \
+	git checkout `git rev-list -n 1 --first-parent --before="$$D" master`; \
+	fi
