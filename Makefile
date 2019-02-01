@@ -39,7 +39,7 @@ GIT_VASM             := https://github.com/leffmann/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/leffmann/vlink
 
-CFLAGS ?= -Os
+CFLAGS ?= -g
 CXXFLAGS ?= $(CFLAGS)
 CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
@@ -967,10 +967,30 @@ info:
 	@$(CXX) -v -E - </dev/null |& grep " version "
 	@echo $(BUILD)
 
-v:
-	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git log -n1 --pretty=oneline) && cd ../..; done
+# print the latest git log entry for all projects
+l:
+	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git log -n1 --pretty=oneline); popd >/dev/null; done
 	@echo "." && git log -n1 --pretty=oneline
 
+# print the git remotes for all projects
 r:
-	@for i in projects/* ; do cd $$i 2>/dev/null && echo $$i && (git remote -v) && cd ../..; done
+	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git remote -v); popd >/dev/null; done
 	@echo "." && git remote -v
+
+# print the git branches for all projects
+b:
+	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && (git branch | grep '*')); popd >/dev/null; done
+	@echo "." && git remote -v
+
+
+# checkout for a given date
+v:
+	@[[ "$(date)" != "" ]] && pushd projects >/dev/null &&\
+	for i in * ; do pushd . >/dev/null; cd $$i 2>/dev/null; [[ -d ".git" ]] && (echo $$i;\
+	B=master;\
+	([[ "$$i" == "binutils" ]] && B=amiga);\
+	([[ "$$i" == "newlib-cygwin" ]] && B=amiga);\
+	([[ "$$i" == "gcc" ]] && B=gcc-6-branch);\
+	git checkout $$B;\
+	git checkout `git rev-list -n 1 --first-parent --before="$(date)" $$(git branch | grep '*' | cut -b3-)`\
+	); popd >/dev/null; done; popd >/dev/null
