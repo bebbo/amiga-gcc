@@ -41,7 +41,7 @@ GIT_VLINK            := https://github.com/leffmann/vlink
 
 CFLAGS ?= -g
 CXXFLAGS ?= $(CFLAGS)
-CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer
+CFLAGS_FOR_TARGET ?= -O2 -fomit-frame-pointer
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
 
 E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
