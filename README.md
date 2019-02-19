@@ -47,7 +47,7 @@ apt-cyg install gcc-core gcc-g++ python git perl-Pod-Simple gperf patch automake
 
 ### Windows with msys2
 ```
-pacman -S git base-devel gcc flex gmp-devel mpc-devel mpfr-devel ncurses-devel
+pacman -S git base-devel gcc flex gmp-devel mpc-devel mpfr-devel ncurses-devel rsync
 ```
 
 ### Ubuntu running on the Windows 10 Linux subsystem
