@@ -108,6 +108,6 @@ SDK/MUI/C/lib/libmui.a
 SDK/MUI/fd/muimaster_lib.fd
 SDK/MUI/sfd/muimaster_lib.sfd
 fd2sfd : muimaster_lib.fd clib/muimaster_protos.h
-sfdc : muimaster_lib.sfd
+sfdc : muimaster_lib.sfd muimaster.h muimaster_lib.h
 stubs : muimaster_lib.sfd
 lib : muimaster_lib.sfd
