@@ -117,11 +117,13 @@ case $1 in
 	    			fi
 	    			
     				dir=$(basename $(dirname $line))
+					#lower-case the directory part
+					outdir=${dir,,}
 	    			
 	    			if [[ $file == *.h ]] || [[ $file == *.i ]]; then
-						mkdir -p "$3/m68k-amigaos/include/$dir"
-						echo cp "build/$2/$line" "$3/m68k-amigaos/include/$dir/$file" 
-						cp "build/$2/$line" "$3/m68k-amigaos/include/$dir/$file" 
+						mkdir -p "$3/m68k-amigaos/include/$outdir"
+						echo cp "build/$2/$line" "$3/m68k-amigaos/include/$outdir/$file" 
+						cp "build/$2/$line" "$3/m68k-amigaos/include/$outdir/$file" 
 					elif [[ $file == *.guide ]]; then
 						mkdir -p "$3/m68k-amigaos/guide"
 						echo cp "build/$2/$line" "$3/m68k-amigaos/guide/$file" 
