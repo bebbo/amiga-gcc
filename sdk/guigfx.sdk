@@ -9,5 +9,5 @@ include/fd/guigfx_lib.fd
 include/guigfx/guigfx.h
 include/pragmas/guigfx_pragmas.h
 fd2sfd : guigfx_lib.fd clib/guigfx_protos.h
-sfdc : guigfx_lib.sfd
+sfdc : guigfx_lib.sfd guigfx.h guigfx_lib.h
 stubs : guigfx_lib.sfd
