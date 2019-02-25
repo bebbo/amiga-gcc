@@ -1,0 +1,14 @@
+Short: 	CAMD developer kit for MorphOS
+Version: 37.1
+Url: http://aminet.net/dev/c/camd-morphos-dev.lha
+
+camd/clib/camd_protos.h
+camd/fd/camd_lib.fd = camd.fd
+camd/midi/camd.h
+camd/midi/camdbase.h
+camd/midi/mididefs.h
+camd/midi/midiprefs.h
+
+fd2sfd : camd.fd clib/camd_protos.h
+sfdc : camd.sfd
+stubs : camd.sfd
