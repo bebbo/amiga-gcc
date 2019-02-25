@@ -1,0 +1,7 @@
+Short: Guigfx MUI custom class
+Version: 19.2
+Url: http://aminet.net/dev/mui/MCC_Guigfx.lha
+
+MCC_Guigfx/Developer/Assembler/Include/MUI/Guigfx_mcc.i
+MCC_Guigfx/Developer/C/Include/MUI/Guigfx_mcc.h
+MCC_Guigfx/Developer/AutoDocs/Guigfx_mcc.doc = MCC_Guigfx.doc
