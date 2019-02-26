@@ -985,7 +985,7 @@ b:
 
 # checkout for a given date
 v:
-	@D=$(date); \
+	@D="$(date)"; \
 	pushd projects >/dev/null; \
 	for i in * ; do \
 	pushd . >/dev/null; \
