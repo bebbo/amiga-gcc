@@ -2,7 +2,7 @@
 for /f %%i in ('cd') do @set PREFIX=%%i
 path %path%;%prefix%\bin\
 if not exist bin\make.exe (copy /y bin\bat2exe.exe bin\make.exe >NUL: & echo %prefix%\bin\_make.exe >>bin\make.exe & echo %prefix%\bin\_make.exe SHELL=%prefix%\bin\sh.exe >>bin\make.exe)
-if not exist ../tmp mkdir ../tmp
+if not exist ..\tmp mkdir ..\tmp
 
 echo *******************************************************************************
 echo *                              Welcome to amiga-gcc                           *
