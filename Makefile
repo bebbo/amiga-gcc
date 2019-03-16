@@ -38,6 +38,7 @@ GIT_SFDC             := https://github.com/adtools/sfdc
 GIT_VASM             := https://github.com/leffmann/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/leffmann/vlink
+GIT_AROSSTUFF        := https://github.com/bebbo/aros-stuff
 
 CFLAGS ?= -Os
 CXXFLAGS ?= $(CFLAGS)
@@ -118,7 +119,7 @@ help:
 	@echo "make help            display this help"
 	@echo "make info            print prefix and other flags"
 	@echo "make all             build and install all"
-	@echo "make <target>        builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, ndk, ndk13"
+	@echo "make <target>        builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
 	@echo "make clean           remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
 	@echo "make clean-prefix    remove all content from the prefix folder"
@@ -131,7 +132,7 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+.PHONY: all gcc gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13
 all: gcc binutils gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 
 # =================================================
@@ -142,8 +143,8 @@ ifneq ($(OWNMPC),)
 clean: clean-gmp clean-mpc clean-mpfr
 endif
 
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
+.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
 	rm -rf $(BUILD)
 	rm -rf *.log
 	mkdir -p $(BUILD)
@@ -209,6 +210,9 @@ clean-libdebug:
 clean-libSDL12:
 	rm -rf $(BUILD)/libSDL12
 
+clean-libpthread:
+	rm -rf $(BUILD)/libpthread
+
 clean-newlib:
 	rm -rf $(BUILD)/newlib
 
@@ -224,8 +228,8 @@ clean-prefix:
 # update all projects
 # =================================================
 
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-ndk update-newlib update-netinclude
+.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
+update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
 
 update-gcc: projects/gcc/configure
 	@cd projects/gcc && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
@@ -268,6 +272,9 @@ update-libdebug: projects/libdebug/configure
 
 update-libSDL12: projects/libSDL12/Makefile.bax
 	@cd projects/libSDL12 && git pull
+
+update-libpthread: projects/aros-stuff/pthreads/Makefile
+	@cd projects/aros-stuff && git pull
 
 update-ndk: download/NDK39.lha
 	mkdir -p $(BUILD)
@@ -841,11 +848,11 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile.bax
 	$(MAKE) sdk=cgx
 	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2)
 	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
-	@mkdir -p $(PREFIX)/include/GL
-	@mkdir -p $(PREFIX)/include/SDL
-	@rsync -a $(BUILD)/libSDL12/include/GL/*.i $(PREFIX)/include/GL/
-	@rsync -a $(BUILD)/libSDL12/include/GL/*.h $(PREFIX)/include/GL/
-	@rsync -a $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/include/SDL/
+	@mkdir -p $(PREFIX)/m68k-amigaos/include/GL
+	@mkdir -p $(PREFIX)/m68k-amigaos/include/SDL
+	@rsync -a $(BUILD)/libSDL12/include/GL/*.i $(PREFIX)/m68k-amigaos/include/GL/
+	@rsync -a $(BUILD)/libSDL12/include/GL/*.h $(PREFIX)/m68k-amigaos/include/GL/
+	@rsync -a $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
 	@echo "done" >$@
 
 $(BUILD)/libSDL12/Makefile.bax: $(BUILD)/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
@@ -857,6 +864,27 @@ projects/libSDL12/Makefile.bax:
 	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
 
+
+# =================================================
+# libpthread
+# =================================================
+
+libpthread: $(BUILD)/libpthread/_done
+
+$(BUILD)/libpthread/_done: $(BUILD)/libpthread/Makefile
+	$(L0)"make libpthread"$(L1) cd $(BUILD)/libpthread && $(MAKE) -f Makefile $(L2)
+	$(L0)"install libpthread"$(L1) cp $(BUILD)/libpthread/libpthread.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
+	@rsync -a --exclude=debug.h $(BUILD)/libpthread/*.h $(PREFIX)/m68k-amigaos/include/
+	@echo "done" >$@
+
+$(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done projects/aros-stuff/pthreads/Makefile $(shell find 2>/dev/null projects/aros-stuff/pthreads -type f)
+	@mkdir -p $(BUILD)/libpthread
+	@rsync -a projects/aros-stuff/pthreads/* $(BUILD)/libpthread
+	@touch $(BUILD)/libpthread/Makefile
+
+projects/aros-stuff/pthreads/Makefile:
+	@mkdir -p projects
+	@cd projects &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
 
 # =================================================
 # newlib
