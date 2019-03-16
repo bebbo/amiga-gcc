@@ -1,0 +1,52 @@
+#!/bin/bash
+date
+
+#echo rm -rf amiga-gcc
+#rm -rf amiga-gcc
+
+#echo tar xzf amiga-gcc-src.tgz
+#tar xzf amiga-gcc-src.tgz
+
+cd amiga-gcc
+rm *.exe
+git pull
+if [ "$1" == "clean" ]; then
+  make clean clean-prefix -j
+fi
+make update
+make all -j4
+make all-sdk
+
+echo "#define MyAppVersion \"$(date +%Y%m%d)\"" > build/setup2.iss
+cat setup/setup2.iss >> build/setup2.iss
+cp setup/icon.ico build
+
+echo copy support files
+cp setup/hello.c /opt/amiga
+cp setup/cmdline.bat /opt/amiga
+cp setup/bat2exe.exe /opt/amiga/bin/
+
+echo copy dlls
+cp /usr/bin/msys-iconv-2.dll /opt/amiga/bin
+cp /usr/bin/msys-intl-8.dll /opt/amiga/bin
+cp /usr/bin/msys-2.0.dll /opt/amiga/bin
+cp /usr/bin/msys-z.dll /opt/amiga/bin
+cp /usr/bin/msys-gcc_s-seh-1.dll /opt/amiga/bin
+cp /usr/bin/msys-stdc++-6.dll /opt/amiga/bin
+cp /usr/bin/msys-mpfr-6.dll /opt/amiga/bin
+cp /usr/bin/msys-mpc-3.dll /opt/amiga/bin
+cp /usr/bin/msys-gmp-10.dll /opt/amiga/bin
+cp /usr/bin/msys-ncursesw6.dll /opt/amiga/bin
+cp /usr/bin/iconv.exe /opt/amiga/bin
+cp /usr/bin/sh.exe /opt/amiga/bin
+cp /usr/bin/rm.exe /opt/amiga/bin
+cp /usr/bin/cp.exe /opt/amiga/bin
+cp /usr/bin/uname.exe /opt/amiga/bin
+cp /usr/bin/which.exe /opt/amiga/bin
+cp /usr/bin/make.exe /opt/amiga/bin/_make.exe
+
+/c/Program\ Files\ \(x86\)/Inno\ Setup\ 5/ISCC.exe build/setup2.iss
+
+date
+exit
+
