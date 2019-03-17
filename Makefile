@@ -984,13 +984,9 @@ update-repos:
 info:
 	@echo $@ $(UNAME_S)
 	@echo PREFIX=$(PREFIX)
-	@echo GCC_GIT=$(GCC_GIT)
-	@echo GCC_BRANCH=$(GCC_BRANCH)
 	@echo GCC_VERSION=$(GCC_VERSION)
 	@echo CFLAGS=$(CFLAGS)
 	@echo CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)
-	@echo BINUTILS_GIT=$(BINUTILS_GIT)
-	@echo BINUTILS_BRANCH=$(BINUTILS_BRANCH)
 	@$(CC) -v -E - </dev/null |& grep " version "
 	@$(CXX) -v -E - </dev/null |& grep " version "
 	@echo $(BUILD)
