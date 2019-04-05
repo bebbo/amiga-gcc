@@ -38,9 +38,14 @@ cp /usr/bin/msys-mpc-3.dll /opt/amiga/bin
 cp /usr/bin/msys-gmp-10.dll /opt/amiga/bin
 cp /usr/bin/msys-ncursesw6.dll /opt/amiga/bin
 cp /usr/bin/iconv.exe /opt/amiga/bin
-cp /usr/bin/sh.exe /opt/amiga/bin
-cp /usr/bin/rm.exe /opt/amiga/bin
 cp /usr/bin/cp.exe /opt/amiga/bin
+cp /usr/bin/echo.exe /opt/amiga/bin
+cp /usr/bin/find.exe /opt/amiga/bin
+cp /usr/bin/ls.exe /opt/amiga/bin
+cp /usr/bin/mkdir.exe /opt/amiga/bin
+cp /usr/bin/rm.exe /opt/amiga/bin
+cp /usr/bin/sh.exe /opt/amiga/bin
+cp /usr/bin/touch.exe /opt/amiga/bin
 cp /usr/bin/uname.exe /opt/amiga/bin
 cp /usr/bin/which.exe /opt/amiga/bin
 cp /usr/bin/make.exe /opt/amiga/bin/_make.exe
