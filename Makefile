@@ -258,7 +258,7 @@ update-vbcc: projects/vbcc/Makefile
 update-vlink: projects/vlink/Makefile
 	@cd projects/vlink && git pull
 
-update-libnix: projects/libnix/configure
+update-libnix: projects/libnix/Makefile.gcc6
 	@cd projects/libnix && git pull
 
 update-ixemul: projects/ixemul/configure
@@ -751,9 +751,11 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 
 libnix: $(BUILD)/libnix/_done
 
-$(BUILD)/libnix/_done: $(BUILD)/libnix/Makefile
-	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix $(L2)
-	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix install $(L2)
+$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/Makefile.gcc6 projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC)
+	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
+	@mkdir -p $(BUILD)/libnix
+	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix all $(L2)
+	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix install $(L2)
 	@cd $(BUILD)/newlib/complex && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libb/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libm.a $(COMPLEX_FILES)
@@ -761,19 +763,7 @@ $(BUILD)/libnix/_done: $(BUILD)/libnix/Makefile
 	@cd $(BUILD)/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
 	@echo "done" >$@
 
-$(BUILD)/libnix/Makefile: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/configure projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC)
-	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
-	@mkdir -p $(BUILD)/libnix
-	@echo 'void foo(){}' > $(BUILD)/libnix/x.c
-	@if [ ! -e $(PREFIX)/m68k-amigaos/lib/libstubs.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/lib/libstubs.a; fi
-	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
-	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"configure libnix"$(L1) cd $(BUILD)/libnix && CFLAGS="$(CFLAGS_FOR_TARGET)" AR=m68k-amigaos-ar AS=m68k-amigaos-as CC=m68k-amigaos-gcc $(A) $(PWD)/projects/libnix/configure $(CONFIG_LIBNIX) $(L2)
-	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/include/
-	@rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
-	@touch $(BUILD)/libnix/Makefile
-
-projects/libnix/configure:
+projects/libnix/Makefile.gcc6:
 	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBNIX)
 
