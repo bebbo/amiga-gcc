@@ -751,7 +751,7 @@ LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/lib
 
 libnix: $(BUILD)/libnix/_done
 
-$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/Makefile.gcc6 projects/libnix/Makefile.in $(LIBAMIGA) $(LIBNIX_SRC)
+$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/Makefile.gcc6 $(LIBAMIGA) $(LIBNIX_SRC)
 	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
 	@mkdir -p $(BUILD)/libnix
 	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix all $(L2)
@@ -786,7 +786,7 @@ $(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(LIBAMIGA) $(shell find 2>/dev
 
 clib2: $(BUILD)/clib2/_done
 
-$(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) $(BUILD)/libnix/Makefile $(LIBAMIGA)
+$(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) $(BUILD)/libnix/_done $(LIBAMIGA)
 	@mkdir -p $(BUILD)/clib2/
 	@rsync -a projects/clib2/library/* $(BUILD)/clib2
 	@cd $(BUILD)/clib2 && find * -name lib\*.a -delete
