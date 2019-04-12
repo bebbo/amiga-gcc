@@ -763,7 +763,7 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@cd $(BUILD)/newlib/complex/libm020 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020/libb && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb/libm.a $(COMPLEX_FILES)
 	@cd $(BUILD)/newlib/complex/libm020/libb32 && $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/m68k-amigaos/libnix/lib/libm020/libb32/libm.a $(COMPLEX_FILES)
-	@rsync -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
+	@rsync --delete -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >$@
 
 projects/libnix/Makefile.gcc6:
@@ -962,7 +962,7 @@ update-repos:
 #	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
 	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
 	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
-	@cd projects/libsdl12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
+	@cd projects/libSDL12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
 	@cd projects/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
 	@cd projects/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
 	@cd projects/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
