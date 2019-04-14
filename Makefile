@@ -20,6 +20,7 @@ GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
 BINUTILS_BRANCH := amiga
 GCC_BRANCH := gcc-6-branch
+NEWLIB_BRANCH := amiga
 
 GIT_AMIGA_NETINCLUDE := https://github.com/bebbo/amiga-netinclude
 GIT_BINUTILS         := https://github.com/bebbo/binutils-gdb
@@ -98,8 +99,8 @@ UPDATE = __x=
 ANDPULL = ;__y=$$(git branch | grep '*' | cut -b3-);echo setting remote origin from $$(git remote get-url origin) to $$__x using branch $$__y;\
 	git remote remove origin; \
 	git remote add origin $$__x; \
-	git pull origin $$__y;\
-	git branch --set-upstream-to=origin/$$__y $$__y; \
+	git remote set-branches origin $$__y;\
+	git pull
 
 # =================================================
 
@@ -922,7 +923,7 @@ $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/configure
 
 projects/newlib-cygwin/newlib/configure:
 	@mkdir -p projects
-	@cd projects &&	git clone -b amiga --depth 4  $(GIT_NEWLIB_CYGWIN)
+	@cd projects &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
 
 # =================================================
 # ixemul
