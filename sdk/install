@@ -77,10 +77,6 @@ case $1 in
 				(
 					flock -x 200
 					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libstubs.a build/$2/$name.o || exit 1
-					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libb/libstubs.a build/$2/$name.o || exit 1
-					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libm020/libstubs.a build/$2/$name.o || exit 1
-					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libm020/libb/libstubs.a build/$2/$name.o || exit 1
-					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libm020/libb32/libstubs.a build/$2/$name.o || exit 1
 				) 200>/tmp/amiga-gcc-libstubs-lock
 			;;
 			lib)
