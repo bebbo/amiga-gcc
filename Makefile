@@ -746,8 +746,6 @@ $(LIBAMIGA):
 # libnix
 # =================================================
 
-CONFIG_LIBNIX := --prefix=$(PREFIX)/m68k-amigaos/libnix --target=m68k-amigaos --host=m68k-amigaos
-
 LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/libnix/.git -prune \) -not \( -path projects/libnix/sources/stubs/libbases -prune \) -not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
 
 libnix: $(BUILD)/libnix/_done
@@ -757,7 +755,7 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@mkdir -p $(BUILD)/libnix
 	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"make libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix all $(L2)
+	$(L0)"make libnix"$(L1) CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix all $(L2)
 	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix install $(L2)
 	@rsync --delete -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >$@
