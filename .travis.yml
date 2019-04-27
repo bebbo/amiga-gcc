@@ -28,12 +28,12 @@ matrix:
 script:
  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         echo x >/c/tools/pipe;
-        cmd /c "start cmd /k c:\\tools\\msys64\\usr\\bin\\bash --login /c/Users/travis/build/bebbo/crap0000/buildwin";
+        cmd /c "start cmd /k c:\\tools\\msys64\\usr\\bin\\bash --login ./setup/buildwin";
         travis_wait 60 tail --follow=name --max-unchanged-stats=1 /c/tools/pipe || echo "EOF";
         ls -l Output;
     else
-        make update -j2;
-        make all -j2;
+        make update -j3;
+        make all -j3;
         tar czf amiga-gcc-$(uname)-$(date +%Y%m%d).tgz /opt/amiga;
         ls -l;
     fi
