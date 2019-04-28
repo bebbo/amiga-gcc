@@ -698,19 +698,19 @@ download/NDK39.lha:
 ndk13: $(BUILD)/ndk-include_ndk13
 
 $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUILD)/sfdc/_done
-	@while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo ":$$p:"; cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
-	$(L0)"extract ndk13"$(L1) while read p; do \
+	@while read p; do p=$$(echo $$p|tr -d '\r'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
+	$(L0)"extract ndk13"$(L1) while read p; do p=$$(echo $$p|tr -d '\r'); \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
 	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
 	  LC_CTYPE=C sed -n -e '/#ifndef  CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  else cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; fi \
 	done < patches/ndk13/chfiles $(L2)
-	@while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
+	@while read p; do p=$$(echo $$p|tr -d '\r'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
 	@echo '#undef	EXECNAME' > $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
 	@echo '#define	EXECNAME	"exec.library"' >> $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd13
-	@while read p; do LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
+	@while read p; do p=$$(echo $$p|tr -d '\r'); LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd13
 	@for i in $(PREFIX)/m68k-amigaos/ndk/lib/fd13/*; do fd2sfd $$i $(PREFIX)/m68k-amigaos/ndk13-include/clib/$$(basename $$i _lib.fd)_protos.h > $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/$$(basename $$i .fd).sfd; done
 	$(L0)"macros+protos ndk13"$(L1) for i in $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/*; do \
