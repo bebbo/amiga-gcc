@@ -698,7 +698,7 @@ download/NDK39.lha:
 ndk13: $(BUILD)/ndk-include_ndk13
 
 $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUILD)/sfdc/_done
-	@while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
+	@while IFS=$$' '$$'\r'$$'\n' read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
 	$(L0)"extract ndk13"$(L1) while read p; do \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
 	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
