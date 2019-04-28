@@ -404,7 +404,7 @@ $(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/n
 	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2)
 	@echo "done" >$@
 
-$(BUILD)/binutils/gprof/Makefile: projects/binutils/gprof/configure $(BUILD)/binutils/_done
+$(BUILD)/binutils/gprof/Makefile: projects/binutils/configure projects/binutils/gprof/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/binutils/gprof
 	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/projects/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
