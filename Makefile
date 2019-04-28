@@ -15,6 +15,7 @@ export PATH := $(PREFIX)/bin:$(PATH)
 
 UNAME_S := $(shell uname -s)
 BUILD := build-$(UNAME_S)
+__BUILDDIR := $(shell mkdir -p $(BUILD))
 
 GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
@@ -627,7 +628,7 @@ $(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE)
+$(BUILD)/ndk-include_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
 	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
 	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
@@ -696,7 +697,7 @@ download/NDK39.lha:
 .PHONY: ndk_13
 ndk13: $(BUILD)/ndk-include_ndk13
 
-$(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk
+$(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUILD)/sfdc/_done
 	@while read p; do mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
 	$(L0)"extract ndk13"$(L1) while read p; do \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
