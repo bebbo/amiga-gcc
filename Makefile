@@ -338,7 +338,11 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null pro
 	@touch -t 0001010000 projects/binutils/binutils/arlex.l
 	@touch -t 0001010000 projects/binutils/ld/ldgram.y
 	@touch -t 0001010000 projects/binutils/intl/plural.y
-	$(L0)"make binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas all-binutils all-ld $(ALL_GDB) $(L2)
+	$(L0)"make binutils bfd"$(L1)$(MAKE) -C $(BUILD)/binutils all-bfd $(L2)
+	$(L0)"make binutils gas"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas $(L2)
+	$(L0)"make binutils binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-binutils $(L2)
+	$(L0)"make binutils ld"$(L1)$(MAKE) -C $(BUILD)/binutils all-ld $(L2)
+	$(L0)"make binutils (gdb)"$(L1)$(MAKE) -C $(BUILD)/binutils all-bfd all-gas all-binutils all-ld $(ALL_GDB) $(L2)
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
 	@echo "done" >$@
 
