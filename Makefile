@@ -136,8 +136,8 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13
-all: gcc binutils gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+.PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13
+all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
 
 # =================================================
 # clean
@@ -342,14 +342,7 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null pro
 	$(L0)"make binutils gas"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas $(L2)
 	$(L0)"make binutils binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-binutils $(L2)
 	$(L0)"make binutils ld"$(L1)$(MAKE) -C $(BUILD)/binutils all-ld $(L2)
-ifeq (,$(ALL_GDB))
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(L2)
-else
-	$(L0)"make binutils configure gdb"$(L1)$(MAKE) -C $(BUILD)/binutils configure-gdb $(L2)
-	$(L0)"make binutils gdb libs"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb all-lib $(L2)
-	$(L0)"make binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils $(ALL_GDB) $(L2)
-	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
-endif
 	@echo "done" >$@
 
 $(BUILD)/binutils/Makefile: projects/binutils/configure
@@ -359,6 +352,38 @@ $(BUILD)/binutils/Makefile: projects/binutils/configure
 
 projects/binutils/configure:
 	@cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
+
+# =================================================
+# gdb
+# =================================================
+
+gdb: $(BUILD)/binutils/_gdb
+
+$(BUILD)/binutils/_gdb: $(BUILD)/binutils/_done
+ifneq (,$(ALL_GDB))
+	$(L0)"make binutils configure gdb"$(L1)$(MAKE) -C $(BUILD)/binutils configure-gdb $(L2)
+	$(L0)"make binutils gdb libs"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb all-lib $(L2)
+	$(L0)"make binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils $(ALL_GDB) $(L2)
+	$(L0)"install binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
+endif
+	@echo "done" >$@
+
+	
+# =================================================
+# gprof
+# =================================================
+CONFIG_GRPOF := --prefix=$(PREFIX) --target=m68k-amigaos --disable-werror
+
+gprof: $(BUILD)/binutils/_gprof
+
+$(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null projects/binutils/gprof -type f)
+	$(L0)"make gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof all $(L2)
+	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2)
+	@echo "done" >$@
+
+$(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/_done
+	@mkdir -p $(BUILD)/binutils/gprof
+	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/projects/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
 # =================================================
 # gcc
@@ -397,22 +422,6 @@ endif
 
 projects/gcc/configure:
 	@cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
-
-# =================================================
-# gprof
-# =================================================
-CONFIG_GRPOF := --prefix=$(PREFIX) --target=m68k-amigaos --disable-werror
-
-gprof: $(BUILD)/binutils/_gprof
-
-$(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null projects/binutils/gprof -type f)
-	$(L0)"make gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof all $(L2)
-	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2)
-	@echo "done" >$@
-
-$(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/_done
-	@mkdir -p $(BUILD)/binutils/gprof
-	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/projects/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
 # =================================================
 # fd2sfd
