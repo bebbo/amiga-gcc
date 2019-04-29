@@ -342,8 +342,14 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null pro
 	$(L0)"make binutils gas"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas $(L2)
 	$(L0)"make binutils binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-binutils $(L2)
 	$(L0)"make binutils ld"$(L1)$(MAKE) -C $(BUILD)/binutils all-ld $(L2)
-	$(L0)"make binutils (gdb)"$(L1)$(MAKE) -C $(BUILD)/binutils all-bfd all-gas all-binutils all-ld $(ALL_GDB) $(L2)
+ifeq (,$(ALL_GDB))
+	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(L2)
+else
+	$(L0)"make binutils configure gdb"$(L1)$(MAKE) -C $(BUILD)/binutils configure-gdb $(L2)
+	$(L0)"make binutils libgdb.a"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb libgdb.a $(L2)
+	$(L0)"make binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils $(ALL_GDB) $(L2)
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
+endif
 	@echo "done" >$@
 
 $(BUILD)/binutils/Makefile: projects/binutils/configure
