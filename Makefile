@@ -16,6 +16,8 @@ export PATH := $(PREFIX)/bin:$(PATH)
 UNAME_S := $(shell uname -s)
 BUILD := build-$(UNAME_S)
 __BUILDDIR := $(shell mkdir -p $(BUILD))
+__PROJECTDIR := $(shell mkdir -p projects)
+__DOWNLOADDIR := $(shell mkdir -p download)
 
 GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
 
@@ -279,7 +281,6 @@ update-libpthread: projects/aros-stuff/pthreads/Makefile
 	@cd projects/aros-stuff && git pull
 
 update-ndk: download/NDK39.lha
-	mkdir -p $(BUILD)
 	make projects/NDK_3.9.info
 
 update-newlib: projects/newlib-cygwin/newlib/configure
@@ -289,7 +290,6 @@ update-netinclude: projects/amiga-netinclude/README.md
 	@cd projects/amiga-netinclude && git pull
 
 update-gmp:
-	@mkdir -p download
 	if [ -a download/$(GMPFILE) ]; \
 	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
@@ -297,7 +297,6 @@ update-gmp:
 	@cd projects && tar xf ../download/$(GMPFILE)
 
 update-mpc:
-	@mkdir -p download
 	if [ -a download/$(MPCFILE) ]; \
 	then rm -rf projcts/$(MPC); rm -rf projects/gcc/mpc; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpc/$(MPCFILE); \
@@ -305,7 +304,6 @@ update-mpc:
 	@cd projects && tar xf ../download/$(MPCFILE)
 
 update-mpfr:
-	@mkdir -p download
 	if [ -a download/$(MPFRFILE) ]; \
 	then rm -rf projects/$(MPFR); rm -rf projects/gcc/mpfr; \
 	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
@@ -350,7 +348,6 @@ $(BUILD)/binutils/Makefile: projects/binutils/configure
 
 
 projects/binutils/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
 
 # =================================================
@@ -389,7 +386,6 @@ endif
 	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(L2)
 
 projects/gcc/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
 
 # =================================================
@@ -428,7 +424,6 @@ $(BUILD)/fd2sfd/Makefile: projects/fd2sfd/configure
 	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
 projects/fd2sfd/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2SFD)
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
@@ -451,7 +446,6 @@ $(BUILD)/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/nu
 	$(L0)"make fd2sfd"$(L1) cd projects/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c $(L2)
 
 projects/fd2pragma/makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
 
 # =================================================
@@ -471,7 +465,6 @@ $(BUILD)/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -n
 	$(L0)"make ira"$(L1) cd projects/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99 $(L2)
 
 projects/ira/Makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_IRA)
 
 # =================================================
@@ -494,7 +487,6 @@ $(BUILD)/sfdc/Makefile: projects/sfdc/configure
 	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
 projects/sfdc/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_SFDC)
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
@@ -520,7 +512,6 @@ $(BUILD)/vasm/Makefile: projects/vasm/Makefile $(shell find 2>/dev/null projects
 	@touch $(BUILD)/vasm/Makefile
 
 projects/vasm/Makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_VASM)
 
 # =================================================
@@ -547,7 +538,6 @@ $(BUILD)/vbcc/Makefile: projects/vbcc/Makefile $(shell find 2>/dev/null projects
 	@touch $(BUILD)/vbcc/Makefile
 
 projects/vbcc/Makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_VBCC)
 
 # =================================================
@@ -568,7 +558,6 @@ $(BUILD)/vlink/Makefile: projects/vlink/Makefile
 	@rsync -a projects/vlink $(BUILD)/ --exclude .git
 
 projects/vlink/Makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_VLINK)
 
 .PHONY: lha
@@ -676,8 +665,6 @@ $(BUILD)/ndk-include_proto: projects/NDK_3.9.info
 	@echo "done" >$@
 
 projects/NDK_3.9.info: $(BUILD)/_lha_done download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
-	@mkdir -p projects
-	@mkdir -p $(BUILD)/
 	$(L0)"unpack ndk"$(L1) cd projects && lha xf ../download/NDK39.lha $(L2)
 	@touch -t 0001010000 download/NDK39.lha
 	$(L0)"patch ndk"$(L1) for i in $$(find patches/NDK_3.9/ -type f); do \
@@ -687,7 +674,6 @@ projects/NDK_3.9.info: $(BUILD)/_lha_done download/NDK39.lha $(shell find 2>/dev
 	@touch projects/NDK_3.9.info
 
 download/NDK39.lha:
-	@mkdir -p download
 	@cd download && wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha
 
 
@@ -728,7 +714,6 @@ $(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_n
 	@echo "done" >$@
 
 projects/amiga-netinclude/README.md:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
 
 # =================================================
@@ -762,7 +747,6 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@echo "done" >$@
 
 projects/libnix/Makefile.gcc6:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBNIX)
 
 # =================================================
@@ -795,7 +779,6 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@echo "done" >$@
 
 projects/clib2/LICENSE:
-	@mkdir -p projects
 	@cd projects && git clone -b master --depth 4 $(GIT_CLIB2)
 
 # =================================================
@@ -815,7 +798,6 @@ $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(
 	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 projects/libdebug/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
 	@touch -t 0001010000 projects/libdebug/configure.ac
 
@@ -844,7 +826,6 @@ $(BUILD)/libSDL12/Makefile.bax: $(BUILD)/libnix/_done projects/libSDL12/Makefile
 	@touch $(BUILD)/libSDL12/Makefile.bax
 
 projects/libSDL12/Makefile.bax:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
 
 
@@ -866,7 +847,6 @@ $(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done projects/aros-stuff/pthreads
 	@touch $(BUILD)/libpthread/Makefile
 
 projects/aros-stuff/pthreads/Makefile:
-	@mkdir -p projects
 	@cd projects &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
 
 # =================================================
@@ -897,14 +877,12 @@ $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/newlib/configure
 	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb $(L2)
 
 projects/newlib-cygwin/newlib/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
 
 # =================================================
 # ixemul
 # =================================================
 projects/ixemul/configure:
-	@mkdir -p projects
 	@cd projects &&	git clone $(GIT_IXEMUL)
 
 # =================================================
