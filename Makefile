@@ -346,7 +346,7 @@ ifeq (,$(ALL_GDB))
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(L2)
 else
 	$(L0)"make binutils configure gdb"$(L1)$(MAKE) -C $(BUILD)/binutils configure-gdb $(L2)
-	$(L0)"make binutils libgdb.a"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb libgdb.a $(L2)
+	$(L0)"make binutils gdb libs"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb all-lib $(L2)
 	$(L0)"make binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils $(ALL_GDB) $(L2)
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
 endif
