@@ -887,11 +887,7 @@ $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(BUILD)/ndk-incl
 	@for x in $$(find $(PREFIX)/m68k-amigaos/lib/* -name libm.a); do ln -sf $$x $${x%*m.a}__m__.a; done
 	@touch $@
 
-ifeq (,$(wildcard $(BUILD)/gcc/_done))
-$(BUILD)/newlib/newlib/Makefile: $(BUILD)/gcc/_done
-endif
-
-$(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/newlib/configure
+$(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/newlib/configure $(BUILD)/gcc/_done
 	@mkdir -p $(BUILD)/newlib/newlib
 	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb $(L2)
 
