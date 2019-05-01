@@ -1,3 +1,6 @@
+branches:
+  only:
+  - master
 matrix:
   include:
     - os: linux
@@ -7,7 +10,6 @@ matrix:
       before_install:
         - sudo apt-get install -y make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext texinfo
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
-  
     - os: osx
       osx_image: xcode9.4
       sudo: required
@@ -16,25 +18,15 @@ matrix:
         - brew install libmpc util-linux
         - brew tap discoteq/discoteq; brew install flock
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
-        
-    - os: windows
-      language: shell
-      before_install:
-        - choco install msys2 innosetup
-        - uname -a
-        - echo $PWD
-        - whoami
-
 script:
- - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-        echo x >/c/tools/pipe;
-        cmd /c "start cmd /k c:\\tools\\msys64\\usr\\bin\\bash --login ./setup/buildwin";
-        travis_wait 60 tail --follow=name --max-unchanged-stats=1 /c/tools/pipe || echo "EOF";
-        ls -l Output;
-    else
-        make update -j3;
-        make all -j3;
-        tar czf amiga-gcc-$(uname)-$(date +%Y%m%d).tgz /opt/amiga;
-        ls -l;
-    fi
-
+ - make all -j3
+ - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
+ - ls -l
+deploy:
+  provider: releases
+  api_key:
+    secure: ahFeqlMYR6x9DA01B4NeBAqNKqv+ZxJoM0fpQrCzeKI+szah6M3THhhP8XO/PTBhUbM865wpoVg5J+l7GxFtH/Q7AB2wA1sEhpt79FhT4j43Ek8h5E18GKG9UGVZWRLDfhor6ewo3gjf8Q8Tw14MH5H4qdXbxQIHyU3PWoBuIX2Z63/8ad2CWAcSiAaqpK4wzKqR73cjHEH8xHJp5+Q1e5kEsvlksbu95pEVPqndpQ/9HUetwqgR/U6A0dPdY4GcQM8AX17SmvzbXrAOqRhegOg2/j2FnKa/w2m8WD89CxRDW/roRgCOOTe0JleBVqZzuLNaPHu/aRnTSC7wt4SfDbh/WVp1XfZKI5Y49evaljzx11C5PWpqaUk9n3ITg9bGxXcNbgYKo96S6chR33mlBdZWDt/3bWeQGp+liNiUMM57kRpxsLNP3yMNkvxVxAIJ/xMe+FWUJuKwMD/dLDNuTS+vqH0ezLAbuwWLn92G/9OPw24CRrusZ7OPQuZFenDBBj0kM4+1n11JksGgPwF43hPJbXs6u6CQAxVeYYzCMziF3klidoIqiFKz4cmyvxB73cWqRBGP2cr+qworJp41pNnazklRAgVUgoxqWLUNEqHzJ+qU21T1EpoaYXqdcMEv5SBQhOpv/bQmSXU25MGA7VlMrnxTziqVvztKZcA0jyo=
+  file: amiga-gcc-${TRAVIS_OS_NAME}.tgz
+  skip_cleanup: true
+  on:
+    repo: bebbo/amiga-gcc
