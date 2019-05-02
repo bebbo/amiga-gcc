@@ -883,6 +883,7 @@ $(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a
 
 $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(NEWLIB_FILES)
 	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
+	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2)
 	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2)
 	@for x in $$(find $(PREFIX)/m68k-amigaos/lib/* -name libm.a); do ln -sf $$x $${x%*m.a}__m__.a; done
