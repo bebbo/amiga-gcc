@@ -728,6 +728,9 @@ $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUI
 # =================================================
 # netinclude
 # =================================================
+.PHONY: netinclude
+netinclude: $(BUILD)/_netinclude
+
 $(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
 	@rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
