@@ -25,7 +25,7 @@ script:
 before_deploy:
  - git config --local user.name "bebbo@travis-ci"
  - git config --local user.email "bebbo@bejy.net"
- - export TRAVIS_TAG=latest
+ - export TRAVIS_TAG=latest-$(date)
  - git tag $TRAVIS_TAG
 deploy:
   provider: releases
