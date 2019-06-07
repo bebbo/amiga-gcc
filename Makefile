@@ -88,9 +88,9 @@ ifeq ($(verbose),)
 L1 = ; ($(FLOCK) 200; echo -e \\033[33m$$__p...\\033[0m >>.state; echo -ne \\033[33m$$__p...\\033[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
   echo -e \\r\\033[K\\033[31m$$__p...failed\\033[0m; \
-  tail -n 100 "$$__l"; \
+   sed -n '1,/\*\*\*/p' "$$__l" | tail -n 100; \
   echo -e \\033[31m$$__p...failed\\033[0m; \
-  echo -e \\033[1mless \"$$__l\"\\033[0m; \
+  echo -e use \\033[1mless \"$$__l\"\\033[0m to view the full log and search for ***; \
   else echo -e \\r\\033[K\\033[32m$$__p...done\\033[0m; fi \
   ;grep -v "$$__p" .state >.state0 2>/dev/null; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
 else
@@ -795,7 +795,7 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@mkdir -p $(BUILD)/clib2/
 	@rsync -a projects/clib2/library/* $(BUILD)/clib2
 	@cd $(BUILD)/clib2 && find * -name lib\*.a -delete
-	$(L0)"make clib2"$(L1) $(MAKE) -C $(BUILD)/clib2 -f GNUmakefile.68k $(L2)
+	$(L0)"make clib2"$(L1) $(MAKE) -C $(BUILD)/clib2 -f GNUmakefile.68k -j1 $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/clib2
 	@rsync -a $(BUILD)/clib2/include $(PREFIX)/m68k-amigaos/clib2
 	@rsync -a $(BUILD)/clib2/lib $(PREFIX)/m68k-amigaos/clib2
