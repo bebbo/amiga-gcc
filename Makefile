@@ -90,7 +90,7 @@ L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
   echo -e \\r\\033[K\\033[31m$$__p...failed\\033[0m; \
    sed -n '1,/\*\*\*/p' "$$__l" | tail -n 100; \
   echo -e \\033[31m$$__p...failed\\033[0m; \
-  echo -e use \\033[1mless \"$$__l\"\\033[0m to view the full log and search for ***; \
+  echo -e use \\033[1mless \"$$__l\"\\033[0m to view the full log and search for \*\*\*; \
   else echo -e \\r\\033[K\\033[32m$$__p...done\\033[0m; fi \
   ;grep -v "$$__p" .state >.state0 2>/dev/null; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
 else
