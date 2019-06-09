@@ -167,7 +167,7 @@ clean-mpfr:
 
 clean-libgcc:
 	rm -rf $(BUILD)/gcc/m68k-amigaos
-	rm $(BUILD)/gcc/_libgcc_done
+	rm -rf $(BUILD)/gcc/_libgcc_done
 
 clean-binutils:
 	rm -rf $(BUILD)/binutils
