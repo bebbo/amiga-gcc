@@ -389,8 +389,8 @@ CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,o
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
-ifeq ($(findstring Darwin,$(shell uname)),)
-CONFIG_GCC = ${CONFIG_GCC} --with-gmp="/usr/local/Cellar/gmp/6.1.2_2" --with-mpfr="/usr/local/Cellar/mpfr/4.0.2" --with-mpc="/usr/local/Cellar/libmpc/1.1.0"
+ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
+	CONFIG_GCC += --with-gmp-include=/usr/local/include --with-gmp-lib=/usr/local/lib --with-mpfr-include=/usr/local/include --with-mpfr-lib=/usr/local/lib --with-mpfr-include=/usr/local/include --with-mpfr-lib=/usr/local/lib
 endif
 
 
