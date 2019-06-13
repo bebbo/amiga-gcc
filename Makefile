@@ -945,6 +945,19 @@ update-repos:
 
 
 # =================================================
+# run gcc torture check
+# =================================================
+ifeq (,$(board))
+board = amigaos
+endif
+
+.PHONY: check
+check:
+	@ln -sf $(PREFIX)/m68k-amigaos/libnix $(BUILD)/gcc/m68k-amigaos/libnix
+	$(MAKE) -C $(BUILD)/gcc check-gcc-c "RUNTESTFLAGS=--target_board=$(board) execute.exp=* SIM=vamos" | grep '# of\|PASS\|FAIL\|===\|/amigaos-'
+
+
+# =================================================
 # info
 # =================================================
 .PHONY: info v r
