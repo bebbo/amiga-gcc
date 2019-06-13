@@ -326,10 +326,8 @@ BINUTILS := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 BINUTILS_DIR := . bfd gas ld binutils opcodes
 BINUTILSD := $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
 
-ifeq ($(findstring Darwin,$(shell uname)),)
 ALL_GDB := all-gdb
 INSTALL_GDB := install-gdb
-endif
 
 binutils: $(BUILD)/binutils/_done
 
@@ -360,12 +358,10 @@ projects/binutils/configure:
 gdb: $(BUILD)/binutils/_gdb
 
 $(BUILD)/binutils/_gdb: $(BUILD)/binutils/_done
-ifneq (,$(ALL_GDB))
 	$(L0)"make binutils configure gdb"$(L1)$(MAKE) -C $(BUILD)/binutils configure-gdb $(L2)
 	$(L0)"make binutils gdb libs"$(L1)$(MAKE) -C $(BUILD)/binutils/gdb all-lib $(L2)
 	$(L0)"make binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils $(ALL_GDB) $(L2)
 	$(L0)"install binutils gdb"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(INSTALL_GDB) $(L2)
-endif
 	@echo "done" >$@
 
 	
@@ -390,7 +386,12 @@ $(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/
 # =================================================
 CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
 	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared \
-	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"
+	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
+
+# OSX : libs added by the command brew install gmp mpfr libmpc
+ifeq ($(findstring Darwin,$(shell uname)),)
+CONFIG_GCC = ${CONFIG_GCC} --with-gmp="/usr/local/Cellar/gmp/6.1.2_2" --with-mpfr="/usr/local/Cellar/mpfr/4.0.2" --with-mpc="/usr/local/Cellar/libmpc/1.1.0"
+endif
 
 
 GCC_CMD := m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \

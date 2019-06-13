@@ -23,15 +23,15 @@ Right now these tools are build:
 ### macOS
 Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
 
-`brew install bash wget make lhasa gmp mpfr mpc flex gettext texinfo`
+`brew install bash wget make lhasa gmp mpfr libmpc flex gettext texinfo gcc make autoconf`
 
 By default macOS uses an outdated version of bash. Therefore, on macOS host always pass the the SHELL=/usr/local/bin/bash parameter (or any other valid path pointing to bash), e.g.:
 ```
 make all SHELL=/usr/local/bin/bash
 ```
-On macOS it may be also necessary to point to the correct compiler version (there is a gcc wrapper for clang, which can produce compile errors!), e.g.:
+On macOS it may be also necessary to point to the brew version of gcc make and autoconf, e.g.:
 ```
-CC=clang CXX=clang++ make all SHELL=/usr/local/bin/bash
+CC=gcc-9 CXX=g++-9 gmake all SHELL=/usr/local/bin/bash
 ```
 
 **ALSO NOTE** If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
