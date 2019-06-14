@@ -6,17 +6,17 @@ addons:
     taps: discoteq/discoteq
     packages:
       - bash
-      - wget
+      #- wget
       - make
       - lhasa
-      - gmp
-      - mpfr
-      - libmpc
+      #- gmp
+      #- mpfr
+      #- libmpc
       - flex
       - gettext
       - texinfo
-      - gcc
-      - autoconf
+      #- gcc
+      #- autoconf
       - flock
 matrix:
   include:
@@ -25,12 +25,12 @@ matrix:
       sudo: required
       language: c
       before_install:
-        - ls -l /usr/local/bin
+        #- ls -l /usr/local/bin
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
  - echo ${TRAVIS_OS_NAME}
  #- if [ "${TRAVIS_OS_NAME}" == "osx" ]; then export SHELL=/usr/local/bin/bash; fi
- - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-9 CXX=g++-9 gmake all -j3; else make all -j3; fi
+ - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-8 CXX=g++-8 gmake all -j3; else make all -j3; fi
  - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
  - ls -l
 after_failure:
