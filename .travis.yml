@@ -25,6 +25,7 @@ matrix:
       sudo: required
       language: c
       before_install:
+        - ls -l /usr/local/bin
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
  - echo ${TRAVIS_OS_NAME}
