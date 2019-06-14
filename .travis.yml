@@ -19,7 +19,8 @@ matrix:
         - brew tap discoteq/discoteq; brew install flock
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
- - if [ "${TRAVIS_OS_NAME}" == "osx"]; then CC=gcc-9 CXX=g++-9 make all -j3; else make all -j3; fi
+ - echo ${TRAVIS_OS_NAME}
+ - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-9 CXX=g++-9 make all -j3; else make all -j3; fi
  - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
  - ls -l
 before_deploy:
