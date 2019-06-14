@@ -1,14 +1,30 @@
 branches:
   only:
   - master
+addons:
+  homebrew:
+    taps: discoteq/discoteq
+    packages:
+      - bash
+      - wget
+      - make
+      - lhasa
+      - gmp
+      - mpfr
+      - libmpc
+      - flex
+      - gettext
+      - texinfo
+      - gcc
+      - autoconf
+      - flock
 matrix:
   include:
     - os: osx
+      osx_image: xcode10.2
       sudo: required
-      language: c++
+      language: cpp
       before_install:
-        - brew install bash wget make lhasa gmp mpfr libmpc flex gettext texinfo gcc make autoconf
-        - brew tap discoteq/discoteq; brew install flock
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
  - echo ${TRAVIS_OS_NAME}
