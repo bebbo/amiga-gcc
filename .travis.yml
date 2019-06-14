@@ -23,12 +23,14 @@ matrix:
     - os: osx
       osx_image: xcode10.2
       sudo: required
-      language: cpp
+      language: c
       before_install:
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
  - echo ${TRAVIS_OS_NAME}
- - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then export SHELL=/usr/local/bin/bash; fi
+ #- if [ "${TRAVIS_OS_NAME}" == "osx" ]; then export SHELL=/usr/local/bin/bash; fi
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-9 CXX=g++-9 gmake all -j3; else make all -j3; fi
  - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
  - ls -l
+after_failure:
+  - cat log/*.log
