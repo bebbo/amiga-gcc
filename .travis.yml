@@ -55,3 +55,5 @@ deploy:
   overwrite: true
   on:
     tags: true
+after_failure:
+  - cat log/*.log
