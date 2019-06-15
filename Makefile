@@ -609,11 +609,11 @@ $(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info 
 
 
 $(BUILD)/vbcc_target_m68k-amigaos.info: download/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
-	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf ../download/vbcc_target_m68k-amigaos.lha $(L2)
+	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf ../download/vbcc_target_m68k-amiga.lha $(L2)
 	@touch $(BUILD)/vbcc_target_m68k-amigaos.info
 
 download/vbcc_target_m68k-amigaos.lha:
-	$(L0)"downloading vbcc_target"$(L1) cd download && wget http://server.owl.de/~frank/vbcc/2017-08-14/vbcc_target_m68k-amigaos.lha $(L2)
+	$(L0)"downloading vbcc_target"$(L1) cd download && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha $(L2)
 
 # =================================================
 # L I B R A R I E S

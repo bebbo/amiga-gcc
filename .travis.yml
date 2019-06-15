@@ -1,6 +1,18 @@
 branches:
   only:
   - master
+  addons:
+  homebrew:
+    taps: discoteq/discoteq
+    packages:
+      - bash
+      - make
+      - lhasa
+      - flex
+      - gettext
+      - texinfo
+      - flock
+      # needed but already installed : gcc autoconf wget gmp mpfr libmpc
 matrix:
   include:
     - os: linux
@@ -11,16 +23,21 @@ matrix:
         - sudo apt-get install -y make git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex gettext texinfo
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
     - os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.2
       sudo: required
       language: c
       before_install:
-        - brew install libmpc util-linux gcc
-        - brew tap discoteq/discoteq; brew install flock
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
- - echo ${TRAVIS_OS_NAME}
- - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-9 CXX=g++-9 make all -j3; else make all -j3; fi
+  - echo ${TRAVIS_OS_NAME}
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ];
+    then 
+      export CC=gcc-8;
+      export CXX=g++-8;
+      travis_wait 60 gmake all -j3;
+    else
+      travis_wait 60 make all -j3;
+    fi
  - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
  - ls -l
 before_deploy:
@@ -37,3 +54,5 @@ deploy:
   overwrite: true
   on:
     tags: true
+after_failure:
+  - cat log/*.log
