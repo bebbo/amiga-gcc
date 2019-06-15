@@ -12,13 +12,7 @@ addons:
       - gettext
       - texinfo
       - flock
-      # already installed
-      #- gcc
-      #- autoconf
-      #- wget
-      #- gmp
-      #- mpfr
-      #- libmpc
+      # needed but already installed : gcc autoconf wget gmp mpfr libmpc
 matrix:
   include:
     - os: osx
@@ -28,9 +22,13 @@ matrix:
       before_install:
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
- - echo ${TRAVIS_OS_NAME}
- - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then CC=gcc-8 CXX=g++-8 travis_wait 30 gmake all -j3; else make all -j3; fi
- - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
- - ls -l
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ];
+    then 
+      export CC=gcc-8;
+      export CXX=g++-8;
+      travis_wait 30 gmake all -j3;
+    else
+      make all -j3;
+    fi
 after_failure:
   - cat log/*.log
