@@ -33,7 +33,7 @@ script:
    then
      export CC=gcc-8;
      export CXX=g++-8;
-     (gmake -j3 all &); while [ ! -f $(realpath build-Darwin/gcc/_libgcc_done) ]; do date; sleep 60; done;
+     (gmake -j3 all &); while [ ! -f $(realpath build-Darwin)/gcc/_libgcc_done ]; do date; sleep 60; done;
    else
      make all -j3;
    fi
