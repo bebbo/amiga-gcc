@@ -1,7 +1,7 @@
 branches:
   only:
   - master
-  addons:
+addons:
   homebrew:
     taps: discoteq/discoteq
     packages:
@@ -29,17 +29,18 @@ matrix:
       before_install:
         - sudo mkdir /opt/amiga && sudo chown $(whoami) /opt/amiga
 script:
-  - echo ${TRAVIS_OS_NAME}
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ];
-    then 
-      export CC=gcc-8;
-      export CXX=g++-8;
-      travis_wait 60 gmake all -j3;
-    else
-      travis_wait 60 make all -j3;
-    fi
+ - if [ "${TRAVIS_OS_NAME}" == "osx" ];
+   then
+     export CC=gcc-8;
+     export CXX=g++-8;
+     (gmake -j3 all &); while [ ! -f $(realpath build-Darwin)/gcc/_libgcc_done ]; do date; sleep 60; done;
+   else
+     make all -j3;
+   fi
  - tar czf amiga-gcc-${TRAVIS_OS_NAME}.tgz /opt/amiga
  - ls -l
+after_failure:
+  - cat log/*.log
 before_deploy:
  - git config --local user.name "bebbo@travis-ci"
  - git config --local user.email "bebbo@bejy.net"
