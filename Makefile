@@ -955,7 +955,7 @@ endif
 .PHONY: check
 check:
 	@ln -sf $(PREFIX)/m68k-amigaos/libnix $(BUILD)/gcc/m68k-amigaos/libnix
-	$(MAKE) -C $(BUILD)/gcc check-gcc-c "RUNTESTFLAGS=--target_board=$(board) execute.exp=* SIM=vamos" | grep '# of\|PASS\|FAIL\|===\|/amigaos-'
+	$(MAKE) -C $(BUILD)/gcc check-gcc-c "RUNTESTFLAGS=--target_board=$(board) execute.exp=* SIM=vamos" | grep '# of\|PASS\|FAIL\|===\|Running\|Using' 
 
 
 # =================================================
