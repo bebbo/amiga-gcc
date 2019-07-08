@@ -16,7 +16,7 @@ process_multilib_options ""
 
 set_board_info compiler "[find_gcc]"
 set_board_info cflags "-noixemul"
-set_board_info ldflags ""
+set_board_info ldflags "-lpthread"
 set_board_info ldscript "";
 
 set_board_info sim vamos
