@@ -385,7 +385,7 @@ $(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/
 # gcc
 # =================================================
 CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=posix \
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared  \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
