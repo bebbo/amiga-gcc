@@ -64,6 +64,7 @@ hardware/dmabits.h
 hardware/intbits.h
 intuition/intuition.h
 intuition/intuitionbase.h
+intuition/iobsolete.h
 intuition/preferences.h
 intuition/screens.h
 libraries/configregs.h
