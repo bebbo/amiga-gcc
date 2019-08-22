@@ -1,6 +1,5 @@
 exec/avl.h
 intuition/classes.h
-intuition/iobsolete.h
 intuition/cghook.h
 intuition/classusr.h
 graphics/displayinfo.h
