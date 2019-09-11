@@ -90,10 +90,10 @@ make all PREFIX=/here/or/there
 The build performs the installation automatically, there is no separate `make install` step. Because of this, you must make sure that the target `PREFIX` directory is writable for the user who is doing the build.
 If the `PREFIX` directory points to a directory where the user already has appropriate permissions the below steps can be ommited and the directory will be created by the build process.
 ```
-mkdir /opt/amiga
-chgrp users /opt/amiga
-chmod 775 /opt/amiga
-sudo usermod -a -G group username
+sudo mkdir /opt/amiga
+sudo chgrp users /opt/amiga
+sudo chmod 775 /opt/amiga
+sudo usermod -a -G users username
 ```
 After adding the user to the group, you may have to logout and login again to apply the changes to your user.
 
