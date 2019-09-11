@@ -18,8 +18,11 @@ Right now these tools are build:
 ## Prerequisites
 ### Centos
 `sudo yum install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo`
-### Ubuntu
+### Ubuntu, Debian
 `sudo apt install make wget git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev autoconf`
+
+If building with a normal user, the `PREFIX` directory must be writable (default is `/opt/amiga`). You can add the user to an appropriate group. 
+
 ### macOS
 Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
 
@@ -84,6 +87,16 @@ The default prefix is `/opt/amiga`. You may specify a different prefix by adding
 ```
 make all PREFIX=/here/or/there
 ```
+The build performs the installation automatically, there is no separate `make install` step. Because of this, you must make sure that the target `PREFIX` directory is writable for the user who is doing the build.
+If the `PREFIX` directory points to a directory where the user already has appropriate permissions the below steps can be ommited and the directory will be created by the build process.
+```
+sudo mkdir /opt/amiga
+sudo chgrp users /opt/amiga
+sudo chmod 775 /opt/amiga
+sudo usermod -a -G users username
+```
+After adding the user to the group, you may have to logout and login again to apply the changes to your user.
+
 ## Building
 Simply run `make all`. Also add -j to speedup the build.
 
