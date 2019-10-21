@@ -115,4 +115,4 @@ If you plan to develop for Kickstart 1.3 you should use `-mcrt=nix13` in your co
 m68k-amigaos-gcc test.cpp -mcrt=nix13
 ```
 
-The include files for 1.3 can be found at `<PREFIX>/m68k-amigaos/ndk13-include` i.E. `/opt/amiga/m68k-amigaos/ndk13-include`
+The include files for 1.3 - which are picked up by the compiler if `-mcrt=nix13` is used - can be found at `<PREFIX>/m68k-amigaos/ndk13-include` i.E. `/opt/amiga/m68k-amigaos/ndk13-include`
