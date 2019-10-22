@@ -1,6 +1,6 @@
 --- NDK_3.9/Include/include_h/hardware/custom.h	2001-12-17 14:15:22.000000000 +0100
 +++ NDK_3.9/Include/include_h/hardware/custom.h	2018-01-22 18:49:45.382919800 +0100
-@@ -23,122 +23,122 @@
+@@ -23,122 +23,139 @@
  
  
  struct Custom {
@@ -75,24 +75,24 @@
 -    UWORD   adkcon;
 +    volatile UWORD   bltddat;
 +    volatile UWORD   dmaconr;
-+     union {
-+        volatile ULONG vpos32;
-+        struct {
-+                union {
-+                        volatile UWORD   vposr;
-+                        struct {
-+                                volatile UBYTE  vposr_h;
-+                                volatile UBYTE  vposr_l;
-+                        };
-+                };
-+                union {
-+                        volatile UWORD   vhposr;
-+                        struct {
-+                                volatile UBYTE  vhposr_h;
-+                                volatile UBYTE  vhposr_l;
-+                        };
-+                };
-+        };
++    union {
++    	volatile ULONG vpos32;
++    	struct {
++    		union {
++    			volatile UWORD   vposr;
++    			struct {
++        			volatile UBYTE  vposr_h;
++        			volatile UBYTE  vposr_l;
++    			};
++    		};
++    		union {
++    			volatile UWORD   vhposr;
++    			struct {
++        			volatile UBYTE  vhposr_h;
++        			volatile UBYTE  vhposr_l;
++    			};
++    		};
++    	};
 +    };
 +    volatile UWORD   dskdatr;
 +    volatile UWORD   joy0dat;
