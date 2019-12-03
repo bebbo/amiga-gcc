@@ -274,7 +274,7 @@ update-clib2: projects/clib2/LICENSE
 update-libdebug: projects/libdebug/configure
 	@cd projects/libdebug && git pull
 
-update-libSDL12: projects/libSDL12/Makefile.bax
+update-libSDL12: projects/libSDL12/Makefile
 	@cd projects/libSDL12 && git pull
 
 update-libpthread: projects/aros-stuff/pthreads/Makefile
@@ -832,10 +832,10 @@ CONFIG_LIBSDL12 := PREFX=$(PREFIX) PREF=$(PREFIX)
 
 libSDL12: $(BUILD)/libSDL12/_done
 
-$(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile.bax
+$(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
 	$(MAKE) sdk=ahi
 	$(MAKE) sdk=cgx
-	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile.bax $(CONFIG_LIBSDL12) $(L2)
+	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile $(CONFIG_LIBSDL12) $(L2)
 	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/include/GL
 	@mkdir -p $(PREFIX)/m68k-amigaos/include/SDL
@@ -844,12 +844,12 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile.bax
 	@rsync -a $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
 	@echo "done" >$@
 
-$(BUILD)/libSDL12/Makefile.bax: $(BUILD)/libnix/_done projects/libSDL12/Makefile.bax $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
+$(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done projects/libSDL12/Makefile $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libSDL12
 	@rsync -a projects/libSDL12/* $(BUILD)/libSDL12
-	@touch $(BUILD)/libSDL12/Makefile.bax
+	@touch $(BUILD)/libSDL12/Makefile
 
-projects/libSDL12/Makefile.bax:
+projects/libSDL12/Makefile:
 	@cd projects &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
 
 
