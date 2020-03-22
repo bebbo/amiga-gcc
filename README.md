@@ -1,4 +1,4 @@
-# amiga-gcc       [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YRRBRLCKDU3H6)]
+# amiga-gcc       [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YRRBRLCKDU3H6)
 The GNU C-Compiler with Binutils and other useful tools for cross development
 
 This is a Makefile based approach to build the same files as in the old amigaos-toolchain to reduce the build time.
