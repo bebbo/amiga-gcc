@@ -1,18 +1,23 @@
 --- /old/Include/include_h/devices/timer.h	2020-03-15 21:42:33.285184100 +0100
-+++ /new/Include/include_h/devices/timer.h	2020-03-15 21:43:10.704643200 +0100
-@@ -27,10 +27,15 @@
- 
- #define TIMERNAME	"timer.device"
- 
-+#ifndef _TIMEVAL_DEFINED
-+#define _TIMEVAL_DEFINED
++++ /new/Include/include_h/devices/timer.h	2020-04-13 20:04:21.627065100 +0200
+@@ -30,11 +30,15 @@
+ #ifndef _TIMEVAL_DEFINED
+ #define _TIMEVAL_DEFINED
  struct timeval {
-     ULONG tv_secs;
-     ULONG tv_micro;
+-    ULONG tv_secs;
+-    ULONG tv_micro;
++    union {
++        time_t          tv_sec;         /* seconds */
++        time_t          tv_secs;
++    };
++    union {
++        suseconds_t     tv_usec;        /* and microseconds */
++        suseconds_t     tv_micro;
++    };
  };
-+#define tv_sec tv_secs
-+#define tv_usec tv_micro
-+#endif
+-#define tv_sec tv_secs
+-#define tv_usec tv_micro
+ #endif
  
  struct EClockVal {
-     ULONG ev_hi;
+
