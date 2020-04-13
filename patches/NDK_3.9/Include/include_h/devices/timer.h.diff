@@ -10,12 +10,12 @@
 -    ULONG tv_secs;
 -    ULONG tv_micro;
 +    union {
-+        time_t          tv_sec;         /* seconds */
-+        time_t          tv_secs;
++        ULONG          tv_sec;         /* seconds */
++        ULONG          tv_secs;
 +    };
 +    union {
-+        suseconds_t     tv_usec;        /* and microseconds */
-+        suseconds_t     tv_micro;
++        ULONG     tv_usec;        /* and microseconds */
++        ULONG     tv_micro;
 +    };
  };
 +#endif
