@@ -18,6 +18,7 @@ Right now these tools are build:
 ## Prerequisites
 ### Centos
 `sudo yum install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo rsync`
+
 ### Ubuntu, Debian
 `sudo apt install make wget git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev autoconf rsync`
 
@@ -49,12 +50,12 @@ apt-cyg install gcc-core gcc-g++ python git perl-Pod-Simple gperf patch automake
 ```
 
 ### Windows with msys2
+
+Precompiled suite with installer: http://franke.ms/download/setup-amiga-gcc.exe
+
 ```
 pacman -S git base-devel gcc flex gmp-devel mpc-devel mpfr-devel ncurses-devel rsync
 ```
-
-### Ubuntu running on the Windows 10 Linux subsystem
-tbd
 
 ## Howto Clone and Download All You Need
 ```
