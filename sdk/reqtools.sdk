@@ -1,0 +1,15 @@
+Short: reqtools.library
+Version: 2.9
+Url: http://aminet.net/util/libs/ReqToolsDev.lha
+
+ReqTools/ReqTools.guide
+ReqTools/fd/reqtools_lib.fd = reqtools.fd
+ReqTools/include/proto/reqtools.h
+ReqTools/include/pragme/reqtools_pragmas.h
+ReqTools/include/libraries/reqtools.h
+ReqTools/include/libraries/reqtools.i
+ReqTools/include/libraries/reqtools_lib.i
+ReqTools/include/clib/reqtools_protos.h
+fd2sfd : reqtools.fd clib/reqtools_protos.h
+sfdc : reqtools.sfd
+stubs : reqtools.sfd
