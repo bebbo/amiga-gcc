@@ -53,6 +53,8 @@ apt-cyg install gcc-core gcc-g++ python git perl-Pod-Simple gperf patch automake
 pacman -S git base-devel gcc flex gmp-devel mpc-devel mpfr-devel ncurses-devel rsync
 ```
 
+Also note that you **MUST** cd into an **absolute path** e.g. `cd /c/msys64/home/test/amiga-gcc/` before running make, or builds may fail, because some files aren't found correctly (that's a msys2 bug).
+
 ### Ubuntu running on the Windows 10 Linux subsystem
 tbd
 
