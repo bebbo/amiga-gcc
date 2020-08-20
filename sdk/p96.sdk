@@ -1,0 +1,17 @@
+Short: Picasso96 retargetable graphics system
+Version: 2.3
+Url: http://wiki.icomp.de/w/images/e/e9/Develop.lha
+
+Picasso96Develop/Include/libraries/Picasso96.i
+Picasso96Develop/Include/libraries/Picasso96.h
+Picasso96Develop/Include/autodocs/Picasso96API.doc
+Picasso96Develop/Include/clib/Picasso96_protos.h
+Picasso96Develop/Include/inline/Picasso96.h
+Picasso96Develop/Include/pragmas/Picasso96_pragmas.h
+Picasso96Develop/Include/proto/Picasso96.h
+Picasso96Develop/Include/fd/Picasso96API_lib.fd
+Picasso96Develop/Include/lvo_p96.i = ../lvo/lvo_p96.i
+fd2sfd : Picasso96API_lib.fd clib/Picasso96_protos.h
+stubs : Picasso96API_lib.sfd
+
+

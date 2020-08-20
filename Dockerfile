@@ -1,9 +1,26 @@
-FROM centos:7 as builder
-RUN yum install -y gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo wget
-# LhA was missing in some of the steps
-RUN yum install -y http://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/lha-1.14i-19.2.2.el6.rf.x86_64.rpm
-RUN git clone https://github.com/bebbo/amiga-gcc && cd amiga-gcc && make update && make all
+FROM debian:10.4-slim AS builder
 
-FROM centos:7
-RUN yum install -y make git
+RUN echo deb http://deb.debian.org/debian/ buster main >/etc/apt/sources.list &&\
+ echo deb-src http://deb.debian.org/debian/ buster main >>/etc/apt/sources.list &&\
+ echo deb http://security.debian.org/debian-security buster/updates main >>/etc/apt/sources.list &&\
+ echo deb-src http://security.debian.org/debian-security buster/updates main >>/etc/apt/sources.list &&\
+ echo deb http://deb.debian.org/debian/ buster-updates main >>/etc/apt/sources.list &&\
+ echo deb-src http://deb.debian.org/debian/ buster-updates main >>/etc/apt/sources.list
+
+RUN apt-get -y update &&\
+    apt-get -y install make wget git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev autoconf rsync git lhasa
+
+RUN git clone https://github.com/bebbo/amiga-gcc &&\
+    cd amiga-gcc &&\
+    make update &&\
+    make all -j
+
+
+
+FROM debian:10.4-slim
+
 COPY --from=builder /opt/amiga /opt/amiga
+
+RUN echo deb http://deb.debian.org/debian/ buster main >/etc/apt/sources.list &&\
+    apt-get -y update &&\
+    apt-get -y install make git
