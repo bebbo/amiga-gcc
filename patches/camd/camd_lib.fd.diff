@@ -1,0 +1,11 @@
+--- camd/fd/camd_lib.fd.orig	2020-09-26 20:21:15.315420700 +0100
++++ camd/fd/camd_lib.fd	2020-09-26 20:21:27.785420700 +0100
+@@ -3,7 +3,7 @@
+ ##public
+ LockCAMD(locktype)(d0)
+ UnlockCAMD(lock)(a0)
+-CreateMidiA(name,tags)(a0)
++CreateMidiA(tags)(a0)
+ DeleteMidi(mi)(a0)
+ SetMidiAttrsA(mi,tags)(a0,a1)
+ GetMidiAttrsA(mi,tags)(a0,a1)
