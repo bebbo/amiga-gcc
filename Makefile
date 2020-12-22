@@ -51,6 +51,8 @@ CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
 
 E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
 
+THREADS ?= no
+
 # =================================================
 # determine exe extension for cygwin
 $(eval MYMAKE = $(shell which make 2>/dev/null) )
@@ -87,11 +89,11 @@ L00 = __p=
 ifeq ($(verbose),)
 L1 = ; ($(FLOCK) 200; echo -e \\033[33m$$__p...\\033[0m >>.state; echo -ne \\033[33m$$__p...\\033[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
-  echo -e \\r\\033[K\\033[31m$$__p...failed\\033[0m; \
+  echo -e \\n\\033[K\\033[31m$$__p...failed\\033[0m; \
    sed -n '1,/\*\*\*/p' "$$__l" | tail -n 100; \
   echo -e \\033[31m$$__p...failed\\033[0m; \
   echo -e use \\033[1mless \"$$__l\"\\033[0m to view the full log and search for \*\*\*; \
-  else echo -e \\r\\033[K\\033[32m$$__p...done\\033[0m; fi \
+  else echo -e \\n\\033[K\\033[32m$$__p...done\\033[0m; fi \
   ;grep -v "$$__p" .state >.state0 2>/dev/null; mv .state0 .state ;echo -n $$(cat .state | paste -sd " " -); ) 200>.lock; [[ $$__r -gt 0 ]] && exit $$__r; echo -n ""
 else
 L1 = ;
@@ -120,24 +122,33 @@ x:
 # =================================================
 .PHONY: help
 help:
-	@echo "make help            display this help"
-	@echo "make info            print prefix and other flags"
-	@echo "make all             build and install all"
-	@echo "make <target>        builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
-	@echo "make clean           remove the build folder"
+	@echo "make help		display this help"
+	@echo "make info		print prefix and other flags"
+	@echo "make all 		build and install all"
+	@echo "make min 		build and install the minimal to use gcc"
+	@echo "make <target>		builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
+	@echo "make clean		remove the build folder"
 	@echo "make clean-<target>	remove the target's build folder"
-	@echo "make clean-prefix    remove all content from the prefix folder"
-	@echo "make update          perform git pull for all targets"
-	@echo "make update-<target> perform git pull for the given target"
-	@echo "make sdk=<sdk>       install the sdk <sdk>"
-	@echo "make all-sdk         install all sdks"
-	@echo "make info			display some info"
+	@echo "make clean-prefix	remove all content from the prefix folder"
+	@echo "make update		perform git pull for all targets"
+	@echo "make update-<target>	perform git pull for the given target"
+	@echo "make sdk=<sdk>		install the sdk <sdk>"
+	@echo "make all-sdk		install all sdks"
+	@echo "make info		display some info"
+	@echo "make l   		print the last log entry for each project"
+	@echo "make b   		print the branch for each project"
+	@echo "make r   		print the remote for each project"
+	@echo "make v date=<date>	checkout all projects for a given date"
+	@echo ""
+	@echo "the optional parameter THREADS=posix will build it with thread support"
 
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13
-all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libSDL12 ndk ndk13
+.PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13 min
+all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libpthread libSDL12 ndk ndk13
+
+min: binutils gcc gdb gprof libnix libgcc
 
 # =================================================
 # clean
@@ -385,7 +396,7 @@ $(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/
 # gcc
 # =================================================
 CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared  \
+	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
@@ -705,19 +716,19 @@ download/NDK39.lha:
 ndk13: $(BUILD)/ndk-include_ndk13
 
 $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUILD)/sfdc/_done
-	@while read p; do p=$$(echo $$p|tr -d '\r'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
-	$(L0)"extract ndk13"$(L1) while read p; do p=$$(echo $$p|tr -d '\r'); \
+	@while read p; do p=$$(echo $$p|tr -d '\n'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/hfiles
+	$(L0)"extract ndk13"$(L1) while read p; do p=$$(echo $$p|tr -d '\n'); \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
 	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
 	  LC_CTYPE=C sed -n -e '/#ifndef  CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  else cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; fi \
 	done < patches/ndk13/chfiles $(L2)
-	@while read p; do p=$$(echo $$p|tr -d '\r'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
+	@while read p; do p=$$(echo $$p|tr -d '\n'); mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); echo "" >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; done < patches/ndk13/ehfiles
 	@echo '#undef	EXECNAME' > $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
 	@echo '#define	EXECNAME	"exec.library"' >> $(PREFIX)/m68k-amigaos/ndk13-include/exec/execname.h
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd13
-	@while read p; do p=$$(echo $$p|tr -d '\r'); LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
+	@while read p; do p=$$(echo $$p|tr -d '\n'); LC_CTYPE=C sed -n -e '/##base/,/V36/P'  $(PREFIX)/m68k-amigaos/ndk/lib/fd/$$p >$(PREFIX)/m68k-amigaos/ndk/lib/fd13/$$p; done < patches/ndk13/fdfiles
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd13
 	@for i in $(PREFIX)/m68k-amigaos/ndk/lib/fd13/*; do fd2sfd $$i $(PREFIX)/m68k-amigaos/ndk13-include/clib/$$(basename $$i _lib.fd)_protos.h > $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/$$(basename $$i .fd).sfd; done
 	$(L0)"macros+protos ndk13"$(L1) for i in $(PREFIX)/m68k-amigaos/ndk/lib/sfd13/*; do \
@@ -961,7 +972,7 @@ check:
 # =================================================
 # info
 # =================================================
-.PHONY: info v r
+.PHONY: info v r b l
 info:
 	@echo $@ $(UNAME_S)
 	@echo PREFIX=$(PREFIX)
@@ -1007,7 +1018,7 @@ v:
 	done; \
 	popd >/dev/null; \
 	echo .; \
-	git checkout master; \
+	git checkout $$B; \
 	if [ "$$D" != "" ]; then \
-	git checkout `git rev-list -n 1 --first-parent --before="$$D" master`; \
+	git checkout `git rev-list -n 1 --first-parent --before="$$D" $$B`; \
 	fi
