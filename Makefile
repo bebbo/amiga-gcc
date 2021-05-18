@@ -39,9 +39,9 @@ GIT_LIBNIX           := https://github.com/bebbo/libnix
 GIT_LIBSDL12         := https://github.com/AmigaPorts/libSDL12
 GIT_NEWLIB_CYGWIN    := https://github.com/bebbo/newlib-cygwin
 GIT_SFDC             := https://github.com/adtools/sfdc
-GIT_VASM             := https://github.com/leffmann/vasm
+GIT_VASM             := https://github.com/mheyer32/vasm
 GIT_VBCC             := https://github.com/bebbo/vbcc
-GIT_VLINK            := https://github.com/leffmann/vlink
+GIT_VLINK            := https://github.com/mheyer32/vlink
 GIT_AROSSTUFF        := https://github.com/bebbo/aros-stuff
 
 CFLAGS ?= -Os
