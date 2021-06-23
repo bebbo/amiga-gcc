@@ -40,6 +40,20 @@ CC=gcc-9 CXX=g++-9 gmake all SHELL=/usr/local/bin/bash
 
 **ALSO NOTE** If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
 
+### macOs on Mi1
+
+Native build on M1 Mac has proved difficult at this stage for a number of reasons. I filed (and closed) a separate issue. 
+
+We can, however, get an x86 version of the toolchain working on M1 with these steps.
+
+1. Ensure rosetta is installed. `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
+2. Ensure Xcode command line tools are installed `xcode-select --install`
+3. Install convince Homebrew to install an x86_64 version instead `arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`.  Ensure `/usr/local/bin` is early in your path.
+4. Use the x86 homebrew to install the required packages `arch -x86_64 brew install bash wget make lhasa gmp mpfr libmpc flex gettext texinfo gcc make autoconf`
+5. `git clone git@github.com:bebbo/amiga-gcc ; cd amiga-gcc`
+6. specify x86 when building `CC=gcc-10 CXX=g++-10 SHELL=/usr/local/bin/bash arch -x86_64 gmake clean update all`. 
+7. profit!
+
 ### Windows with Cygwin
 Install cygwin via setup.exe and add wget. Then open cygwin shell and run:
 
