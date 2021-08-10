@@ -44,9 +44,29 @@ GIT_VBCC             := https://github.com/bebbo/vbcc
 GIT_VLINK            := https://github.com/mheyer32/vlink
 GIT_AROSSTUFF        := https://github.com/bebbo/aros-stuff
 
+ifeq ($(NDK),3.2)
+NDK_URL              := http://aminet.net/dev/misc/NDK3.2R3.lha
+NDK_ARC_NAME         := NDK3.2R3
+NDK_FOLDER_NAME      := NDK3.2
+NDK_FOLDER_NAME_H    := NDK3.2/Include_H
+NDK_FOLDER_NAME_I    := NDK3.2/Include_I
+NDK_FOLDER_NAME_FD   := NDK3.2/FD
+NDK_FOLDER_NAME_SFD  := NDK3.2/SFD
+NDK_FOLDER_NAME_LIBS := NDK3.2/lib
+else
+NDK_URL         := http://www.haage-partner.de/download/AmigaOS/NDK_3.9.lha
+NDK_ARC_NAME    := NDK39
+NDK_FOLDER_NAME := NDK_3.9/Include
+NDK_FOLDER_NAME_H    := NDK_3.9/Include/include_h
+NDK_FOLDER_NAME_I    := NDK_3.9/Include/include_i
+NDK_FOLDER_NAME_FD   := NDK_3.9/Include/fd
+NDK_FOLDER_NAME_SFD  := NDK_3.9/Include/sfd
+NDK_FOLDER_NAME_LIBS := NDK_3.9/Include/linker_libs
+endif
+
 CFLAGS ?= -Os
 CXXFLAGS ?= $(CFLAGS)
-CFLAGS_FOR_TARGET ?= -O2 -fomit-frame-pointer
+CFLAGS_FOR_TARGET ?= 
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
 
 E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
@@ -295,8 +315,8 @@ update-libSDL12: projects/libSDL12/Makefile
 update-libpthread: projects/aros-stuff/pthreads/Makefile
 	@cd projects/aros-stuff && git pull
 
-update-ndk: download/NDK39.lha
-	make projects/NDK_3.9.info
+update-ndk: download/$(NDK_ARC_NAME).lha
+	make projects/$(NDK_FOLDER_NAME).info
 
 update-newlib: projects/newlib-cygwin/newlib/configure
 	@cd projects/newlib-cygwin && git pull
@@ -512,12 +532,12 @@ sfdc: $(BUILD)/sfdc/_done
 $(BUILD)/sfdc/_done: $(PREFIX)/bin/sfdc
 	@echo "done" >$@
 
-$(PREFIX)/bin/sfdc: $(BUILD)/sfdc/Makefile $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
+$(PREFIX)/bin/sfdc: $(BUILD)/sfdc/Makefile
 	$(L0)"make sfdc"$(L1) $(MAKE) -C $(BUILD)/sfdc sfdc $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install sfdc"$(L1) install $(BUILD)/sfdc/sfdc $(PREFIX)/bin $(L2)
 
-$(BUILD)/sfdc/Makefile: projects/sfdc/configure
+$(BUILD)/sfdc/Makefile: projects/sfdc/configure $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
 	@rsync -a projects/sfdc $(BUILD)/ --exclude .git
 	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
@@ -637,12 +657,12 @@ download/vbcc_target_m68k-amigaos.lha:
 # NDK - no git
 # =================================================
 
-NDK_INCLUDE = $(shell find 2>/dev/null projects/NDK_3.9/Include/include_h -type f)
-NDK_INCLUDE_SFD = $(shell find 2>/dev/null projects/NDK_3.9/Include/sfd -type f -name *.sfd)
-NDK_INCLUDE_INLINE = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_LVO    = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_PROTO  = $(patsubst projects/NDK_3.9/Include/sfd/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
-SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/NDK_3.9/Include/include_h/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
+NDK_INCLUDE = $(shell find 2>/dev/null projects/$(NDK_FOLDER_NAME_H) -type f)
+NDK_INCLUDE_SFD = $(shell find 2>/dev/null projects/$(NDK_FOLDER_NAME_SFD) -type f -name *.sfd)
+NDK_INCLUDE_INLINE = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_LVO    = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_PROTO  = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/$(NDK_FOLDER_NAME_H)/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
 
 .PHONY: ndk-inline ndk-lvo ndk-proto
 
@@ -653,17 +673,19 @@ $(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
+$(BUILD)/ndk-include_ndk0: projects/$(NDK_FOLDER_NAME).info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_h/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto
-	@rsync -a $(PWD)/projects/NDK_3.9/Include/include_i/* $(PREFIX)/m68k-amigaos/ndk-include
-	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib
-	@rsync -a $(PWD)/projects/NDK_3.9/Include/fd $(PREFIX)/m68k-amigaos/ndk/lib
-	@rsync -a $(PWD)/projects/NDK_3.9/Include/sfd $(PREFIX)/m68k-amigaos/ndk/lib
-	@rsync -a $(PWD)/projects/NDK_3.9/Include/linker_libs $(PREFIX)/m68k-amigaos/ndk/lib
+	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
+	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
+	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd
+	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd
+	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/libs
+	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_FD)/* $(PREFIX)/m68k-amigaos/ndk/lib/fd
+	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_SFD)/* $(PREFIX)/m68k-amigaos/ndk/lib/sfd
+	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_LIBS)/* $(PREFIX)/m68k-amigaos/ndk/lib/libs
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
-	@cp -p projects/NDK_3.9/Include/include_h/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
-	@cp -p projects/NDK_3.9/Include/include_h/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
+	@cp -p projects/$(NDK_FOLDER_NAME_H)/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
+	@cp -p projects/$(NDK_FOLDER_NAME_H)/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@cp -p projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/ndk-include/inline
@@ -673,44 +695,44 @@ $(BUILD)/ndk-include_ndk0: projects/NDK_3.9.info $(NDK_INCLUDE) $(BUILD)/fd2sfd/
 
 ndk-inline: $(NDK_INCLUDE_INLINE) sfdc $(BUILD)/ndk-include_inline
 $(NDK_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_inline $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc inline $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc inline $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
 ndk-lvo: $(NDK_INCLUDE_LVO) sfdc
 $(NDK_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc lvo $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc lvo $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
 ndk-proto: $(NDK_INCLUDE_PROTO) sfdc
 $(NDK_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	$(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc proto $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,projects/NDK_3.9/Include/sfd/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc proto $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
-$(BUILD)/ndk-include_inline: projects/NDK_3.9.info
+$(BUILD)/ndk-include_inline: projects/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_lvo: projects/NDK_3.9.info
+$(BUILD)/ndk-include_lvo: projects/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/lvo
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/lvo
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_proto: projects/NDK_3.9.info
+$(BUILD)/ndk-include_proto: projects/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/proto
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-projects/NDK_3.9.info: $(BUILD)/_lha_done download/NDK39.lha $(shell find 2>/dev/null patches/NDK_3.9/ -type f)
-	$(L0)"unpack ndk"$(L1) cd projects && lha xf ../download/NDK39.lha $(L2)
-	@touch -t 0001010000 download/NDK39.lha
-	$(L0)"patch ndk"$(L1) for i in $$(find patches/NDK_3.9/ -type f); do \
+projects/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done download/$(NDK_ARC_NAME).lha $(shell find 2>/dev/null patches/$(NDK_FOLDER_NAME)/ -type f)
+	$(L0)"unpack ndk"$(L1) cd projects && lha xf ../download/$(NDK_ARC_NAME).lha $(L2)
+	@touch -t 0001010000 download/$(NDK_ARC_NAME).lha
+	$(L0)"patch ndk"$(L1) for i in $$(find patches/$(NDK_FOLDER_NAME)/ -type f); do \
 	   if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
 		else cp -pv "$$i" "projects/$${i:8}"; fi ; done $(L2)
-	@touch projects/NDK_3.9.info
+	@touch projects/$(NDK_FOLDER_NAME).info
 
-download/NDK39.lha:
-	@cd download && wget http://www.haage-partner.de/download/AmigaOS/NDK39.lha
+download/$(NDK_ARC_NAME).lha:
+	@cd download && wget $(NDK_URL)
 
 
 # =================================================
@@ -724,7 +746,7 @@ $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUI
 	$(L0)"extract ndk13"$(L1) while read p; do p=$$(echo $$p|tr -d '\n'); \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
 	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
-	  LC_CTYPE=C sed -n -e '/#ifndef  CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
+	  LC_CTYPE=C sed -n -e '/#ifndef\s\s*CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  else cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; fi \
 	done < patches/ndk13/chfiles $(L2)

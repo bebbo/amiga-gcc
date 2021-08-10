@@ -1,0 +1,9 @@
+--- NDK3.2/SFD/exec_lib.sfd	2020-08-12 23:22:42.000000000 +0200
++++ NDK3.2/SFD/exec_lib.sfd	2021-08-10 20:50:52.450248645 +0200
+@@ -1,5 +1,6 @@
+ ==id $Id: exec_lib.sfd,v 47.4 2020/08/12 14:21:06 obarthel Exp $
+ * "exec.library"
++==basetype struct ExecBase *
+ ==base _SysBase
+ ==bias 30
+ ==public

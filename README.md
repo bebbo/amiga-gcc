@@ -101,7 +101,10 @@ make update-<target>	perform git pull for the given target
 display which targets can be build, you'll mostly use
 *`make all`
 *`make clean`
-*`make clean-prefx`
+*`make clean-prefix`
+
+to use NDK3.2 add `NDK=3.2` to the make parameters
+
 ## Prefix
 The default prefix is `/opt/amiga`. You may specify a different prefix by adding `PREFIX=yourprefix` to make command. E.g.
 ```

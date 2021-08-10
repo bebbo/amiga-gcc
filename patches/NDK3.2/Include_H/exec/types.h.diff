@@ -1,0 +1,25 @@
+--- NDK3.2/Include_H/exec/types.h	2021-08-10 21:12:23.590231011 +0200
++++ NDK3.2/Include_H/exec/types.h	2021-08-10 21:12:45.580230711 +0200
+@@ -133,18 +133,18 @@
+ #endif /* !__use_amiga_stdc_c99 */
+ 
+ #ifdef __cplusplus
+-typedef char *		STRPTR;		/* string pointer (NUL-terminated) */
++typedef char *	STRPTR;		/* string pointer (NUL-terminated) */
+ #else
+-typedef unsigned char *	STRPTR;		/* string pointer (NUL-terminated) */
++typedef char *	STRPTR;		/* string pointer (NUL-terminated) */
+ #endif
+ 
+ /* Constant string pointer (NUL-terminated), which is most useful
+  * in function prototypes and data structure definitions.
+  */
+ #ifdef __cplusplus
+-typedef CONST char *		CONST_STRPTR;
++typedef CONST char *	CONST_STRPTR;
+ #else
+-typedef CONST unsigned char *	CONST_STRPTR;
++typedef CONST char *	CONST_STRPTR;
+ #endif
+ 
+ /* Types with specific semantics */
