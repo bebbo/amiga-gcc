@@ -1,0 +1,22 @@
+--- NDK_3.9/Include/include_h/clib/debug_protos.h	2001-12-17 15:18:00.000000000 +0100
++++ NDK_3.9/Include/include_h/clib/debug_protos.h	2021-08-11 14:21:11.908276836 +0200
+@@ -29,8 +29,8 @@
+ LONG kgetnum( VOID );
+ LONG KMayGetChar( VOID );
+ LONG KMayGetCh( VOID );
+-VOID KPutFmt( CONST_STRPTR formatString, CONST APTR values );
+-VOID KVPrintF( CONST_STRPTR formatString, CONST APTR values );
++VOID KPutFmt( CONST_STRPTR formatString, CONST_APTR values );
++VOID KVPrintF( CONST_STRPTR formatString, CONST_APTR values );
+ VOID KPrintF( CONST_STRPTR formatString, ... );
+ VOID kprintf( CONST_STRPTR formatString, ... );
+ VOID KPutChar( LONG ch );
+@@ -41,7 +41,7 @@
+ VOID KPutStr( CONST_STRPTR string );
+ VOID kputs( CONST_STRPTR string );
+ VOID KPutS( CONST_STRPTR string );
+-VOID KDoFmt( CONST_STRPTR formatString, CONST APTR dataStream, CONST APTR putChProc, APTR putChData );
++VOID KDoFmt( CONST_STRPTR formatString, CONST_APTR dataStream, CONST_APTR putChProc, APTR putChData );
+ 
+ #ifdef __cplusplus
+ }
