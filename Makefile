@@ -54,7 +54,7 @@ NDK_FOLDER_NAME_FD   := NDK3.2/FD
 NDK_FOLDER_NAME_SFD  := NDK3.2/SFD
 NDK_FOLDER_NAME_LIBS := NDK3.2/lib
 else
-NDK_URL         := http://www.haage-partner.de/download/AmigaOS/NDK_3.9.lha
+NDK_URL         := http://www.haage-partner.de/download/AmigaOS/NDK3.9.lha
 NDK_ARC_NAME    := NDK39
 NDK_FOLDER_NAME := NDK_3.9/Include
 NDK_FOLDER_NAME_H    := NDK_3.9/Include/include_h
