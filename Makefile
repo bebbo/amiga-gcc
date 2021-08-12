@@ -676,6 +676,10 @@ $(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_
 $(BUILD)/ndk-include_ndk0: projects/$(NDK_FOLDER_NAME).info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
 	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
+	$(L0)"STDARGing ndk"$(L1) for i in $$(find $(PREFIX)/m68k-amigaos/ndk-include/clib/*protos.h -type f); do \
+		echo $$i; \
+		LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/\1\2 __stdargs \3(/g' $$i; \
+		rm $$i.bak; done $(L2)	
 	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd
@@ -729,10 +733,6 @@ projects/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done download/$(NDK_ARC_NAME).lh
 	   if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
 		else cp -pv "$$i" "projects/$${i:8}"; fi ; done $(L2)
-#	$(L0)"STDARGing ndk"$(L1) for i in $$(find projects/$(NDK_FOLDER_NAME_H)/clib/*protos.h -type f); do \
-#		echo $$i; \
-#		LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/__stdargs \1\2\3(/g' $$i; \
-#		rm $$i.bak; done $(L2)
 	@touch projects/$(NDK_FOLDER_NAME).info
 
 download/$(NDK_ARC_NAME).lha:
@@ -750,7 +750,7 @@ $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUI
 	$(L0)"extract ndk13"$(L1) while read p; do p=$$(echo $$p|tr -d '\n'); \
 	  mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/$$(dirname $$p); \
 	  if grep V36 $(PREFIX)/m68k-amigaos/ndk-include/$$p; then \
-	  LC_CTYPE=C sed -n -e '/#ifndef[[:space:]]*CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
+	  LC_CTYPE=C sed -n -e '/#ifndef[[:space:]]*CLIB/,/V36/p' $(PREFIX)/m68k-amigaos/ndk-include/$$p | sed -e 's/__stdargs//g' >$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  echo -e "#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n#endif" >>$(PREFIX)/m68k-amigaos/ndk13-include/$$p; \
 	  else cp $(PREFIX)/m68k-amigaos/ndk-include/$$p $(PREFIX)/m68k-amigaos/ndk13-include/$$p; fi \
 	done < patches/ndk13/chfiles $(L2)
@@ -765,6 +765,10 @@ $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUI
 	  sfdc --target=m68k-amigaos --mode=macros --output=$(PREFIX)/m68k-amigaos/ndk13-include/inline/$$(basename $$i _lib.sfd).h $$i; \
 	  sfdc --target=m68k-amigaos --mode=proto --output=$(PREFIX)/m68k-amigaos/ndk13-include/proto/$$(basename $$i _lib.sfd).h $$i; \
 	done $(L2)
+	$(L0)"STDARGing ndk13"$(L1) for i in $$(find $(PREFIX)/m68k-amigaos/ndk13-include/clib/*protos.h -type f); do \
+	echo $$i; \
+	LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/\1\2 __stdargs \3(/g' $$i; \
+	rm $$i.bak; done $(L2)	
 	@echo "done" >$@
 
 # =================================================
