@@ -729,6 +729,10 @@ projects/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done download/$(NDK_ARC_NAME).lh
 	   if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
 		else cp -pv "$$i" "projects/$${i:8}"; fi ; done $(L2)
+#	$(L0)"STDARGing ndk"$(L1) for i in $$(find projects/$(NDK_FOLDER_NAME_H)/clib/*protos.h -type f); do \
+#		echo $$i; \
+#		LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/__stdargs \1\2\3(/g' $$i; \
+#		rm $$i.bak; done $(L2)
 	@touch projects/$(NDK_FOLDER_NAME).info
 
 download/$(NDK_ARC_NAME).lha:
