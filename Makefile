@@ -545,7 +545,7 @@ projects/sfdc/configure:
 	@cd projects &&	git clone -b master --depth 4 $(GIT_SFDC)
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
+		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; retCode=$$?; [[ $$retCode -gt 1 ]] && exit $$retCode; fi ; done; exit 0
 
 # =================================================
 # vasm
