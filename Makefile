@@ -736,7 +736,7 @@ projects/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done download/$(NDK_ARC_NAME).lh
 	@touch projects/$(NDK_FOLDER_NAME).info
 
 download/$(NDK_ARC_NAME).lha:
-	@cd download && wget $(NDK_URL)
+	@cd download && wget $(NDK_URL) -O $(NDK_ARC_NAME).lha
 
 
 # =================================================
