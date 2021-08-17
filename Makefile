@@ -14,12 +14,14 @@ PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
 
 UNAME_S := $(shell uname -s)
-BUILD := build-$(UNAME_S)
+BUILD := $(shell pwd)/build-$(UNAME_S)
+PROJECTS := $(shell pwd)/projects
+DOWNLOAD := $(shell pwd)/download
 __BUILDDIR := $(shell mkdir -p $(BUILD))
-__PROJECTDIR := $(shell mkdir -p projects)
-__DOWNLOADDIR := $(shell mkdir -p download)
+__PROJECTDIR := $(shell mkdir -p $(PROJECTS))
+__DOWNLOADDIR := $(shell mkdir -p $(DOWNLOAD))
 
-GCC_VERSION ?= $(shell cat 2>/dev/null projects/gcc/gcc/BASE-VER)
+GCC_VERSION ?= $(shell cat 2>/dev/null $(PROJECTS)/gcc/gcc/BASE-VER)
 
 BINUTILS_BRANCH := amiga
 GCC_BRANCH := gcc-6-branch
@@ -54,7 +56,7 @@ NDK_FOLDER_NAME_FD   := NDK3.2/FD
 NDK_FOLDER_NAME_SFD  := NDK3.2/SFD
 NDK_FOLDER_NAME_LIBS := NDK3.2/lib
 else
-NDK_URL         := http://www.haage-partner.de/download/AmigaOS/NDK3.9.lha
+NDK_URL         := http://www.haage-partner.de/$(DOWNLOAD)/AmigaOS/NDK3.9.lha
 NDK_ARC_NAME    := NDK3.9
 NDK_FOLDER_NAME := NDK_3.9/Include
 NDK_FOLDER_NAME_H    := NDK_3.9/Include/include_h
@@ -188,13 +190,13 @@ clean-gcc:
 	rm -rf $(BUILD)/gcc
 
 clean-gmp:
-	rm -rf projects/gcc/gmp
+	rm -rf $(PROJECTS)/gcc/gmp
 
 clean-mpc:
-	rm -rf projects/gcc/mpc
+	rm -rf $(PROJECTS)/gcc/mpc
 
 clean-mpfr:
-	rm -rf projects/gcc/mpfr
+	rm -rf $(PROJECTS)/gcc/mpfr
 
 clean-libgcc:
 	rm -rf $(BUILD)/gcc/m68k-amigaos
@@ -270,80 +272,80 @@ clean-prefix:
 .PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
 
-update-gcc: projects/gcc/configure
-	@cd projects/gcc && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
+update-gcc: $(PROJECTS)/gcc/configure
+	@cd $(PROJECTS)/gcc && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
 
-update-binutils: projects/binutils/configure
-	@cd projects/binutils && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
+update-binutils: $(PROJECTS)/binutils/configure
+	@cd $(PROJECTS)/binutils && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
 
-update-fd2sfd: projects/fd2sfd/configure
-	@cd projects/fd2sfd && git pull
+update-fd2sfd: $(PROJECTS)/fd2sfd/configure
+	@cd $(PROJECTS)/fd2sfd && git pull
 
-update-fd2pragma: projects/fd2pragma/makefile
-	@cd projects/fd2pragma && git pull
+update-fd2pragma: $(PROJECTS)/fd2pragma/makefile
+	@cd $(PROJECTS)/fd2pragma && git pull
 
-update-ira: projects/ira/Makefile
-	@cd projects/ira && git pull
+update-ira: $(PROJECTS)/ira/Makefile
+	@cd $(PROJECTS)/ira && git pull
 
-update-sfdc: projects/sfdc/configure
-	@cd projects/sfdc && git pull
+update-sfdc: $(PROJECTS)/sfdc/configure
+	@cd $(PROJECTS)/sfdc && git pull
 
-update-vasm: projects/vasm/Makefile
-	@cd projects/vasm && git pull
+update-vasm: $(PROJECTS)/vasm/Makefile
+	@cd $(PROJECTS)/vasm && git pull
 
-update-vbcc: projects/vbcc/Makefile
-	@cd projects/vbcc && git pull
+update-vbcc: $(PROJECTS)/vbcc/Makefile
+	@cd $(PROJECTS)/vbcc && git pull
 
-update-vlink: projects/vlink/Makefile
-	@cd projects/vlink && git pull
+update-vlink: $(PROJECTS)/vlink/Makefile
+	@cd $(PROJECTS)/vlink && git pull
 
-update-libnix: projects/libnix/Makefile.gcc6
-	@cd projects/libnix && git pull
+update-libnix: $(PROJECTS)/libnix/Makefile.gcc6
+	@cd $(PROJECTS)/libnix && git pull
 
-update-ixemul: projects/ixemul/configure
-	@cd projects/ixemul && git pull
+update-ixemul: $(PROJECTS)/ixemul/configure
+	@cd $(PROJECTS)/ixemul && git pull
 
-update-clib2: projects/clib2/LICENSE
-	@cd projects/clib2 && git pull
+update-clib2: $(PROJECTS)/clib2/LICENSE
+	@cd $(PROJECTS)/clib2 && git pull
 
-update-libdebug: projects/libdebug/configure
-	@cd projects/libdebug && git pull
+update-libdebug: $(PROJECTS)/libdebug/configure
+	@cd $(PROJECTS)/libdebug && git pull
 
-update-libSDL12: projects/libSDL12/Makefile
-	@cd projects/libSDL12 && git pull
+update-libSDL12: $(PROJECTS)/libSDL12/Makefile
+	@cd $(PROJECTS)/libSDL12 && git pull
 
-update-libpthread: projects/aros-stuff/pthreads/Makefile
-	@cd projects/aros-stuff && git pull
+update-libpthread: $(PROJECTS)/aros-stuff/pthreads/Makefile
+	@cd $(PROJECTS)/aros-stuff && git pull
 
-update-ndk: download/$(NDK_ARC_NAME).lha
-	make projects/$(NDK_FOLDER_NAME).info
+update-ndk: $(DOWNLOAD)/$(NDK_ARC_NAME).lha
+	make $(PROJECTS)/$(NDK_FOLDER_NAME).info
 
-update-newlib: projects/newlib-cygwin/newlib/configure
-	@cd projects/newlib-cygwin && git pull
+update-newlib: $(PROJECTS)/newlib-cygwin/newlib/configure
+	@cd $(PROJECTS)/newlib-cygwin && git pull
 
-update-netinclude: projects/amiga-netinclude/README.md
-	@cd projects/amiga-netinclude && git pull
+update-netinclude: $(PROJECTS)/amiga-netinclude/README.md
+	@cd $(PROJECTS)/amiga-netinclude && git pull
 
 update-gmp:
-	if [ -a download/$(GMPFILE) ]; \
-	then rm -rf projects/$(GMP); rm -rf projects/gcc/gmp; \
-	else cd download && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
+	if [ -a $(DOWNLOAD)/$(GMPFILE) ]; \
+	then rm -rf $(PROJECTS)/$(GMP); rm -rf $(PROJECTS)/gcc/gmp; \
+	else cd $(DOWNLOAD) && wget ftp://ftp.gnu.org/gnu/gmp/$(GMPFILE); \
 	fi;
-	@cd projects && tar xf ../download/$(GMPFILE)
+	@cd $(PROJECTS) && tar xf $(DOWNLOAD)/$(GMPFILE)
 
 update-mpc:
-	if [ -a download/$(MPCFILE) ]; \
-	then rm -rf projcts/$(MPC); rm -rf projects/gcc/mpc; \
-	else cd download && wget ftp://ftp.gnu.org/gnu/mpc/$(MPCFILE); \
+	if [ -a $(DOWNLOAD)/$(MPCFILE) ]; \
+	then rm -rf projcts/$(MPC); rm -rf $(PROJECTS)/gcc/mpc; \
+	else cd $(DOWNLOAD) && wget ftp://ftp.gnu.org/gnu/mpc/$(MPCFILE); \
 	fi;
-	@cd projects && tar xf ../download/$(MPCFILE)
+	@cd $(PROJECTS) && tar xf $(DOWNLOAD)/$(MPCFILE)
 
 update-mpfr:
-	if [ -a download/$(MPFRFILE) ]; \
-	then rm -rf projects/$(MPFR); rm -rf projects/gcc/mpfr; \
-	else cd download && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
+	if [ -a $(DOWNLOAD)/$(MPFRFILE) ]; \
+	then rm -rf $(PROJECTS)/$(MPFR); rm -rf $(PROJECTS)/gcc/mpfr; \
+	else cd $(DOWNLOAD) && wget ftp://ftp.gnu.org/gnu/mpfr/$(MPFRFILE); \
 	fi;
-	@cd projects && tar xf ../download/$(MPFRFILE)
+	@cd $(PROJECTS) && tar xf $(DOWNLOAD)/$(MPFRFILE)
 
 # =================================================
 # B I N
@@ -359,18 +361,18 @@ BINUTILS_CMD := m68k-amigaos-addr2line m68k-amigaos-ar m68k-amigaos-as m68k-amig
 BINUTILS := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(BINUTILS_CMD))
 
 BINUTILS_DIR := . bfd gas ld binutils opcodes
-BINUTILSD := $(patsubst %,projects/binutils/%, $(BINUTILS_DIR))
+BINUTILSD := $(patsubst %,$(PROJECTS)/binutils/%, $(BINUTILS_DIR))
 
 ALL_GDB := all-gdb
 INSTALL_GDB := install-gdb
 
 binutils: $(BUILD)/binutils/_done
 
-$(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null projects/binutils -not \( -path projects/binutils/.git -prune \) -not \( -path projects/binutils/gprof -prune \) -type f)
-	@touch -t 0001010000 projects/binutils/binutils/arparse.y
-	@touch -t 0001010000 projects/binutils/binutils/arlex.l
-	@touch -t 0001010000 projects/binutils/ld/ldgram.y
-	@touch -t 0001010000 projects/binutils/intl/plural.y
+$(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null $(PROJECTS)/binutils -not \( -path $(PROJECTS)/binutils/.git -prune \) -not \( -path $(PROJECTS)/binutils/gprof -prune \) -type f)
+	@touch -t 0001010000 $(PROJECTS)/binutils/binutils/arparse.y
+	@touch -t 0001010000 $(PROJECTS)/binutils/binutils/arlex.l
+	@touch -t 0001010000 $(PROJECTS)/binutils/ld/ldgram.y
+	@touch -t 0001010000 $(PROJECTS)/binutils/intl/plural.y
 	$(L0)"make binutils bfd"$(L1)$(MAKE) -C $(BUILD)/binutils all-bfd $(L2)
 	$(L0)"make binutils gas"$(L1)$(MAKE) -C $(BUILD)/binutils all-gas $(L2)
 	$(L0)"make binutils binutils"$(L1)$(MAKE) -C $(BUILD)/binutils all-binutils $(L2)
@@ -378,13 +380,13 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null pro
 	$(L0)"install binutils"$(L1)$(MAKE) -C $(BUILD)/binutils install-gas install-binutils install-ld $(L2)
 	@echo "done" >$@
 
-$(BUILD)/binutils/Makefile: projects/binutils/configure
+$(BUILD)/binutils/Makefile: $(PROJECTS)/binutils/configure
 	@mkdir -p $(BUILD)/binutils
-	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(L2)
+	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PWD)/$(PROJECTS)/binutils/configure $(CONFIG_BINUTILS) $(L2)
 
 
-projects/binutils/configure:
-	@cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
+$(PROJECTS)/binutils/configure:
+	@cd $(PROJECTS) &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
 
 # =================================================
 # gdb
@@ -407,20 +409,20 @@ CONFIG_GRPOF := --prefix=$(PREFIX) --target=m68k-amigaos --disable-werror
 
 gprof: $(BUILD)/binutils/_gprof
 
-$(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null projects/binutils/gprof -type f)
+$(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/null $(PROJECTS)/binutils/gprof -type f)
 	$(L0)"make gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof all $(L2)
 	$(L0)"install gprof"$(L1)$(MAKE) -C $(BUILD)/binutils/gprof install $(L2)
 	@echo "done" >$@
 
-$(BUILD)/binutils/gprof/Makefile: projects/binutils/configure $(BUILD)/binutils/_done
+$(BUILD)/binutils/gprof/Makefile: $(PROJECTS)/binutils/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/binutils/gprof
-	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/projects/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
+	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/$(PROJECTS)/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
 # =================================================
 # gcc
 # =================================================
 CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
+	--with-headers=$(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
@@ -435,7 +437,7 @@ GCC_CMD := m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68
 GCC := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(GCC_CMD))
 
 GCC_DIR := . gcc gcc/c gcc/c-family gcc/cp gcc/objc gcc/config/m68k libiberty libcpp libdecnumber
-GCCD := $(patsubst %,projects/gcc/%, $(GCC_DIR))
+GCCD := $(patsubst %,$(PROJECTS)/gcc/%, $(GCC_DIR))
 
 gcc: $(BUILD)/gcc/_done
 
@@ -444,20 +446,20 @@ $(BUILD)/gcc/_done: $(BUILD)/gcc/Makefile $(shell find 2>/dev/null $(GCCD) -maxd
 	$(L0)"install gcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-gcc $(L2)
 	@echo "done" >$@
 
-$(BUILD)/gcc/Makefile: projects/gcc/configure $(BUILD)/binutils/_done
+$(BUILD)/gcc/Makefile: $(PROJECTS)/gcc/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/gcc
 ifneq ($(OWNGMP),)
-	@mkdir -p projects/gcc/gmp
-	@mkdir -p projects/gcc/mpc
-	@mkdir -p projects/gcc/mpfr
-	@rsync -a projects/$(GMP)/* projects/gcc/gmp
-	@rsync -a projects/$(MPC)/* projects/gcc/mpc
-	@rsync -a projects/$(MPFR)/* projects/gcc/mpfr
+	@mkdir -p $(PROJECTS)/gcc/gmp
+	@mkdir -p $(PROJECTS)/gcc/mpc
+	@mkdir -p $(PROJECTS)/gcc/mpfr
+	@rsync -a $(PROJECTS)/$(GMP)/* $(PROJECTS)/gcc/gmp
+	@rsync -a $(PROJECTS)/$(MPC)/* $(PROJECTS)/gcc/mpc
+	@rsync -a $(PROJECTS)/$(MPFR)/* $(PROJECTS)/gcc/mpfr
 endif
-	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(L2)
+	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/$(PROJECTS)/gcc/configure $(CONFIG_GCC) $(L2)
 
-projects/gcc/configure:
-	@cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
+$(PROJECTS)/gcc/configure:
+	@cd $(PROJECTS) &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
 
 # =================================================
 # fd2sfd
@@ -469,20 +471,20 @@ fd2sfd: $(BUILD)/fd2sfd/_done
 $(BUILD)/fd2sfd/_done: $(PREFIX)/bin/fd2sfd
 	@echo "done" >$@
 
-$(PREFIX)/bin/fd2sfd: $(BUILD)/fd2sfd/Makefile $(shell find 2>/dev/null projects/fd2sfd -not \( -path projects/fd2sfd/.git -prune \) -type f)
+$(PREFIX)/bin/fd2sfd: $(BUILD)/fd2sfd/Makefile $(shell find 2>/dev/null $(PROJECTS)/fd2sfd -not \( -path $(PROJECTS)/fd2sfd/.git -prune \) -type f)
 	$(L0)"make fd2sfd"$(L1) $(MAKE) -C $(BUILD)/fd2sfd all $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install fd2sfd"$(L1) $(MAKE) -C $(BUILD)/fd2sfd install $(L2)
 
-$(BUILD)/fd2sfd/Makefile: projects/fd2sfd/configure
+$(BUILD)/fd2sfd/Makefile: $(PROJECTS)/fd2sfd/configure
 	@mkdir -p $(BUILD)/fd2sfd
-	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
+	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/$(PROJECTS)/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
-projects/fd2sfd/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2SFD)
+$(PROJECTS)/fd2sfd/configure:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2SFD)
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
+		then j=$${i:8}; patch -N "$(PROJECTS)/$${j%.diff}" "$$i"; fi ; done
 
 # =================================================
 # fd2pragma
@@ -496,12 +498,12 @@ $(PREFIX)/bin/fd2pragma: $(BUILD)/fd2pragma/fd2pragma
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install fd2sfd"$(L1) install $(BUILD)/fd2pragma/fd2pragma $(PREFIX)/bin/ $(L2)
 
-$(BUILD)/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/null projects/fd2pragma -not \( -path projects/fd2pragma/.git -prune \) -type f)
+$(BUILD)/fd2pragma/fd2pragma: $(PROJECTS)/fd2pragma/makefile $(shell find 2>/dev/null $(PROJECTS)/fd2pragma -not \( -path $(PROJECTS)/fd2pragma/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/fd2pragma
-	$(L0)"make fd2sfd"$(L1) cd projects/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c $(L2)
+	$(L0)"make fd2sfd"$(L1) cd $(PROJECTS)/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c $(L2)
 
-projects/fd2pragma/makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
+$(PROJECTS)/fd2pragma/makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
 
 # =================================================
 # ira
@@ -515,12 +517,12 @@ $(PREFIX)/bin/ira: $(BUILD)/ira/ira
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install ira"$(L1) install $(BUILD)/ira/ira $(PREFIX)/bin/ $(L2)
 
-$(BUILD)/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -not \( -path projects/ira/.git -prune \) -type f)
+$(BUILD)/ira/ira: $(PROJECTS)/ira/Makefile $(shell find 2>/dev/null $(PROJECTS)/ira -not \( -path $(PROJECTS)/ira/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/ira
-	$(L0)"make ira"$(L1) cd projects/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99 $(L2)
+	$(L0)"make ira"$(L1) cd $(PROJECTS)/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99 $(L2)
 
-projects/ira/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_IRA)
+$(PROJECTS)/ira/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_IRA)
 
 # =================================================
 # sfdc
@@ -537,15 +539,15 @@ $(PREFIX)/bin/sfdc: $(BUILD)/sfdc/Makefile
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install sfdc"$(L1) install $(BUILD)/sfdc/sfdc $(PREFIX)/bin $(L2)
 
-$(BUILD)/sfdc/Makefile: projects/sfdc/configure $(shell find 2>/dev/null projects/sfdc -not \( -path projects/sfdc/.git -prune \)  -type f)
-	@rsync -a projects/sfdc $(BUILD)/ --exclude .git
+$(BUILD)/sfdc/Makefile: $(PROJECTS)/sfdc/configure $(shell find 2>/dev/null $(PROJECTS)/sfdc -not \( -path $(PROJECTS)/sfdc/.git -prune \)  -type f)
+	@rsync -a $(PROJECTS)/sfdc $(BUILD)/ --exclude .git
 	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
-projects/sfdc/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_SFDC)
+$(PROJECTS)/sfdc/configure:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_SFDC)
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; retCode=$$?; [[ $$retCode -gt 1 ]] && exit $$retCode; fi ; done; exit 0
+		then j=$${i:8}; patch -N "$(PROJECTS)/$${j%.diff}" "$$i"; retCode=$$?; [[ $$retCode -gt 1 ]] && exit $$retCode; fi ; done; exit 0
 
 # =================================================
 # vasm
@@ -562,12 +564,12 @@ $(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile
 	install $(BUILD)/vasm/vobjdump $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
 
-$(BUILD)/vasm/Makefile: projects/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
-	@rsync -a projects/vasm $(BUILD)/ --exclude .git
+$(BUILD)/vasm/Makefile: $(PROJECTS)/vasm/Makefile $(shell find 2>/dev/null $(PROJECTS)/vasm -not \( -path $(PROJECTS)/vasm/.git -prune \) -type f)
+	@rsync -a $(PROJECTS)/vasm $(BUILD)/ --exclude .git
 	@touch $(BUILD)/vasm/Makefile
 
-projects/vasm/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VASM)
+$(PROJECTS)/vasm/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VASM)
 
 # =================================================
 # vbcc
@@ -587,13 +589,13 @@ $(BUILD)/vbcc/_done: $(BUILD)/vbcc/Makefile
 	$(L0)"install vbcc"$(L1) install $(BUILD)/vbcc/bin/v* $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
 
-$(BUILD)/vbcc/Makefile: projects/vbcc/Makefile $(shell find 2>/dev/null projects/vbcc -not \( -path projects/vbcc/.git -prune \) -type f)
-	@rsync -a projects/vbcc $(BUILD)/ --exclude .git
+$(BUILD)/vbcc/Makefile: $(PROJECTS)/vbcc/Makefile $(shell find 2>/dev/null $(PROJECTS)/vbcc -not \( -path $(PROJECTS)/vbcc/.git -prune \) -type f)
+	@rsync -a $(PROJECTS)/vbcc $(BUILD)/ --exclude .git
 	@mkdir -p $(BUILD)/vbcc/bin
 	@touch $(BUILD)/vbcc/Makefile
 
-projects/vbcc/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VBCC)
+$(PROJECTS)/vbcc/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VBCC)
 
 # =================================================
 # vlink
@@ -603,17 +605,17 @@ VLINK := $(patsubst %,$(PREFIX)/bin/%$(EXEEXT), $(VLINK_CMD))
 
 vlink: $(BUILD)/vlink/_done vbcc-target
 
-$(BUILD)/vlink/_done: $(BUILD)/vlink/Makefile $(shell find 2>/dev/null projects/vlink -not \( -path projects/vlink/.git -prune \) -type f)
+$(BUILD)/vlink/_done: $(BUILD)/vlink/Makefile $(shell find 2>/dev/null $(PROJECTS)/vlink -not \( -path $(PROJECTS)/vlink/.git -prune \) -type f)
 	$(L0)"make vlink"$(L1) cd $(BUILD)/vlink && TARGET=m68k $(MAKE) $(L2)
 	@mkdir -p $(PREFIX)/bin/
 	$(L0)"install vlink"$(L1) install $(BUILD)/vlink/vlink $(PREFIX)/bin/ $(L2)
 	@echo "done" >$@
 
-$(BUILD)/vlink/Makefile: projects/vlink/Makefile
-	@rsync -a projects/vlink $(BUILD)/ --exclude .git
+$(BUILD)/vlink/Makefile: $(PROJECTS)/vlink/Makefile
+	@rsync -a $(PROJECTS)/vlink $(BUILD)/ --exclude .git
 
-projects/vlink/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VLINK)
+$(PROJECTS)/vlink/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VLINK)
 
 .PHONY: lha
 lha: $(BUILD)/_lha_done
@@ -643,12 +645,12 @@ $(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info 
 	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2)
 
 
-$(BUILD)/vbcc_target_m68k-amigaos.info: download/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
-	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf ../download/vbcc_target_m68k-amigaos.lha $(L2)
+$(BUILD)/vbcc_target_m68k-amigaos.info: $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
+	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha $(L2)
 	@touch $(BUILD)/vbcc_target_m68k-amigaos.info
 
-download/vbcc_target_m68k-amigaos.lha:
-	$(L0)"downloading vbcc_target"$(L1) cd download && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha -O vbcc_target_m68k-amigaos.lha $(L2)
+$(DOWNLOAD)/vbcc_target_m68k-amigaos.lha:
+	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha -O vbcc_target_m68k-amigaos.lha $(L2)
 
 # =================================================
 # L I B R A R I E S
@@ -657,86 +659,86 @@ download/vbcc_target_m68k-amigaos.lha:
 # NDK - no git
 # =================================================
 
-NDK_INCLUDE = $(shell find 2>/dev/null projects/$(NDK_FOLDER_NAME_H) -type f)
-NDK_INCLUDE_SFD = $(shell find 2>/dev/null projects/$(NDK_FOLDER_NAME_SFD) -type f -name *.sfd)
-NDK_INCLUDE_INLINE = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_LVO    = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
-NDK_INCLUDE_PROTO  = $(patsubst projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
-SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst projects/$(NDK_FOLDER_NAME_H)/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
+NDK_INCLUDE = $(shell find 2>/dev/null $(PROJECTS)/$(NDK_FOLDER_NAME_H) -type f)
+NDK_INCLUDE_SFD = $(shell find 2>/dev/null $(PROJECTS)/$(NDK_FOLDER_NAME_SFD) -type f -name *.sfd)
+NDK_INCLUDE_INLINE = $(patsubst $(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_LVO    = $(patsubst $(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(NDK_INCLUDE_SFD))
+NDK_INCLUDE_PROTO  = $(patsubst $(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(NDK_INCLUDE_SFD))
+SYS_INCLUDE2 = $(filter-out $(NDK_INCLUDE_PROTO),$(patsubst $(PROJECTS)/$(NDK_FOLDER_NAME_H)/%,$(PREFIX)/m68k-amigaos/ndk-include/%, $(NDK_INCLUDE)))
 
 .PHONY: ndk-inline ndk-lvo ndk-proto
 
 ndk: $(BUILD)/ndk-include_ndk
 
-$(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCLUDE_LVO) $(NDK_INCLUDE_PROTO) projects/fd2sfd/configure projects/fd2pragma/makefile
+$(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_INCLUDE_LVO) $(NDK_INCLUDE_PROTO) $(PROJECTS)/fd2sfd/configure $(PROJECTS)/fd2pragma/makefile
 	$(MAKE) ndk_inc=1 ndk-proto ndk-lvo ndk-inline
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_ndk0: projects/$(NDK_FOLDER_NAME).info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
+$(BUILD)/ndk-include_ndk0: $(PROJECTS)/$(NDK_FOLDER_NAME).info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
+	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
 	$(L0)"STDARGing ndk"$(L1) for i in $$(find $(PREFIX)/m68k-amigaos/ndk-include/clib/*protos.h -type f); do \
 		echo $$i; \
 		LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/\1\2 __stdargs \3(/g' $$i; \
 		rm $$i.bak; done $(L2)	
-	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
+	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/libs
-	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_FD)/* $(PREFIX)/m68k-amigaos/ndk/lib/fd
-	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_SFD)/* $(PREFIX)/m68k-amigaos/ndk/lib/sfd
-	@rsync -a $(PWD)/projects/$(NDK_FOLDER_NAME_LIBS)/* $(PREFIX)/m68k-amigaos/ndk/lib/libs
+	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_FD)/* $(PREFIX)/m68k-amigaos/ndk/lib/fd
+	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/* $(PREFIX)/m68k-amigaos/ndk/lib/sfd
+	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/* $(PREFIX)/m68k-amigaos/ndk/lib/libs
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
-	@cp -p projects/$(NDK_FOLDER_NAME_H)/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
-	@cp -p projects/$(NDK_FOLDER_NAME_H)/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
+	@cp -p $(PROJECTS)/$(NDK_FOLDER_NAME_H)/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
+	@cp -p $(PROJECTS)/$(NDK_FOLDER_NAME_H)/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
-	@cp -p projects/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/ndk-include/inline
-	@cp -p projects/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/ndk-include/inline
-	@cp -p projects/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/ndk-include/inline
+	@cp -p $(PROJECTS)/fd2sfd/cross/share/m68k-amigaos/alib.h $(PREFIX)/m68k-amigaos/ndk-include/inline
+	@cp -p $(PROJECTS)/fd2pragma/Include/inline/stubs.h $(PREFIX)/m68k-amigaos/ndk-include/inline
+	@cp -p $(PROJECTS)/fd2pragma/Include/inline/macros.h $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
 ndk-inline: $(NDK_INCLUDE_INLINE) sfdc $(BUILD)/ndk-include_inline
 $(NDK_INCLUDE_INLINE): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_inline $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc inline $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc inline $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=macros --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/inline/%.h,$(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
 ndk-lvo: $(NDK_INCLUDE_LVO) sfdc
 $(NDK_INCLUDE_LVO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD) $(BUILD)/ndk-include_lvo $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc lvo $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc lvo $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=lvo --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/lvo/%_lib.i,$(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
 ndk-proto: $(NDK_INCLUDE_PROTO) sfdc
 $(NDK_INCLUDE_PROTO): $(PREFIX)/bin/sfdc $(NDK_INCLUDE_SFD)	$(BUILD)/ndk-include_proto $(BUILD)/ndk-include_ndk0
-	$(L0)"sfdc proto $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,projects/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
+	$(L0)"sfdc proto $(@F)"$(L1) sfdc --target=m68k-amigaos --mode=proto --output=$@ $(patsubst $(PREFIX)/m68k-amigaos/ndk-include/proto/%.h,$(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/%_lib.sfd,$@) $(L2)
 
-$(BUILD)/ndk-include_inline: projects/$(NDK_FOLDER_NAME).info
+$(BUILD)/ndk-include_inline: $(PROJECTS)/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/inline
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_lvo: projects/$(NDK_FOLDER_NAME).info
+$(BUILD)/ndk-include_lvo: $(PROJECTS)/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/lvo
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/lvo
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-$(BUILD)/ndk-include_proto: projects/$(NDK_FOLDER_NAME).info
+$(BUILD)/ndk-include_proto: $(PROJECTS)/$(NDK_FOLDER_NAME).info
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk13-include/proto
 	@mkdir -p $(BUILD)/ndk-include/
 	@echo "done" >$@
 
-projects/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done download/$(NDK_ARC_NAME).lha $(shell find 2>/dev/null patches/$(NDK_FOLDER_NAME)/ -type f)
-	$(L0)"unpack ndk"$(L1) cd projects && lha xf ../download/$(NDK_ARC_NAME).lha $(L2)
-	@touch -t 0001010000 download/$(NDK_ARC_NAME).lha
+$(PROJECTS)/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(shell find 2>/dev/null patches/$(NDK_FOLDER_NAME)/ -type f)
+	$(L0)"unpack ndk"$(L1) cd $(PROJECTS) && lha xf $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(L2)
+	@touch -t 0001010000 $(DOWNLOAD)/$(NDK_ARC_NAME).lha
 	$(L0)"patch ndk"$(L1) for i in $$(find patches/$(NDK_FOLDER_NAME)/ -type f); do \
 	   if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; \
-		else cp -pv "$$i" "projects/$${i:8}"; fi ; done $(L2)
-	@touch projects/$(NDK_FOLDER_NAME).info
+		then j=$${i:8}; patch -N "$(PROJECTS)/$${j%.diff}" "$$i"; \
+		else cp -pv "$$i" "$(PROJECTS)/$${i:8}"; fi ; done $(L2)
+	@touch $(PROJECTS)/$(NDK_FOLDER_NAME).info
 
-download/$(NDK_ARC_NAME).lha:
-	@cd download && wget $(NDK_URL) -O $(NDK_ARC_NAME).lha
+$(DOWNLOAD)/$(NDK_ARC_NAME).lha:
+	@cd $(DOWNLOAD) && wget $(NDK_URL) -O $(NDK_ARC_NAME).lha
 
 
 # =================================================
@@ -777,13 +779,13 @@ $(BUILD)/ndk-include_ndk13: $(BUILD)/ndk-include_ndk $(BUILD)/fd2sfd/_done $(BUI
 .PHONY: netinclude
 netinclude: $(BUILD)/_netinclude
 
-$(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_ndk $(shell find 2>/dev/null projects/amiga-netinclude/include -type f)
+$(BUILD)/_netinclude: $(PROJECTS)/amiga-netinclude/README.md $(BUILD)/ndk-include_ndk $(shell find 2>/dev/null $(PROJECTS)/amiga-netinclude/include -type f)
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	@rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
+	@rsync -a $(PWD)/$(PROJECTS)/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	@echo "done" >$@
 
-projects/amiga-netinclude/README.md:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
+$(PROJECTS)/amiga-netinclude/README.md:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
 
 # =================================================
 # libamiga
@@ -801,22 +803,22 @@ $(LIBAMIGA):
 # libnix
 # =================================================
 
-LIBNIX_SRC = $(shell find 2>/dev/null projects/libnix -not \( -path projects/libnix/.git -prune \) -not \( -path projects/libnix/sources/stubs/libbases -prune \) -not \( -path projects/libnix/sources/stubs/libnames -prune \) -type f)
+LIBNIX_SRC = $(shell find 2>/dev/null $(PROJECTS)/libnix -not \( -path $(PROJECTS)/libnix/.git -prune \) -not \( -path $(PROJECTS)/libnix/sources/stubs/libbases -prune \) -not \( -path $(PROJECTS)/libnix/sources/stubs/libnames -prune \) -type f)
 
 libnix: $(BUILD)/libnix/_done
 
-$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done projects/libnix/Makefile.gcc6 $(LIBAMIGA) $(LIBNIX_SRC)
+$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done $(PROJECTS)/libnix/Makefile.gcc6 $(LIBAMIGA) $(LIBNIX_SRC)
 	@mkdir -p $(PREFIX)/m68k-amigaos/libnix/lib/libnix
 	@mkdir -p $(BUILD)/libnix
 	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"make libnix"$(L1) CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix all $(L2)
-	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/projects/libnix/Makefile.gcc6 root=$(PWD)/projects/libnix install $(L2)
-	@rsync --delete -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
+	$(L0)"make libnix"$(L1) CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -C $(BUILD)/libnix -f $(PWD)/$(PROJECTS)/libnix/Makefile.gcc6 root=$(PWD)/$(PROJECTS)/libnix all $(L2)
+	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/$(PROJECTS)/libnix/Makefile.gcc6 root=$(PWD)/$(PROJECTS)/libnix install $(L2)
+	@rsync --delete -a $(PROJECTS)/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >$@
 
-projects/libnix/Makefile.gcc6:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBNIX)
+$(PROJECTS)/libnix/Makefile.gcc6:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_LIBNIX)
 
 # =================================================
 # gcc libs
@@ -826,7 +828,7 @@ LIBGCCS := $(patsubst %,$(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/%,$(LIBGCC
 
 libgcc: $(BUILD)/gcc/_libgcc_done
 
-$(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(BUILD)/libpthread/_done $(LIBAMIGA) $(shell find 2>/dev/null projects/gcc/libgcc -type f)
+$(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(BUILD)/libpthread/_done $(LIBAMIGA) $(shell find 2>/dev/null $(PROJECTS)/gcc/libgcc -type f)
 	$(L0)"make libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc all-target $(L2)
 	$(L0)"install libgcc"$(L1) $(MAKE) -C $(BUILD)/gcc install-target $(L2)
 	@echo "done" >$@
@@ -837,9 +839,9 @@ $(BUILD)/gcc/_libgcc_done: $(BUILD)/libnix/_done $(BUILD)/libpthread/_done $(LIB
 
 clib2: $(BUILD)/clib2/_done
 
-$(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/clib2 -not \( -path projects/clib2/.git -prune \) -type f) $(BUILD)/libnix/_done $(LIBAMIGA)
+$(BUILD)/clib2/_done: $(PROJECTS)/clib2/LICENSE $(shell find 2>/dev/null $(PROJECTS)/clib2 -not \( -path $(PROJECTS)/clib2/.git -prune \) -type f) $(BUILD)/libnix/_done $(LIBAMIGA)
 	@mkdir -p $(BUILD)/clib2/
-	@rsync -a projects/clib2/library/* $(BUILD)/clib2
+	@rsync -a $(PROJECTS)/clib2/library/* $(BUILD)/clib2
 	@cd $(BUILD)/clib2 && find * -name lib\*.a -delete
 	$(L0)"make clib2"$(L1) $(MAKE) -C $(BUILD)/clib2 -f GNUmakefile.68k -j1 $(L2)
 	@mkdir -p $(PREFIX)/m68k-amigaos/clib2
@@ -847,8 +849,8 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@rsync -a $(BUILD)/clib2/lib $(PREFIX)/m68k-amigaos/clib2
 	@echo "done" >$@
 
-projects/clib2/LICENSE:
-	@cd projects && git clone -b master --depth 4 $(GIT_CLIB2)
+$(PROJECTS)/clib2/LICENSE:
+	@cd $(PROJECTS) && git clone -b master --depth 4 $(GIT_CLIB2)
 
 # =================================================
 # libdebug
@@ -862,13 +864,13 @@ $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
 	@cp $(BUILD)/libdebug/libdebug.a $(PREFIX)/m68k-amigaos/lib/
 	@echo "done" >$@
 
-$(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(shell find 2>/dev/null projects/libdebug -not \( -path projects/libdebug/.git -prune \) -type f)
+$(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libdebug/configure $(shell find 2>/dev/null $(PROJECTS)/libdebug -not \( -path $(PROJECTS)/libdebug/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libdebug
-	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
+	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/$(PROJECTS)/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
-projects/libdebug/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
-	@touch -t 0001010000 projects/libdebug/configure.ac
+$(PROJECTS)/libdebug/configure:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
+	@touch -t 0001010000 $(PROJECTS)/libdebug/configure.ac
 
 # =================================================
 # libsdl
@@ -889,13 +891,13 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
 	@rsync -a $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
 	@echo "done" >$@
 
-$(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done projects/libSDL12/Makefile $(shell find 2>/dev/null projects/libSDL12 -not \( -path projects/libSDL12/.git -prune \) -type f)
+$(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libSDL12
-	@rsync -a projects/libSDL12/* $(BUILD)/libSDL12
+	@rsync -a $(PROJECTS)/libSDL12/* $(BUILD)/libSDL12
 	@touch $(BUILD)/libSDL12/Makefile
 
-projects/libSDL12/Makefile:
-	@cd projects &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
+$(PROJECTS)/libSDL12/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
 
 
 # =================================================
@@ -910,19 +912,19 @@ $(BUILD)/libpthread/_done: $(BUILD)/libpthread/Makefile
 	@rsync -a --exclude=debug.h $(BUILD)/libpthread/*.h $(PREFIX)/m68k-amigaos/include/
 	@echo "done" >$@
 
-$(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done projects/aros-stuff/pthreads/Makefile $(shell find 2>/dev/null projects/aros-stuff/pthreads -type f)
+$(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/aros-stuff/pthreads/Makefile $(shell find 2>/dev/null $(PROJECTS)/aros-stuff/pthreads -type f)
 	@mkdir -p $(BUILD)/libpthread
-	@rsync -a projects/aros-stuff/pthreads/* $(BUILD)/libpthread
+	@rsync -a $(PROJECTS)/aros-stuff/pthreads/* $(BUILD)/libpthread
 	@touch $(BUILD)/libpthread/Makefile
 
-projects/aros-stuff/pthreads/Makefile:
-	@cd projects &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
+$(PROJECTS)/aros-stuff/pthreads/Makefile:
+	@cd $(PROJECTS) &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
 
 # =================================================
 # newlib
 # =================================================
 NEWLIB_CONFIG := CC=m68k-amigaos-gcc CXX=m68k-amigaos-g++
-NEWLIB_FILES = $(shell find 2>/dev/null projects/newlib-cygwin/newlib -type f)
+NEWLIB_FILES = $(shell find 2>/dev/null $(PROJECTS)/newlib-cygwin/newlib -type f)
 
 .PHONY: newlib
 newlib: $(BUILD)/newlib/_done
@@ -931,27 +933,27 @@ $(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a
 	@echo "done" >$@
 
 $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(NEWLIB_FILES)
-	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
-	@rsync -a $(PWD)/projects/newlib-cygwin/newlib/libc/sys/amigaos/include/stabs.h $(PREFIX)/m68k-amigaos/sys-include
+	@rsync -a $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
+	@rsync -a $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/stabs.h $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2)
 	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2)
 	@for x in $$(find $(PREFIX)/m68k-amigaos/lib/* -name libm.a); do ln -sf $$x $${x%*m.a}__m__.a; done
 	@touch $@
 
-$(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/newlib/configure $(BUILD)/ndk-include_ndk $(BUILD)/gcc/_done
+$(BUILD)/newlib/newlib/Makefile: $(PROJECTS)/newlib-cygwin/newlib/configure $(BUILD)/ndk-include_ndk $(BUILD)/gcc/_done
 	@mkdir -p $(BUILD)/newlib/newlib
 	@if [ ! -f "$(BUILD)/newlib/newlib/Makefile" ]; then \
-	$(L00)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb --enable-newlib-long-time_t $(L2) \
+	$(L00)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb --enable-newlib-long-time_t $(L2) \
 	; else touch "$(BUILD)/newlib/newlib/Makefile"; fi
 
-projects/newlib-cygwin/newlib/configure:
-	@cd projects &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
+$(PROJECTS)/newlib-cygwin/newlib/configure:
+	@cd $(PROJECTS) &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
 
 # =================================================
 # ixemul
 # =================================================
-projects/ixemul/configure:
-	@cd projects &&	git clone $(GIT_IXEMUL)
+$(PROJECTS)/ixemul/configure:
+	@cd $(PROJECTS) &&	git clone $(GIT_IXEMUL)
 
 # =================================================
 # sdk installation
@@ -973,23 +975,23 @@ $(SDKS): libnix
 # =================================================
 .PHONY: update-repos
 update-repos:
-	@cd projects/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
-	@cd projects/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
-	@cd projects/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
-	@cd projects/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
-	@cd projects/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
-	@cd projects/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
-	@cd projects/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
-	@cd projects/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
-#	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
-	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
-	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
-	@cd projects/libSDL12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
-	@cd projects/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
-	@cd projects/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
-	@cd projects/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
-	@cd projects/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
-	@cd projects/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
+	@cd $(PROJECTS)/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
+	@cd $(PROJECTS)/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
+	@cd $(PROJECTS)/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
+	@cd $(PROJECTS)/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
+	@cd $(PROJECTS)/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
+	@cd $(PROJECTS)/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
+	@cd $(PROJECTS)/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
+	@cd $(PROJECTS)/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
+#	@cd $(PROJECTS)/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
+	@cd $(PROJECTS)/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
+	@cd $(PROJECTS)/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
+	@cd $(PROJECTS)/libSDL12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
+	@cd $(PROJECTS)/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
+	@cd $(PROJECTS)/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
+	@cd $(PROJECTS)/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
+	@cd $(PROJECTS)/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
+	@cd $(PROJECTS)/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
 
 
 # =================================================
@@ -1018,20 +1020,21 @@ info:
 	@$(CC) -v -E - </dev/null |& grep " version "
 	@$(CXX) -v -E - </dev/null |& grep " version "
 	@echo $(BUILD)
+	@echo $(PROJECTS)
 
 # print the latest git log entry for all projects
 l:
-	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git log -n1 --pretty=oneline); popd >/dev/null; done
+	@for i in $(PROJECTS)/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git log -n1 --pretty=oneline); popd >/dev/null; done
 	@echo "." && git log -n1 --pretty=oneline
 
 # print the git remotes for all projects
 r:
-	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git remote -v); popd >/dev/null; done
+	@for i in $(PROJECTS)/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git remote -v); popd >/dev/null; done
 	@echo "." && git remote -v
 
 # print the git branches for all projects
 b:
-	@for i in projects/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && (git branch | grep '*')); popd >/dev/null; done
+	@for i in $(PROJECTS)/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && (git branch | grep '*')); popd >/dev/null; done
 	@echo "." && git remote -v
 
 
