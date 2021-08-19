@@ -382,7 +382,7 @@ $(BUILD)/binutils/_done: $(BUILD)/binutils/Makefile $(shell find 2>/dev/null $(P
 
 $(BUILD)/binutils/Makefile: $(PROJECTS)/binutils/configure
 	@mkdir -p $(BUILD)/binutils
-	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PWD)/$(PROJECTS)/binutils/configure $(CONFIG_BINUTILS) $(L2)
+	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PROJECTS)/binutils/configure $(CONFIG_BINUTILS) $(L2)
 
 
 $(PROJECTS)/binutils/configure:
@@ -416,13 +416,13 @@ $(BUILD)/binutils/_gprof: $(BUILD)/binutils/gprof/Makefile $(shell find 2>/dev/n
 
 $(BUILD)/binutils/gprof/Makefile: $(PROJECTS)/binutils/configure $(BUILD)/binutils/_done
 	@mkdir -p $(BUILD)/binutils/gprof
-	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PWD)/$(PROJECTS)/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
+	$(L0)"configure gprof"$(L1) cd $(BUILD)/binutils/gprof && $(E) $(PROJECTS)/binutils/gprof/configure $(CONFIG_GRPOF) $(L2)
 
 # =================================================
 # gcc
 # =================================================
 CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,objc --enable-version-specific-runtime-libs --disable-libssp --disable-nls \
-	--with-headers=$(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
+	--with-headers=$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
@@ -456,7 +456,7 @@ ifneq ($(OWNGMP),)
 	@rsync -a $(PROJECTS)/$(MPC)/* $(PROJECTS)/gcc/mpc
 	@rsync -a $(PROJECTS)/$(MPFR)/* $(PROJECTS)/gcc/mpfr
 endif
-	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/$(PROJECTS)/gcc/configure $(CONFIG_GCC) $(L2)
+	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PROJECTS)/gcc/configure $(CONFIG_GCC) $(L2)
 
 $(PROJECTS)/gcc/configure:
 	@cd $(PROJECTS) &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
@@ -478,7 +478,7 @@ $(PREFIX)/bin/fd2sfd: $(BUILD)/fd2sfd/Makefile $(shell find 2>/dev/null $(PROJEC
 
 $(BUILD)/fd2sfd/Makefile: $(PROJECTS)/fd2sfd/configure
 	@mkdir -p $(BUILD)/fd2sfd
-	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/$(PROJECTS)/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
+	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PROJECTS)/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
 $(PROJECTS)/fd2sfd/configure:
 	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2SFD)
@@ -500,7 +500,7 @@ $(PREFIX)/bin/fd2pragma: $(BUILD)/fd2pragma/fd2pragma
 
 $(BUILD)/fd2pragma/fd2pragma: $(PROJECTS)/fd2pragma/makefile $(shell find 2>/dev/null $(PROJECTS)/fd2pragma -not \( -path $(PROJECTS)/fd2pragma/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/fd2pragma
-	$(L0)"make fd2sfd"$(L1) cd $(PROJECTS)/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c $(L2)
+	$(L0)"make fd2sfd"$(L1) cd $(PROJECTS)/fd2pragma && $(CC) -o $@ $(CFLAGS) fd2pragma.c $(L2)
 
 $(PROJECTS)/fd2pragma/makefile:
 	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
@@ -519,7 +519,7 @@ $(PREFIX)/bin/ira: $(BUILD)/ira/ira
 
 $(BUILD)/ira/ira: $(PROJECTS)/ira/Makefile $(shell find 2>/dev/null $(PROJECTS)/ira -not \( -path $(PROJECTS)/ira/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/ira
-	$(L0)"make ira"$(L1) cd $(PROJECTS)/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99 $(L2)
+	$(L0)"make ira"$(L1) cd $(PROJECTS)/ira && $(CC) -o $@ $(CFLAGS) *.c -std=c99 $(L2)
 
 $(PROJECTS)/ira/Makefile:
 	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_IRA)
@@ -541,7 +541,7 @@ $(PREFIX)/bin/sfdc: $(BUILD)/sfdc/Makefile
 
 $(BUILD)/sfdc/Makefile: $(PROJECTS)/sfdc/configure $(shell find 2>/dev/null $(PROJECTS)/sfdc -not \( -path $(PROJECTS)/sfdc/.git -prune \)  -type f)
 	@rsync -a $(PROJECTS)/sfdc $(BUILD)/ --exclude .git
-	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
+	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
 $(PROJECTS)/sfdc/configure:
 	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_SFDC)
@@ -677,18 +677,18 @@ $(BUILD)/ndk-include_ndk: $(BUILD)/ndk-include_ndk0 $(NDK_INCLUDE_INLINE) $(NDK_
 
 $(BUILD)/ndk-include_ndk0: $(PROJECTS)/$(NDK_FOLDER_NAME).info $(NDK_INCLUDE) $(BUILD)/fd2sfd/_done $(BUILD)/fd2pragma/_done
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
+	@rsync -a $(PROJECTS)/$(NDK_FOLDER_NAME_H)/* $(PREFIX)/m68k-amigaos/ndk-include --exclude proto --exclude inline
 	$(L0)"STDARGing ndk"$(L1) for i in $$(find $(PREFIX)/m68k-amigaos/ndk-include/clib/*protos.h -type f); do \
 		echo $$i; \
 		LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9 _]*)([[:blank:]]+|\*)([a-zA-Z0-9_]+)\(/\1\2 __stdargs \3(/g' $$i; \
 		rm $$i.bak; done $(L2)	
-	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
+	@rsync -a $(PROJECTS)/$(NDK_FOLDER_NAME_I)/* $(PREFIX)/m68k-amigaos/ndk-include
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/fd
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/sfd
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk/lib/libs
-	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_FD)/* $(PREFIX)/m68k-amigaos/ndk/lib/fd
-	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/* $(PREFIX)/m68k-amigaos/ndk/lib/sfd
-	@rsync -a $(PWD)/$(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/* $(PREFIX)/m68k-amigaos/ndk/lib/libs
+	@rsync -a $(PROJECTS)/$(NDK_FOLDER_NAME_FD)/* $(PREFIX)/m68k-amigaos/ndk/lib/fd
+	@rsync -a $(PROJECTS)/$(NDK_FOLDER_NAME_SFD)/* $(PREFIX)/m68k-amigaos/ndk/lib/sfd
+	@rsync -a $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/* $(PREFIX)/m68k-amigaos/ndk/lib/libs
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@cp -p $(PROJECTS)/$(NDK_FOLDER_NAME_H)/proto/alib.h $(PREFIX)/m68k-amigaos/ndk-include/proto
 	@cp -p $(PROJECTS)/$(NDK_FOLDER_NAME_H)/proto/cardres.h $(PREFIX)/m68k-amigaos/ndk-include/proto
@@ -781,7 +781,7 @@ netinclude: $(BUILD)/_netinclude
 
 $(BUILD)/_netinclude: $(PROJECTS)/amiga-netinclude/README.md $(BUILD)/ndk-include_ndk $(shell find 2>/dev/null $(PROJECTS)/amiga-netinclude/include -type f)
 	@mkdir -p $(PREFIX)/m68k-amigaos/ndk-include
-	@rsync -a $(PWD)/$(PROJECTS)/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
+	@rsync -a $(PROJECTS)/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	@echo "done" >$@
 
 $(PROJECTS)/amiga-netinclude/README.md:
@@ -812,8 +812,8 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@mkdir -p $(BUILD)/libnix
 	@mkdir -p $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)
 	@if [ ! -e $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a ]; then $(PREFIX)/bin/m68k-amigaos-ar rcs $(PREFIX)/lib/gcc/m68k-amigaos/$(GCC_VERSION)/libgcc.a; fi
-	$(L0)"make libnix"$(L1) CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -C $(BUILD)/libnix -f $(PWD)/$(PROJECTS)/libnix/Makefile.gcc6 root=$(PWD)/$(PROJECTS)/libnix all $(L2)
-	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PWD)/$(PROJECTS)/libnix/Makefile.gcc6 root=$(PWD)/$(PROJECTS)/libnix install $(L2)
+	$(L0)"make libnix"$(L1) CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -C $(BUILD)/libnix -f $(PROJECTS)/libnix/Makefile.gcc6 root=$(PROJECTS)/libnix all $(L2)
+	$(L0)"install libnix"$(L1) $(MAKE) -C $(BUILD)/libnix -f $(PROJECTS)/libnix/Makefile.gcc6 root=$(PROJECTS)/libnix install $(L2)
 	@rsync --delete -a $(PROJECTS)/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >$@
 
@@ -866,7 +866,7 @@ $(BUILD)/libdebug/_done: $(BUILD)/libdebug/Makefile
 
 $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libdebug/configure $(shell find 2>/dev/null $(PROJECTS)/libdebug -not \( -path $(PROJECTS)/libdebug/.git -prune \) -type f)
 	@mkdir -p $(BUILD)/libdebug
-	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/$(PROJECTS)/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
+	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PROJECTS)/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 $(PROJECTS)/libdebug/configure:
 	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
@@ -933,8 +933,8 @@ $(BUILD)/newlib/_done: $(BUILD)/newlib/newlib/libc.a
 	@echo "done" >$@
 
 $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(NEWLIB_FILES)
-	@rsync -a $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
-	@rsync -a $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/stabs.h $(PREFIX)/m68k-amigaos/sys-include
+	@rsync -a $(PROJECTS)/newlib-cygwin/newlib/libc/include/ $(PREFIX)/m68k-amigaos/sys-include
+	@rsync -a $(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/stabs.h $(PREFIX)/m68k-amigaos/sys-include
 	$(L0)"make newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib $(L2)
 	$(L0)"install newlib"$(L1) $(MAKE) -C $(BUILD)/newlib/newlib install $(L2)
 	@for x in $$(find $(PREFIX)/m68k-amigaos/lib/* -name libm.a); do ln -sf $$x $${x%*m.a}__m__.a; done
@@ -943,7 +943,7 @@ $(BUILD)/newlib/newlib/libc.a: $(BUILD)/newlib/newlib/Makefile $(NEWLIB_FILES)
 $(BUILD)/newlib/newlib/Makefile: $(PROJECTS)/newlib-cygwin/newlib/configure $(BUILD)/ndk-include_ndk $(BUILD)/gcc/_done
 	@mkdir -p $(BUILD)/newlib/newlib
 	@if [ ! -f "$(BUILD)/newlib/newlib/Makefile" ]; then \
-	$(L00)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/$(PROJECTS)/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb --enable-newlib-long-time_t $(L2) \
+	$(L00)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PROJECTS)/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb --enable-newlib-long-time_t $(L2) \
 	; else touch "$(BUILD)/newlib/newlib/Makefile"; fi
 
 $(PROJECTS)/newlib-cygwin/newlib/configure:
