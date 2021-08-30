@@ -16,7 +16,7 @@ case $1 in
 				if [ "${a[1]}" == "git" ]; then
 					if [ ! -e "projects/$file" ]; then
 						pushd projects
-						git clone ${a[1]}:${a[2]} || rm -rf $file; exit 1
+						git clone ${a[1]}:${a[2]} || (rm -rf $file; exit 1)
 						popd;
 					fi
 					pushd projects/$file
