@@ -82,6 +82,7 @@ SDK/MUI/Autodocs/MUI/MUI_Scrmodelist.doc
 SDK/MUI/Autodocs/MUI/MUI_Radio.doc
 SDK/MUI/Autodocs/MUI/MUI_Levelmeter.doc
 SDK/MUI/Docs/MUIdev.guide
+stdargs : SDK/MUI/C/include/clib/muimaster_protos.h
 SDK/MUI/C/include/clib/muimaster_protos.h
 SDK/MUI/C/include/libraries/mui.h
 SDK/MUI/C/include/pragma/muimaster_lib.h
@@ -111,3 +112,5 @@ fd2sfd : muimaster_lib.fd clib/muimaster_protos.h
 sfdc : muimaster_lib.sfd muimaster.h muimaster_lib.h
 stubs : muimaster_lib.sfd
 lib : muimaster_lib.sfd
+patch : SDK/MUI/C/include/libraries/mui.h
+

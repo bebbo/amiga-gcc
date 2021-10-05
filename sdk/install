@@ -99,9 +99,15 @@ case $1 in
 				rm -rf $3/m68k-amigaos/${a[2]}
 				ln -s $3/m68k-amigaos/${a[1]} $3/m68k-amigaos/${a[2]}
 			;;
+			stdargs)
+				echo adding __stdargs to build/$2/${a[1]}
+				LC_CTYPE=C sed -i.bak -E 's/(.*)__stdargs (.*)/\1\2/g' build/$2/${a[1]}
+				LC_CTYPE=C sed -i.bak -E 's/([a-zA-Z0-9_]*[[:blank:]]*.*[[:blank:]]+\*?[[:blank:]]*)([a-zA-Z0-9_]+)[[:blank:]]*\(/__stdargs \1\2(/g' build/$2/${a[1]}
+				rm build/$2/${a[1]}.bak
+			;;
 			patch)
 				patch=patches/$2/${a[1]}
-				echo applying patch $patch
+				echo applying patch $patch to build/$2
 				patch -N -p0 -r - -d build/$2 < $patch
 			;;
 			*)
