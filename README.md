@@ -27,7 +27,7 @@ If building with a normal user, the `PREFIX` directory must be writable (default
 ### macOS
 Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
 
-`brew install bash wget make lhasa gmp mpfr libmpc flex gettext texinfo gcc make autoconf`
+`brew install bash wget make lhasa gmp mpfr libmpc flex gettext gnu_sed texinfo gcc make autoconf`
 
 By default macOS uses an outdated version of bash. Therefore, on macOS host always pass the the SHELL=/usr/local/bin/bash parameter (or any other valid path pointing to bash), e.g.:
 ```
