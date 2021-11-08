@@ -78,6 +78,7 @@ case $1 in
 					flock -x 200
 					$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/libstubs.a build/$2/$name.o || exit 1
 				) 200>/tmp/amiga-gcc-libstubs-lock
+				rm /tmp/amiga-gcc-libstubs-lock
 			;;
 			lib)
 				sfd=${a[1]}
