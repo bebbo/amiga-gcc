@@ -42,9 +42,9 @@ CC=gcc-9 CXX=g++-9 gmake all SHELL=/usr/local/bin/bash
 
 ### macOs on Mi1
 
-Native build on M1 Mac has proved difficult at this stage for a number of reasons. I filed (and closed) a separate issue. 
-
-We can, however, get an x86 version of the toolchain working on M1 with these steps.
+UPDATE:
+You still need homebrew, but it should work without using the x86_64 versions.
+If native building does not work for you, get an x86 version of the toolchain working on M1 with these steps.
 
 1. Ensure rosetta is installed. `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
 2. Ensure Xcode command line tools are installed `xcode-select --install`
@@ -139,3 +139,25 @@ m68k-amigaos-gcc test.cpp -mcrt=nix13
 ```
 
 The include files for 1.3 - which are picked up by the compiler if `-mcrt=nix13` is used - can be found at `<PREFIX>/m68k-amigaos/ndk13-include` i.E. `/opt/amiga/m68k-amigaos/ndk13-include`
+
+## Checking gcc
+
+To check the built version you may consider to run the gcc dejagnu tests. This does not cover everything but it's a start.
+The tests are using my improved version of VAMOS (downstream of https://github.com/cnvogelg/amitools) to emulate the Amiga,
+and right now not all improvements went back into the upstream.
+
+### Debian / Ubuntu
+```
+sudo apt install dejagnu
+sudo cp baseboards/* /usr/share/dejagnu/baseboards
+pip install -U git+https://github.com/bebbo/amitools.git  
+make check
+```
+
+### macOS
+```
+brew install dejagnu
+cp baseboards/* $(brew --prefix)/opt/dejagnu/share/dejagnu/baseboards
+pip install -U  git+https://github.com/bebbo/amitools.git  
+make check
+```
