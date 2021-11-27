@@ -433,7 +433,10 @@ CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,o
 
 # OSX : libs added by the command brew install gmp mpfr libmpc
 ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
-	CONFIG_GCC += --with-gmp-include=/usr/local/include --with-gmp-lib=/usr/local/lib --with-mpfr-include=/usr/local/include --with-mpfr-lib=/usr/local/lib --with-mpfr-include=/usr/local/include --with-mpfr-lib=/usr/local/lib
+	BREW_PREFIX := $$(brew --prefix)
+	CONFIG_GCC += --with-gmp=$(BREW_PREFIX) \
+		--with-mpfr=$(BREW_PREFIX) \
+		--with-mpc=$(BREW_PREFIX)
 endif
 
 
