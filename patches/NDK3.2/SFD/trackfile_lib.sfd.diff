@@ -1,0 +1,46 @@
+--- NDK3.2/SFD/trackfile_lib.sfd	2020-08-10 18:07:34.000000000 +0200
++++ NDK3.2/SFD/trackfile_lib.sfd	2021-10-07 08:03:47.000000000 +0200
+@@ -4,32 +4,32 @@
+ ==include <devices/trackfile.h>
+ ==bias 6
+ ==private
+-LONG DeviceOpen(struct IORequest *io, LONG unit_number, ULONG flags) (a1, d0, d1)
++LONG DeviceOpen(struct IORequest *io, LONG unit_number, ULONG flags) (a1,d0,d1)
+ BPTR DeviceClose(struct IORequest *io) (a1)
+ BPTR DeviceExpunge() ()
+ ULONG DeviceReserved() ()
+ LONG DeviceBeginIO(struct IORequest *io) (a1)
+ LONG DeviceAbortIO(struct IORequest *io) (a1)
+ ==public
+-LONG TFStartUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0, a0)
++LONG TFStartUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0,a0)
+ ==varargs
+-LONG TFStartUnitTags(LONG which_unit, ...) (d0, a0)
+-LONG TFStopUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0, a0)
++LONG TFStartUnitTags(LONG which_unit, ...) (d0,a0)
++LONG TFStopUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0,a0)
+ ==varargs
+-LONG TFStopUnitTags(LONG which_unit, ...) (d0, a0)
+-LONG TFInsertMediaTagList(LONG which_unit, CONST struct TagItem *tags) (d0, a0)
++LONG TFStopUnitTags(LONG which_unit, ...) (d0,a0)
++LONG TFInsertMediaTagList(LONG which_unit, CONST struct TagItem *tags) (d0,a0)
+ ==varargs
+-LONG TFInsertMediaTags(LONG which_unit, ...) (d0, a0)
+-LONG TFEjectMediaTagList(LONG which_unit, CONST struct TagItem *tags) (d0, a0)
++LONG TFInsertMediaTags(LONG which_unit, ...) (d0,a0)
++LONG TFEjectMediaTagList(LONG which_unit, CONST struct TagItem *tags) (d0,a0)
+ ==varargs
+-LONG TFEjectMediaTags(LONG which_unit, ...) (d0, a0)
++LONG TFEjectMediaTags(LONG which_unit, ...) (d0,a0)
+ struct TrackFileUnitData * TFGetUnitData(LONG which_unit) (d0)
+ VOID TFFreeUnitData(struct TrackFileUnitData *tfud) (a0)
+ *
+ *--- functions in V2 or higher ---
+ *
+-LONG TFChangeUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0, a0)
++LONG TFChangeUnitTagList(LONG which_unit, CONST struct TagItem *tags) (d0,a0)
+ ==varargs
+-LONG TFChangeUnitTags(LONG which_unit, ...) (d0, a0)
++LONG TFChangeUnitTags(LONG which_unit, ...) (d0,a0)
+ LONG TFExamineFileSize(LONG file_size) (d0)
+ ==end
