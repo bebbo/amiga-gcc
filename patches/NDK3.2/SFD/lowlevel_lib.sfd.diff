@@ -1,0 +1,22 @@
+--- NDK3.2/SFD/lowlevel_lib.sfd	2020-06-21 10:56:08.000000000 +0200
++++ NDK3.2/SFD/lowlevel_lib.sfd	2021-10-07 08:03:18.000000000 +0200
+@@ -24,8 +24,8 @@
+ * KEYBOARD HANDLING
+ *
+ ULONG GetKey() ()
+-VOID QueryKeys(struct KeyQuery *queryArray, LONG arraySize) (a0, d1)
+-APTR AddKBInt(APTR intRoutine, APTR intData) (a0, a1)
++VOID QueryKeys(struct KeyQuery *queryArray, LONG arraySize) (a0,d1)
++APTR AddKBInt(APTR intRoutine, APTR intData) (a0,a1)
+ VOID RemKBInt(APTR intHandle) (a1)
+ *
+ * SYSTEM HANDLING
+@@ -36,7 +36,7 @@
+ *
+ * TIMER HANDLING
+ *
+-APTR AddTimerInt (APTR intRoutine, APTR intData) (a0, a1)
++APTR AddTimerInt (APTR intRoutine, APTR intData) (a0,a1)
+ VOID RemTimerInt (APTR intHandle) (a1)
+ VOID StopTimerInt (APTR intHandle) (a1)
+ VOID StartTimerInt (APTR intHandle, ULONG timeInterval, BOOL continuous) (a1,d0,d1)
