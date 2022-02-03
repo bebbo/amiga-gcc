@@ -7,3 +7,16 @@
  ==base _SysBase
  ==bias 30
  ==public
+--- NDK3.2/SFD/exec_lib.sfd 2020-08-12 23:22:42.000000000 +0200
++++ NDK3.2/SFD/exec_lib.sfd	2021-10-07 07:53:39.000000000 +0200
+@@ -186,8 +186,8 @@
+VOID    ExecObsolete4(ULONG tid)(d0)
+==public
+*------ future expansion ---------------------------------------------
+-APTR    CachePreDMA( CONST_APTR address, ULONG *length, ULONG flags) (a0, a1, d0)
+-VOID    CachePostDMA( CONST_APTR address, ULONG *length, ULONG flags) (a0, a1, d0)
++APTR    CachePreDMA( CONST_APTR address, ULONG *length, ULONG flags) (a0,a1,d0)
++VOID    CachePostDMA( CONST_APTR address, ULONG *length, ULONG flags) (a0,a1,d0)
+*------ New, for V39
+==version 39
+*------ Low memory handler functions
