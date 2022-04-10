@@ -25,7 +25,7 @@ Right now these tools are build:
 If building with a normal user, the `PREFIX` directory must be writable (default is `/opt/amiga`). You can add the user to an appropriate group. 
 
 ### macOS
-Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
+Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with Xcode. Once Xcode and Homebrew are up install the required packages:
 
 ```
 brew install bash wget make lhasa gmp mpfr libmpc flex gettext gnu-sed texinfo gcc@11 make autoconf
@@ -45,7 +45,7 @@ CC=gcc-11 CXX=g++-11 gmake all SHELL=$(brew --prefix)/bin/bash
 
 **ALSO NOTE** If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
 
-### macOs on Mi1
+### macOs on M1
 Native builds on M1 Macs are now directly supported.
 
 ### Windows with Cygwin
