@@ -7,3 +7,4 @@ Output
 .state
 .vscode
 .DS_Store
+.repos*

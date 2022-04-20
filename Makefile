@@ -29,28 +29,13 @@ else
 	SED := sed
 endif
 
-BINUTILS_BRANCH := amiga
-GCC_BRANCH := gcc-6-branch
-NEWLIB_BRANCH := amiga
-
-GIT_AMIGA_NETINCLUDE := https://github.com/bebbo/amiga-netinclude
-GIT_BINUTILS         := https://github.com/bebbo/binutils-gdb
-GIT_CLIB2            := https://github.com/bebbo/clib2
-GIT_FD2PRAGMA        := https://github.com/bebbo/fd2pragma
-GIT_FD2SFD           := https://github.com/adtools/fd2sfd
-GIT_GCC              := https://github.com/bebbo/gcc
-GIT_IRA              := https://github.com/bebbo/ira
-GIT_IXEMUL           := https://github.com/bebbo/ixemul
-GIT_LHA              := https://github.com/jca02266/lha
-GIT_LIBDEBUG         := https://github.com/bebbo/libdebug
-GIT_LIBNIX           := https://github.com/bebbo/libnix
-GIT_LIBSDL12         := https://github.com/AmigaPorts/libSDL12
-GIT_NEWLIB_CYGWIN    := https://github.com/bebbo/newlib-cygwin
-GIT_SFDC             := https://github.com/bebbo/sfdc
-GIT_VASM             := https://github.com/mheyer32/vasm
-GIT_VBCC             := https://github.com/bebbo/vbcc
-GIT_VLINK            := https://github.com/mheyer32/vlink
-GIT_AROSSTUFF        := https://github.com/bebbo/aros-stuff
+# get git urls and branches from .repos file
+$(shell  [ ! -f .repos ] && cp default-repos .repos)
+modules := $(shell cat .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f1)
+get_url = $(shell grep $(1) .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f2)
+get_branch = $(shell grep $(1) .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f3)
+$(foreach modu,$(modules),$(eval $(modu)_URL=$(call get_url,$(modu))))
+$(foreach modu,$(modules),$(eval $(modu)_BRANCH=$(call get_branch,$(modu))))
 
 ifeq ($(NDK),3.2)
 NDK_URL              := http://aminet.net/dev/misc/NDK3.2R3.lha
@@ -74,7 +59,7 @@ endif
 
 CFLAGS ?= -Os
 CXXFLAGS ?= $(CFLAGS)
-CFLAGS_FOR_TARGET ?= 
+CFLAGS_FOR_TARGET ?= -Os -fomit-frame-pointer 
 CXXFLAGS_FOR_TARGET ?= $(CFLAGS_FOR_TARGET) -fno-exceptions -fno-rtti
 
 E:=CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CFLAGS_FOR_BUILD="$(CFLAGS)" CXXFLAGS_FOR_BUILD="$(CXXFLAGS)"  CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" CXXFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)"
@@ -128,13 +113,6 @@ L1 = ;(
 L2 = )
 endif
 
-UPDATE = __x=
-ANDPULL = ;__y=$$(git branch | grep '*' | cut -b3-);echo setting remote origin from $$(git remote get-url origin) to $$__x using branch $$__y;\
-	git remote remove origin; \
-	git remote add origin $$__x; \
-	git remote set-branches origin $$__y;\
-	git pull
-
 # =================================================
 
 .PHONY: x init
@@ -150,23 +128,24 @@ x:
 # =================================================
 .PHONY: help
 help:
-	@echo "make help		display this help"
-	@echo "make info		print prefix and other flags"
-	@echo "make all 		build and install all"
-	@echo "make min 		build and install the minimal to use gcc"
-	@echo "make <target>		builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
-	@echo "make clean		remove the build folder"
-	@echo "make clean-<target>	remove the target's build folder"
-	@echo "make clean-prefix	remove all content from the prefix folder"
-	@echo "make update		perform git pull for all targets"
-	@echo "make update-<target>	perform git pull for the given target"
-	@echo "make sdk=<sdk>		install the sdk <sdk>"
-	@echo "make all-sdk		install all sdks"
-	@echo "make info		display some info"
-	@echo "make l   		print the last log entry for each project"
-	@echo "make b   		print the branch for each project"
-	@echo "make r   		print the remote for each project"
-	@echo "make v date=<date>	checkout all projects for a given date"
+	@echo "make help					display this help"
+	@echo "make info					print prefix and other flags"
+	@echo "make all 					build and install all"
+	@echo "make min 					build and install the minimal to use gcc"
+	@echo "make <target>					builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
+	@echo "make clean					remove the build folder"
+	@echo "make clean-<target>				remove the target's build folder"
+	@echo "make clean-prefix				remove all content from the prefix folder"
+	@echo "make update					perform git pull for all targets"
+	@echo "make update-<target>				perform git pull for the given target"
+	@echo "make sdk=<sdk>					install the sdk <sdk>"
+	@echo "make all-sdk					install all sdks"
+	@echo "make info					display some info"
+	@echo "make l   					print the last log entry for each project"
+	@echo "make b   					print the branch for each project"
+	@echo "make r   					print the remote for each project"
+	@echo "make v [date=<date>]				checkout all projects for a given date, checkout to branch if no date given"
+	@echo "make branch branch=<branch> mod=<module>	switch the module to the given branch"
 	@echo ""
 	@echo "the optional parameter THREADS=posix will build it with thread support"
 
@@ -392,7 +371,7 @@ $(BUILD)/binutils/Makefile: $(PROJECTS)/binutils/configure
 
 
 $(PROJECTS)/binutils/configure:
-	@cd $(PROJECTS) &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
+	@cd $(PROJECTS) &&	git clone -b $(binutils_BRANCH) --depth 16 $(binutils_URL) binutils
 
 # =================================================
 # gdb
@@ -468,7 +447,7 @@ endif
 	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PROJECTS)/gcc/configure $(CONFIG_GCC) $(L2)
 
 $(PROJECTS)/gcc/configure:
-	@cd $(PROJECTS) &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
+	@cd $(PROJECTS) &&	git clone -b $(gcc_BRANCH) --depth 16 $(gcc_URL)
 
 # =================================================
 # fd2sfd
@@ -490,7 +469,7 @@ $(BUILD)/fd2sfd/Makefile: $(PROJECTS)/fd2sfd/configure
 	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PROJECTS)/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
 $(PROJECTS)/fd2sfd/configure:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2SFD)
+	@cd $(PROJECTS) &&	git clone -b $(fd2sfd_BRANCH) --depth 4 $(fd2sfd_URL)
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "$(PROJECTS)/$${j%.diff}" "$$i"; fi ; done
@@ -512,7 +491,7 @@ $(BUILD)/fd2pragma/fd2pragma: $(PROJECTS)/fd2pragma/makefile $(shell find 2>/dev
 	$(L0)"make fd2sfd"$(L1) cd $(PROJECTS)/fd2pragma && $(CC) -o $@ $(CFLAGS) fd2pragma.c $(L2)
 
 $(PROJECTS)/fd2pragma/makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
+	@cd $(PROJECTS) &&	git clone -b $(fd2pragma_BRANCH) --depth 4 $(fd2pragma_URL)
 
 # =================================================
 # ira
@@ -531,7 +510,7 @@ $(BUILD)/ira/ira: $(PROJECTS)/ira/Makefile $(shell find 2>/dev/null $(PROJECTS)/
 	$(L0)"make ira"$(L1) cd $(PROJECTS)/ira && $(CC) -o $@ $(CFLAGS) *.c -std=c99 $(L2)
 
 $(PROJECTS)/ira/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_IRA)
+	@cd $(PROJECTS) &&	git clone -b $(ira_BRANCH) --depth 4 $(ira_URL)
 
 # =================================================
 # sfdc
@@ -553,10 +532,7 @@ $(BUILD)/sfdc/Makefile: $(PROJECTS)/sfdc/configure $(shell find 2>/dev/null $(PR
 	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
 $(PROJECTS)/sfdc/configure:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_SFDC)
-	for i in $$(find patches/sfdc/ -type f); \
-	do if [[ "$$i" == *.diff ]] ; \
-		then j=$${i:8}; patch -N "$(PROJECTS)/$${j%.diff}" "$$i"; retCode=$$?; [[ $$retCode -gt 1 ]] && exit $$retCode; fi ; done; exit 0
+	@cd $(PROJECTS) &&	git clone -b $(sfdc_BRANCH) --depth 4 $(sfdc_URL)
 
 # =================================================
 # vasm
@@ -578,7 +554,7 @@ $(BUILD)/vasm/Makefile: $(PROJECTS)/vasm/Makefile $(shell find 2>/dev/null $(PRO
 	@touch $(BUILD)/vasm/Makefile
 
 $(PROJECTS)/vasm/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VASM)
+	@cd $(PROJECTS) &&	git clone -b $(vasm_BRANCH) --depth 4 $(vasm_URL)
 
 # =================================================
 # vbcc
@@ -604,7 +580,7 @@ $(BUILD)/vbcc/Makefile: $(PROJECTS)/vbcc/Makefile $(shell find 2>/dev/null $(PRO
 	@touch $(BUILD)/vbcc/Makefile
 
 $(PROJECTS)/vbcc/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VBCC)
+	@cd $(PROJECTS) &&	git clone -b $(vbcc_BRANCH) --depth 4 $(vbcc_URL)
 
 # =================================================
 # vlink
@@ -624,7 +600,7 @@ $(BUILD)/vlink/Makefile: $(PROJECTS)/vlink/Makefile
 	@rsync -a $(PROJECTS)/vlink $(BUILD)/ --exclude .git
 
 $(PROJECTS)/vlink/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_VLINK)
+	@cd $(PROJECTS) &&	git clone -b $(vlink_BRANCH) --depth 4 $(vlink_URL)
 
 .PHONY: lha
 lha: $(BUILD)/_lha_done
@@ -632,7 +608,7 @@ lha: $(BUILD)/_lha_done
 $(BUILD)/_lha_done:
 	@if [ ! -e "$$(which lha 2>/dev/null)" ]; then \
 	  cd $(BUILD) && rm -rf lha; \
-	  $(L00)"clone lha"$(L1) git clone $(GIT_LHA); $(L2); \
+	  $(L00)"clone lha"$(L1) git clone -b $(lha_BRANCH) $(lha_URL); $(L2); \
 	  cd lha; \
 	  $(L00)"configure lha"$(L1) aclocal; autoheader; automake -a; autoconf; ./configure; $(L2); \
 	  $(L00)"make lha"$(L1) make all; $(L2); \
@@ -794,7 +770,7 @@ $(BUILD)/_netinclude: $(PROJECTS)/amiga-netinclude/README.md $(BUILD)/ndk-includ
 	@echo "done" >$@
 
 $(PROJECTS)/amiga-netinclude/README.md:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
+	@cd $(PROJECTS) &&	git clone -b $(amiga-netinclude_BRANCH) --depth 4 $(amiga-netinclude_URL)
 
 # =================================================
 # libamiga
@@ -827,7 +803,7 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@echo "done" >$@
 
 $(PROJECTS)/libnix/Makefile.gcc6:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_LIBNIX)
+	@cd $(PROJECTS) &&	git clone -b $(libnix_BRANCH) --depth 4 $(libnix_URL)
 
 # =================================================
 # gcc libs
@@ -859,7 +835,7 @@ $(BUILD)/clib2/_done: $(PROJECTS)/clib2/LICENSE $(shell find 2>/dev/null $(PROJE
 	@echo "done" >$@
 
 $(PROJECTS)/clib2/LICENSE:
-	@cd $(PROJECTS) && git clone -b master --depth 4 $(GIT_CLIB2)
+	@cd $(PROJECTS) && git clone -b $(clib2_BRANCH) --depth 4 $(clib2_URL)
 
 # =================================================
 # libdebug
@@ -878,7 +854,7 @@ $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libdebug/configure
 	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PROJECTS)/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 $(PROJECTS)/libdebug/configure:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
+	@cd $(PROJECTS) &&	git clone -b $(libdebug_BRANCH) --depth 4 $(libdebug_URL)
 	@touch -t 0001010000 $(PROJECTS)/libdebug/configure.ac
 
 # =================================================
@@ -906,7 +882,7 @@ $(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile 
 	@touch $(BUILD)/libSDL12/Makefile
 
 $(PROJECTS)/libSDL12/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
+	@cd $(PROJECTS) &&	git clone -b $(libSDL12_BRANCH) --depth 4 $(libSDL12_URL)
 
 
 # =================================================
@@ -927,7 +903,7 @@ $(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/aros-stuff/pthre
 	@touch $(BUILD)/libpthread/Makefile
 
 $(PROJECTS)/aros-stuff/pthreads/Makefile:
-	@cd $(PROJECTS) &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
+	@cd $(PROJECTS) &&	git clone -b $(aros-stuff_BRANCH) --depth 4 $(aros-stuff_URL)
 
 # =================================================
 # newlib
@@ -956,13 +932,13 @@ $(BUILD)/newlib/newlib/Makefile: $(PROJECTS)/newlib-cygwin/newlib/configure $(BU
 	; else touch "$(BUILD)/newlib/newlib/Makefile"; fi
 
 $(PROJECTS)/newlib-cygwin/newlib/configure:
-	@cd $(PROJECTS) &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
+	@cd $(PROJECTS) &&	git clone -b $(newlib-cygwin_BRANCH) --depth 4  $(newlib-cygwin_URL)
 
 # =================================================
 # ixemul
 # =================================================
 $(PROJECTS)/ixemul/configure:
-	@cd $(PROJECTS) &&	git clone $(GIT_IXEMUL)
+	@cd $(PROJECTS) &&	git clone -b $(ixemul_BRANCH) $(ixemul_URL)
 
 # =================================================
 # sdk installation
@@ -984,24 +960,22 @@ $(SDKS): libnix
 # =================================================
 .PHONY: update-repos
 update-repos:
-	@cd $(PROJECTS)/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
-	@cd $(PROJECTS)/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
-	@cd $(PROJECTS)/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
-	@cd $(PROJECTS)/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
-	@cd $(PROJECTS)/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
-	@cd $(PROJECTS)/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
-	@cd $(PROJECTS)/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
-	@cd $(PROJECTS)/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
-#	@cd $(PROJECTS)/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
-	@cd $(PROJECTS)/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
-	@cd $(PROJECTS)/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
-	@cd $(PROJECTS)/libSDL12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
-	@cd $(PROJECTS)/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
-	@cd $(PROJECTS)/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
-	@cd $(PROJECTS)/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
-	@cd $(PROJECTS)/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
-	@cd $(PROJECTS)/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
-
+	@for i in $(modules); do \
+		url=$$(grep $$i .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f2); \
+		bra=$$(grep $$i .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f3); \
+		bra=$${bra/$$'\n'} ;\
+		bra=$${bra/$$'\r'} ;\
+		if [ -e projects/$$i ]; then \
+			pushd projects/$$i; \
+			echo setting remote origin from $$(git remote get-url origin) to $$url using branch $$bra.; \
+			git remote remove origin; \
+			git remote add origin $$url; \
+			git remote set-branches origin $$bra; \
+			git pull --depth 4; \
+			git checkout $$bra; \
+			popd; \
+		fi; \
+	done
 
 # =================================================
 # run gcc torture check
@@ -1019,7 +993,7 @@ check:
 # =================================================
 # info
 # =================================================
-.PHONY: info v r b l
+.PHONY: info v r b l branch
 info:
 	@echo $@ $(UNAME_S)
 	@echo PREFIX=$(PREFIX)
@@ -1030,11 +1004,12 @@ info:
 	@$(CXX) -v -E - </dev/null |& grep " version "
 	@echo $(BUILD)
 	@echo $(PROJECTS)
+	@echo MODULES = $(modules)
 
 # print the latest git log entry for all projects
 l:
-	@for i in $(PROJECTS)/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git log -n1 --pretty=oneline); popd >/dev/null; done
-	@echo "." && git log -n1 --pretty=oneline
+	@for i in $(PROJECTS)/* ; do pushd . >/dev/null; cd $$i 2>/dev/null && ([[ -d ".git" ]] && echo $$i && git log -n1 --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short); popd >/dev/null; done
+	@echo "." && git log -n1 --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short
 
 # print the git remotes for all projects
 r:
@@ -1050,23 +1025,38 @@ b:
 # checkout for a given date
 v:
 	@D="$(date)"; \
-	pushd projects >/dev/null; \
-	for i in * ; do \
-	pushd . >/dev/null; \
-	cd $$i 2>/dev/null; \
-	if [ -d ".git" ]; then \
-	echo $$i;\
-	B=master;\
-	if [ "$$i" == "binutils" ] || [ "$$i" == "newlib-cygwin" ]; then B=amiga; fi;\
-	if [ "$$i" == "gcc" ]; then  B="gcc-6-branch"; fi;\
-	git checkout $$B; \
-	if [ "$$D" != "" ]; then git checkout `git rev-list -n 1 --first-parent --before="$$D" $$B`; fi;\
-	fi;\
-	popd >/dev/null; \
+	for i in $(modules); do \
+		bra=$$(grep $$i .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f3); \
+		bra=$${bra/$$'\n'} ;\
+		bra=$${bra/$$'\r'} ;\
+		if [ -e projects/$$i ]; then \
+			pushd projects/$$i >/dev/null; \
+			echo $$i;\
+			git checkout $$bra; \
+			if [ "$$D" != "" ]; then \
+				(export DEPTH=16; while [ "" == "$$( git rev-list -n 1 --first-parent --before="$$D" $$bra)" ]; \
+					do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH ; export DEPTH=$$(($$DEPTH+$$DEPTH)); done); \
+				git checkout `git rev-list -n 1 --first-parent --before="$$D" $$bra`; \
+			fi;\
+			popd >/dev/null; \
+		fi;\
 	done; \
-	popd >/dev/null; \
 	echo .; \
+	B=master; \
 	git checkout $$B; \
 	if [ "$$D" != "" ]; then \
-	git checkout `git rev-list -n 1 --first-parent --before="$$D" $$B`; \
+		git checkout `git rev-list -n 1 --first-parent --before="$$D" $$B`; \
+	fi
+
+# change version to the given branch
+branch:
+	@if [ "" != "$(branch)" ] && [ "1" == "$$(grep -c $(mod) .repos)" ]; then \
+		echo $(mod) $(branch) ; \
+	    url=$$(grep $(mod) .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f2); \
+	    mv .repos .repos.bak; \
+	    grep -v $(mod) .repos.bak > .repos; \
+	    echo "$(mod) $$url $(branch)" >> .repos; \
+		$(MAKE) update-repos; \
+	else \
+		echo "$(mod) $(branch) does NOT exist!"; \
 	fi
