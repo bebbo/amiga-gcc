@@ -17,10 +17,13 @@ Right now these tools are build:
 # Short Guide
 ## Prerequisites
 ### Centos
-`sudo yum install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo rsync`
+`sudo yum install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo rsync readline-devel`
+
+### Fedora
+`sudo dnf install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo rsync readline-devel`
 
 ### Ubuntu, Debian
-`sudo apt install make wget git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev autoconf rsync`
+`sudo apt install make wget git gcc g++ lhasa libgmp-dev libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev autoconf rsync libreadline-dev`
 
 If building with a normal user, the `PREFIX` directory must be writable (default is `/opt/amiga`). You can add the user to an appropriate group. 
 
@@ -120,7 +123,7 @@ Simply run `make all`. Also add -j to speedup the build.
 ```
 make clean
 make clean-prefix
-date; make all -j3 >&b.log; date
+time make all -j3
 ```
 takes roughly 10 minutes on my laptop running ubuntu. takes forever running cygwin on windows^^.
 
@@ -155,3 +158,30 @@ cp baseboards/* $(brew --prefix)/opt/dejagnu/share/dejagnu/baseboards
 pip install -U  git+https://github.com/bebbo/amitools.git  
 make check
 ```
+
+## Version management
+This project does not use git submodules since it's to inconvenient to work with develop and release branches in each module and the main module.
+
+Instead the **Makefile** provides some targets to switch to an older state for all modules.
+
+### Switching amiga-gcc to a given date
+Use make to switch all modules to a given date. You may also add the time
+```
+make v date=2021-04-01
+```
+### Switching amiga-gcc back to the branches
+Run make to switch all modules back to the branch
+```
+make v
+```
+### Show the current commit for all submodules
+This lists all modules with the last commit. Useful if you switched to a given date to show what's where.
+```
+make l
+```
+### Switch a module to a different branch
+You can switch modules to different branches. E.g.
+```
+make branch mod=binutils branch=devel1
+```
+The default branches and repositories are in the file **default-repos**, the local state is managed in the file **.repos**.
