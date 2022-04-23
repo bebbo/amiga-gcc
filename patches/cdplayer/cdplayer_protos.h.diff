@@ -1,0 +1,12 @@
+--- cdplayer.library/include/clib/cdplayer_protos.orig.h	1995-05-29 11:57:38.000000000 -0700
++++ cdplayer.library/include/clib/cdplayer_protos.h	2022-06-17 22:54:59.342089800 -0700
+@@ -11,7 +11,7 @@
+ #endif
+ 
+ BYTE CDEject (struct IOStdReq *);
+-BYTE CDPlay (UBYTE, UBYTE, struct IOStdReq *);
++BYTE CDPlay (ULONG, ULONG, struct IOStdReq *);
+ BYTE CDResume (BOOL, struct IOStdReq *);
+ BYTE CDStop (struct IOStdReq *);
+ BYTE CDJump (ULONG, struct IOStdReq *);
+

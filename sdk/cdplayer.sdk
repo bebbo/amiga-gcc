@@ -1,0 +1,16 @@
+Short: 	Library to play audio from scsi-cdrom
+Version: 37
+Url: http://aminet.net/dev/misc/CDPlayerlib37.lha
+
+patch : cdplayer.fd.diff
+patch : cdplayer_protos.h.diff
+
+cdplayer.library/include/clib/cdplayer_protos.h
+cdplayer.library/include/fd/cdplayer.fd
+cdplayer.library/include/libraries/cdplayer.h
+cdplayer.library/docs/cdplayer.dok = cdplayer.doc	
+cdplayer.library/docs/cdplayer.guide
+
+fd2sfd : cdplayer.fd clib/cdplayer_protos.h
+sfdc : cdplayer.sfd
+stubs : cdplayer.sfd
