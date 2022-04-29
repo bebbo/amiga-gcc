@@ -31,9 +31,9 @@ endif
 
 # get git urls and branches from .repos file
 $(shell  [ ! -f .repos ] && cp default-repos .repos)
-modules := $(shell cat .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f1)
-get_url = $(shell grep $(1) .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f2)
-get_branch = $(shell grep $(1) .repos | sed -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f3)
+modules := $(shell cat .repos | $(SED) -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f1)
+get_url = $(shell grep $(1) .repos | $(SED) -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f2)
+get_branch = $(shell grep $(1) .repos | $(SED) -e 's/[[:blank:]]\+/ /g' | cut -d' ' -f3)
 $(foreach modu,$(modules),$(eval $(modu)_URL=$(call get_url,$(modu))))
 $(foreach modu,$(modules),$(eval $(modu)_BRANCH=$(call get_branch,$(modu))))
 
