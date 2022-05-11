@@ -952,7 +952,7 @@ SDKS=$(patsubst sdk/%.sdk,%,$(SDKS0))
 .PHONY: $(SDKS)
 all-sdk: $(SDKS)
 
-$(SDKS): libnix
+$(SDKS): libnix lha
 	$(MAKE) sdk=$@
 
 # =================================================
