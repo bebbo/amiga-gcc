@@ -1,14 +1,14 @@
---- old/devices/timer.h	2021-04-13 02:41:06.000000000 +0200
-+++ new/devices/timer.h	2021-08-10 16:38:04.990455793 +0200
-@@ -53,10 +53,19 @@
+--- old/devices/timer.h	2022-02-03 11:59:06.000000000 +0100
++++ new/devices/timer.h	2022-06-27 00:29:43.590685664 +0200
+@@ -71,10 +71,19 @@
  
  #ifndef __USE_NEW_TIMEVAL__
  
 +#ifndef _TIMEVAL_DEFINED
 +#define _TIMEVAL_DEFINED
  struct timeval {
--    ULONG tv_secs;
--    ULONG tv_micro;
+-	ULONG tv_secs;
+-	ULONG tv_micro;
 +    union {
 +        ULONG          tv_sec;         /* seconds */
 +        ULONG          tv_secs;
@@ -21,4 +21,4 @@
 +#endif
  
  struct timerequest {
-     struct IORequest tr_node;
+ 	struct IORequest tr_node;
