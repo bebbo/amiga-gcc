@@ -38,8 +38,8 @@ $(foreach modu,$(modules),$(eval $(modu)_URL=$(call get_url,$(modu))))
 $(foreach modu,$(modules),$(eval $(modu)_BRANCH=$(call get_branch,$(modu))))
 
 ifeq ($(NDK),3.2)
-NDK_URL              := http://aminet.net/dev/misc/NDK3.2R3.lha
-NDK_ARC_NAME         := NDK3.2R3
+NDK_URL              := http://aminet.net/dev/misc/NDK3.2.lha
+NDK_ARC_NAME         := NDK3.2
 NDK_FOLDER_NAME      := NDK3.2
 NDK_FOLDER_NAME_H    := NDK3.2/Include_H
 NDK_FOLDER_NAME_I    := NDK3.2/Include_I
@@ -714,7 +714,7 @@ $(BUILD)/ndk-include_proto: $(PROJECTS)/$(NDK_FOLDER_NAME).info
 	@echo "done" >$@
 
 $(PROJECTS)/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(shell find 2>/dev/null patches/$(NDK_FOLDER_NAME)/ -type f)
-	$(L0)"unpack ndk"$(L1) cd $(PROJECTS) && lha xf $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(L2)
+	$(L0)"unpack ndk"$(L1) cd $(PROJECTS) && lha xfw=NDK3.2 $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(L2)
 	@touch -t 0001010000 $(DOWNLOAD)/$(NDK_ARC_NAME).lha
 	$(L0)"patch ndk"$(L1) for i in $$(find patches/$(NDK_FOLDER_NAME)/ -type f); do \
 	   if [[ "$$i" == *.diff ]] ; \
