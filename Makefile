@@ -714,7 +714,9 @@ $(BUILD)/ndk-include_proto: $(PROJECTS)/$(NDK_FOLDER_NAME).info
 	@echo "done" >$@
 
 $(PROJECTS)/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(shell find 2>/dev/null patches/$(NDK_FOLDER_NAME)/ -type f)
-	$(L0)"unpack ndk"$(L1) cd $(PROJECTS) && lha xfw=NDK3.2 $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(L2)
+	$(L0)"unpack ndk"$(L1) && cd $(PROJECTS) && if [[ $(NDK) == "3.2" ]] ; \
+	   then mkdir NDK3.2 ; cd NDK3.2 ; fi ; \
+	   lha xf $(DOWNLOAD)/$(NDK_ARC_NAME).lha $(L2)
 	@touch -t 0001010000 $(DOWNLOAD)/$(NDK_ARC_NAME).lha
 	$(L0)"patch ndk"$(L1) for i in $$(find patches/$(NDK_FOLDER_NAME)/ -type f); do \
 	   if [[ "$$i" == *.diff ]] ; \
