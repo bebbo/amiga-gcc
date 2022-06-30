@@ -96,6 +96,13 @@ case $1 in
 				echo creating redirecting header $3/m68k-amigaos/include/${a[1]}
 				echo "#include \"${a[2]}\"" >$3/m68k-amigaos/include/${a[1]}
 			;;
+			sed)
+				echo applying: sed -i.bak -E "${a[@]:2}" $3/${a[1]}
+				x=${a[@]:2}
+				x=${x##\"}
+				x=${x%%\"}
+				LC_CTYPE=C sed -i.bak -E "$x" $3/${a[1]}
+			;;
 			symlink)
 				echo creating symlink from $3/m68k-amigaos/${a[2]} to $3/m68k-amigaos/${a[1]}
 				rm -rf $3/m68k-amigaos/${a[2]}
