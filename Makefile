@@ -8,7 +8,7 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-SHELL = /bin/bash
+SHELL ?= /bin/bash
 
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
@@ -24,6 +24,8 @@ __DOWNLOADDIR := $(shell mkdir -p $(DOWNLOAD))
 GCC_VERSION ?= $(shell cat 2>/dev/null $(PROJECTS)/gcc/gcc/BASE-VER)
 
 ifeq ($(UNAME_S), Darwin)
+	SED := gsed
+else ifeq ($(UNAME_S), FreeBSD)
 	SED := gsed
 else
 	SED := sed
@@ -68,7 +70,7 @@ THREADS ?= no
 
 # =================================================
 # determine exe extension for cygwin
-$(eval MYMAKE = $(shell which make 2>/dev/null) )
+$(eval MYMAKE = $(shell which $(MAKE) 2>/dev/null) )
 $(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)" 2>/dev/null) )
 EXEEXT:=$(MYMAKEEXE:%=.exe)
 
@@ -303,7 +305,7 @@ update-libpthread: $(PROJECTS)/aros-stuff/pthreads/Makefile
 	@cd $(PROJECTS)/aros-stuff && git pull
 
 update-ndk: $(DOWNLOAD)/$(NDK_ARC_NAME).lha
-	make $(PROJECTS)/$(NDK_FOLDER_NAME).info
+	$(MAKE) $(PROJECTS)/$(NDK_FOLDER_NAME).info
 
 update-newlib: $(PROJECTS)/newlib-cygwin/newlib/configure
 	@cd $(PROJECTS)/newlib-cygwin && git pull
