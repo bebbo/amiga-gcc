@@ -412,7 +412,7 @@ CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,o
 	--with-headers=$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
-# OSX : libs added by the command brew install gmp mpfr libmpc
+# FreeBSD, OSX : libs added by the command brew install gmp mpfr libmpc
 ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
 	BREW_PREFIX := $$(brew --prefix)
 	CONFIG_GCC += --with-gmp=$(BREW_PREFIX) \
@@ -420,6 +420,12 @@ ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
 		--with-mpc=$(BREW_PREFIX)
 endif
 
+ifeq (FreeBSD, $(findstring FreeBSD, $(UNAME_S)))
+	PORTS_PREFIX?=/usr/local
+	CONFIG_GCC += --with-gmp=$(PORTS_PREFIX) \
+		--with-mpfr=$(PORTS_PREFIX) \
+		--with-mpc=$(PORTS_PREFIX)
+endif
 
 GCC_CMD := m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
 	m68k-amigaos-gcov m68k-amigaos-gcov-tool m68k-amigaos-cpp m68k-amigaos-gcc m68k-amigaos-gcc-ar \
