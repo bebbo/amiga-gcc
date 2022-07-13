@@ -8,7 +8,7 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-SHELL ?= /bin/bash
+$(eval SHELL = $(shell which bash 2>/dev/null) ) 
 
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
