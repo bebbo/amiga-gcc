@@ -8,7 +8,7 @@ include disable_implicite_rules.mk
 # =================================================
 # variables
 # =================================================
-SHELL = /bin/bash
+$(eval SHELL = $(shell which bash 2>/dev/null) ) 
 
 PREFIX ?= /opt/amiga
 export PATH := $(PREFIX)/bin:$(PATH)
@@ -24,6 +24,8 @@ __DOWNLOADDIR := $(shell mkdir -p $(DOWNLOAD))
 GCC_VERSION ?= $(shell cat 2>/dev/null $(PROJECTS)/gcc/gcc/BASE-VER)
 
 ifeq ($(UNAME_S), Darwin)
+	SED := gsed
+else ifeq ($(UNAME_S), FreeBSD)
 	SED := gsed
 else
 	SED := sed
@@ -68,7 +70,7 @@ THREADS ?= no
 
 # =================================================
 # determine exe extension for cygwin
-$(eval MYMAKE = $(shell which make 2>/dev/null) )
+$(eval MYMAKE = $(shell which $(MAKE) 2>/dev/null) )
 $(eval MYMAKEEXE = $(shell which "$(MYMAKE:%=%.exe)" 2>/dev/null) )
 EXEEXT:=$(MYMAKEEXE:%=.exe)
 
@@ -303,7 +305,7 @@ update-libpthread: $(PROJECTS)/aros-stuff/pthreads/Makefile
 	@cd $(PROJECTS)/aros-stuff && git pull
 
 update-ndk: $(DOWNLOAD)/$(NDK_ARC_NAME).lha
-	make $(PROJECTS)/$(NDK_FOLDER_NAME).info
+	$(MAKE) $(PROJECTS)/$(NDK_FOLDER_NAME).info
 
 update-newlib: $(PROJECTS)/newlib-cygwin/newlib/configure
 	@cd $(PROJECTS)/newlib-cygwin && git pull
@@ -410,7 +412,7 @@ CONFIG_GCC = --prefix=$(PREFIX) --target=m68k-amigaos --enable-languages=c,c++,o
 	--with-headers=$(PROJECTS)/newlib-cygwin/newlib/libc/sys/amigaos/include/ --disable-shared --enable-threads=$(THREADS) \
 	--with-stage1-ldflags="-dynamic-libgcc -dynamic-libstdc++" --with-boot-ldflags="-dynamic-libgcc -dynamic-libstdc++"	
 
-# OSX : libs added by the command brew install gmp mpfr libmpc
+# FreeBSD, OSX : libs added by the command brew install gmp mpfr libmpc
 ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
 	BREW_PREFIX := $$(brew --prefix)
 	CONFIG_GCC += --with-gmp=$(BREW_PREFIX) \
@@ -418,6 +420,12 @@ ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
 		--with-mpc=$(BREW_PREFIX)
 endif
 
+ifeq (FreeBSD, $(findstring FreeBSD, $(UNAME_S)))
+	PORTS_PREFIX?=/usr/local
+	CONFIG_GCC += --with-gmp=$(PORTS_PREFIX) \
+		--with-mpfr=$(PORTS_PREFIX) \
+		--with-mpc=$(PORTS_PREFIX)
+endif
 
 GCC_CMD := m68k-amigaos-c++ m68k-amigaos-g++ m68k-amigaos-gcc-$(GCC_VERSION) m68k-amigaos-gcc-nm \
 	m68k-amigaos-gcov m68k-amigaos-gcov-tool m68k-amigaos-cpp m68k-amigaos-gcc m68k-amigaos-gcc-ar \
