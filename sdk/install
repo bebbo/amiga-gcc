@@ -32,7 +32,8 @@ case $1 in
 					if [ ! -e "build/$2" ] || [ "$(ls -l build/$2)" == "total 0" ]; then
 						mkdir -p build/$2
 						pushd build/$2
-							lha x "../../download/$file" 
+							lha x "../../download/$file"
+							find . -type d -exec chmod +x {} \;
 						popd
 					fi
 				fi
