@@ -1,16 +1,16 @@
 Short: mhi.library
-Version: 1.1
-Url: http://aminet.net/mus/play/mhi_dev.lha
+Version: 1.2
+Url: http://aminet.net/driver/audio/mhi_dev.lha
 
-mhi_dev/Autodoc/mhi.doc
-mhi_dev/Docs/MHI_Developer.guide
-mhi_dev/Include/clib/mhi_protos.h
-mhi_dev/Include/fd/mhi_lib.fd = mhi.fd
-mhi_dev/Include/proto/mhi.h
-mhi_dev/Include/pragmas/mhi_pragmas.h
-mhi_dev/Include/pragma/mhi_lib.h
-mhi_dev/Include/libraries/mhi.h
-mhi_dev/Include/proto/mhi.h
+Autodoc/mhi.doc
+Docs/MHI_Developer.guide
+Include/clib/mhi_protos.h
+Include/fd/mhi_lib.fd = mhi.fd
+Include/proto/mhi.h
+Include/pragmas/mhi_pragmas.h
+Include/pragma/mhi_lib.h
+Include/libraries/mhi.h
+Include/proto/mhi.h
 
 fd2sfd : mhi.fd clib/mhi_protos.h
 sfdc : mhi.sfd
