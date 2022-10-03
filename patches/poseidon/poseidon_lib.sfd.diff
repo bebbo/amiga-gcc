@@ -1,0 +1,9 @@
+--- PoseidonDeveloper/includes/poseidon_lib.sfd	2022-10-03 22:47:55.159541145 +0200
++++ PoseidonDeveloper/includes/poseidon_lib.sfd	2022-10-03 22:47:13.111235537 +0200
+@@ -1,5 +1,6 @@
+ ==id $Id: poseidon_lib.sfd 1.2 2002/08/02 12:44:47 hodges Exp $
+ ==base _PsdBase
++==libname poseidon.library
+ ==bias 30
+ ==public
+ ==include <exec/types.h>

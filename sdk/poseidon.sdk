@@ -1,0 +1,30 @@
+Short: poseidon usb stack
+Version: 1.31
+Url: https://dump.platon42.de/files/PoseidonDev.lha
+
+patch : poseidon_lib.sfd.diff
+patch : usbclass_lib.sfd.diff
+
+PoseidonDeveloper/lowlevel.doc
+PoseidonDeveloper/poseidon.doc
+PoseidonDeveloper/usbclass.doc
+PoseidonDeveloper/usbhardware.doc
+PoseidonDeveloper/includes/clib/poseidon_protos.h
+PoseidonDeveloper/includes/clib/usbclass_protos.h
+PoseidonDeveloper/includes/devices/nsd.h
+PoseidonDeveloper/includes/devices/usb.h
+PoseidonDeveloper/includes/devices/usbhardware.h
+PoseidonDeveloper/includes/fd/poseidon_lib.fd
+PoseidonDeveloper/includes/fd/usbclass_lib.fd
+PoseidonDeveloper/includes/libraries/lowlevel_ext.h
+PoseidonDeveloper/includes/libraries/poseidon.h
+PoseidonDeveloper/includes/libraries/usbclass.h
+PoseidonDeveloper/includes/pragmas/poseidon_pragmas.h
+PoseidonDeveloper/includes/pragmas/usbclass_pragmas.h
+PoseidonDeveloper/includes/proto/poseidon.h
+PoseidonDeveloper/includes/proto/usbclass.h
+PoseidonDeveloper/includes/poseidon_lib.sfd = poseidon.sfd
+PoseidonDeveloper/includes/usbclass_lib.sfd = usbclass.sfd
+
+sfdc : poseidon.sfd
+sfdc : usbclass.sfd
