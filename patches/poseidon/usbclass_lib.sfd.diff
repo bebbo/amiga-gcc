@@ -1,0 +1,9 @@
+--- PoseidonDeveloper/includes/usbclass_lib.sfd	2002-09-08 21:12:38.000000000 +0200
++++ PoseidonDeveloper/includes/usbclass_lib.sfd	2022-10-03 22:55:51.279001616 +0200
+@@ -1,5 +1,6 @@
+ ==id $Id: usbclass_lib.sfd 1.1 2002/03/02 12:44:47 hodges Exp $
+ ==base _UsbClsBase
++==libname usbclass.library
+ ==bias 30
+ ==public
+ ==include <exec/types.h>
