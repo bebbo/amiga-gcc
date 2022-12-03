@@ -1,0 +1,12 @@
+Short: 	Shared lib that recognizes file types
+Version: 4.0
+Url: http://aminet.net/util/cli/WhatIs.lha
+
+
+WhatIs/include/clib/whatis_protos.h
+WhatIs/include/libraries/WhatIsBase.h
+../../patches/WhatIs/whatis.fd
+
+fd2sfd : whatis.fd clib/whatis_protos.h
+sfdc : whatis.sfd
+stubs : whatis.sfd
