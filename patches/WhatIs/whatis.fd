@@ -1,0 +1,17 @@
+##base _WhatIsBase
+##bias 30
+##public
+WhatIs(Name,TagArray)(a0,a1)
+GetIDString(Type)(a0)
+GetIconName(Type)(a0)
+GetIDType(IdString)(a0)
+CmpFileType(Type1,Type2)(a0,a1)
+GetIDStringMaxLen()()
+FirstType()()
+NextType(Type)(a0)
+AskReparse(Now)(d0)
+ParentFileType(Type)(d0)
+IsSubTypeOf(Type,ParentType)(d0,d1)
+MakeTypeInfos(SizeOfInfo)(d0)
+GetTypeInfo(Handle,Type)(a0,d0)
+FreeTypeInfos(Handle)(a0)
