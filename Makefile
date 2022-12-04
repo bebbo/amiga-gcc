@@ -137,7 +137,7 @@ help:
 	@echo "make <target>					builds a target: binutils, gcc, gprof, fd2sfd, fd2pragma, ira, sfdc, vasm, vbcc, vlink, libnix, ixemul, libgcc, clib2, libdebug, libSDL12, libpthread, ndk, ndk13"
 	@echo "make clean					remove the build folder"
 	@echo "make clean-<target>				remove the target's build folder"
-	@echo "make clean-prefix				remove all content from the prefix folder"
+	@echo "make drop-prefix				remove all content from the prefix folder"
 	@echo "make update					perform git pull for all targets"
 	@echo "make update-<target>				perform git pull for the given target"
 	@echo "make sdk=<sdk>					install the sdk <sdk>"
@@ -167,7 +167,7 @@ ifneq ($(OWNMPC),)
 clean: clean-gmp clean-mpc clean-mpfr
 endif
 
-.PHONY: clean-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk
+.PHONY: drop-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk
 clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
 	rm -rf $(BUILD)
 	rm -rf *.log
@@ -240,8 +240,8 @@ clean-libpthread:
 clean-newlib:
 	rm -rf $(BUILD)/newlib
 
-# clean-prefix drops the files from prefix folder
-clean-prefix:
+# drop-prefix drops the files from prefix folder
+drop-prefix:
 	rm -rf $(PREFIX)/bin
 	rm -rf $(PREFIX)/etc
 	rm -rf $(PREFIX)/info
