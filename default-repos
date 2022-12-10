@@ -3,7 +3,7 @@ binutils           https://github.com/bebbo/binutils-gdb		amiga
 clib2              https://github.com/bebbo/clib2				master
 fd2pragma          https://github.com/bebbo/fd2pragma			master
 fd2sfd             https://github.com/adtools/fd2sfd			master
-gcc                https://github.com/bebbo/gcc				    gcc-6-branch
+gcc                https://github.com/bebbo/gcc				amiga6
 ira                https://github.com/bebbo/ira				    master
 ixemul             https://github.com/bebbo/ixemul				master
 lha                https://github.com/jca02266/lha				master
