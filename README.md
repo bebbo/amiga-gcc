@@ -185,3 +185,6 @@ You can switch modules to different branches. E.g.
 make branch mod=binutils branch=devel1
 ```
 The default branches and repositories are in the file **default-repos**, the local state is managed in the file **.repos**.
+
+Note that the gcc default branch is now `amiga6` and there is also an `amiga10` branch.
+
