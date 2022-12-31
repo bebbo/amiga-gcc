@@ -154,8 +154,8 @@ help:
 # =================================================
 # all
 # =================================================
-.PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libSDL12 libpthread ndk ndk13 min
-all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libpthread libSDL12 ndk ndk13
+.PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libpthread ndk ndk13 min
+all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libpthread ndk ndk13 libSDL12
 
 min: binutils gcc gprof libnix libgcc
 
@@ -167,8 +167,8 @@ ifneq ($(OWNMPC),)
 clean: clean-gmp clean-mpc clean-mpfr
 endif
 
-.PHONY: drop-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk
-clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libSDL12 clean-libpthread clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr
+.PHONY: drop-prefix clean clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-libgcc clean-clib2 clean-libdebug clean-libpthread clean-newlib clean-ndk
+clean: clean-gcc clean-binutils clean-fd2sfd clean-fd2pragma clean-ira clean-sfdc clean-vasm clean-vbcc clean-vlink clean-libnix clean-ixemul clean-clib2 clean-libdebug clean-libpthread clean-newlib clean-ndk clean-gmp clean-mpc clean-mpfr clean-libSDL12
 	rm -rf $(BUILD)
 	rm -rf *.log
 	mkdir -p $(BUILD)
@@ -230,9 +230,6 @@ clean-clib2:
 
 clean-libdebug:
 	rm -rf $(BUILD)/libdebug
-
-clean-libSDL12:
-	rm -rf $(BUILD)/libSDL12
 
 clean-libpthread:
 	rm -rf $(BUILD)/libpthread
@@ -868,34 +865,6 @@ $(PROJECTS)/libdebug/configure:
 	@touch -t 0001010000 $(PROJECTS)/libdebug/configure.ac
 
 # =================================================
-# libsdl
-# =================================================
-CONFIG_LIBSDL12 := PREFX=$(PREFIX) PREF=$(PREFIX)
-
-libSDL12: $(BUILD)/libSDL12/_done
-
-$(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
-	$(MAKE) sdk=ahi
-	$(MAKE) sdk=cgx
-	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile $(CONFIG_LIBSDL12) $(L2)
-	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/m68k-amigaos/lib/ $(L2)
-	@mkdir -p $(PREFIX)/m68k-amigaos/include/GL
-	@mkdir -p $(PREFIX)/m68k-amigaos/include/SDL
-	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.i $(PREFIX)/m68k-amigaos/include/GL/
-	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.h $(PREFIX)/m68k-amigaos/include/GL/
-	@rsync -a --no-group $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/m68k-amigaos/include/SDL/
-	@echo "done" >$@
-
-$(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
-	@mkdir -p $(BUILD)/libSDL12
-	@rsync -a --no-group $(PROJECTS)/libSDL12/* $(BUILD)/libSDL12
-	@touch $(BUILD)/libSDL12/Makefile
-
-$(PROJECTS)/libSDL12/Makefile:
-	@cd $(PROJECTS) &&	git clone -b $(libSDL12_BRANCH) --depth 4 $(libSDL12_URL)
-
-
-# =================================================
 # libpthread
 # =================================================
 
@@ -1070,3 +1039,264 @@ branch:
 	else \
 		echo "$(mod) $(branch) does NOT exist!"; \
 	fi
+
+
+# =================================================
+# multilib support
+# =================================================
+MULTI = MODNAME/.: \
+		MODNAME/libm020:-m68020 \
+		MODNAME/libm020/libm881:-m68020_-m68881 \
+		MODNAME/libb:-fbaserel \
+		MODNAME/libb/libm020:-fbaserel_-m68020 \
+		MODNAME/libb/libm020/libm881:-fbaserel_-m68020_-m68881 \
+		MODNAME/libb32/libm020:-fbaserel32_-m68020 \
+		MODNAME/libb32/libm020/libm881:-fbaserel32_-m68020_-m68881
+
+# 1=module name, 2=from name, 3 = to name
+COPY_MULTILIBS = $(foreach T, $(subst MODNAME,$1,$(MULTI)),cp $(BUILD)/$(word 1,$(subst :, ,${T}))/$2 $(BUILD)/$(word 1,$(subst :, ,${T}))/$3;)
+
+# 1=module name, 2=lib name
+INSTALL_MULTILIBS = $(L0)"install $1"$(L1) $(foreach T, $(subst MODNAME,$1,$(MULTI)),rsync -av --no-group $(BUILD)/$(word 1,$(subst :, ,${T}))/$2 $(PREFIX)/lib/$(word 1,$(subst :, ,$(subst $1/,,${T})));) $(L2)
+
+# 1=module name 3,4... = params for make
+MULTIMAKE = $(L0)"make $1"$(L1) $(foreach T,$(subst MODNAME,$1,$(MULTI)), $(MAKE) -C $(BUILD)/$(word 1,$(subst :, ,${T})) $3 $4 $5 $6 $7 $8;) $(L2)
+
+# 1=module name 2=multilib path 3=cflags
+MULTICONFIGURE1 = mkdir -p $(BUILD)/$2 && cd $(BUILD)/$2 && \
+	PKG_CONFIG=/bin/false CC=m68k-amigaos-gcc CXX=m68k-amigaos-g++ AR=m68k-amigaos-ar LD=m68k-amigaos-ld CFLAGS="$(subst _, ,$3) -noixemul $(CFLAGS_FOR_TARGET)" $(PROJECTS)/$1/configure
+
+# 1=module name 3,4...= params for configure
+MULTICONFIGURE = $(L0)"configure $1"$(L1) $(foreach T,$(subst MODNAME,$1,$(MULTI)),$(call MULTICONFIGURE1,$1,$(word 1,$(subst :, ,${T})),$(word 2,$(subst :, ,${T}))) $3 $4 $5 $6 $7 $8;)$(L2)
+
+# =================================================
+# zlib
+# =================================================
+ZLIB=zlib-1.2.13
+
+.PHONY: zlib clean-zlib
+
+clean-zlib:
+	rm -rf $(BUILD)/$(ZLIB)
+
+zlib: $(BUILD)/$(ZLIB)/_done
+
+$(BUILD)/$(ZLIB)/_done: $(PREFIX)/lib/libz.a
+	@echo "done" >$@
+
+$(PREFIX)/lib/libz.a: $(BUILD)/$(ZLIB)/libz.a
+	@rsync -a --no-group $(PROJECTS)/$(ZLIB)/zlib.h $(PREFIX)/include/ 
+	@rsync -a --no-group $(BUILD)/$(ZLIB)/zconf.h $(PREFIX)/include/
+	$(call INSTALL_MULTILIBS,$(ZLIB),libz.a)
+	@touch $@
+
+$(BUILD)/$(ZLIB)/libz.a: $(BUILD)/$(ZLIB)/Makefile
+	+$(call MULTIMAKE,$(ZLIB),libz.a)
+	@touch $@
+
+$(BUILD)/$(ZLIB)/Makefile: $(PROJECTS)/$(ZLIB)/configure
+	$(call MULTICONFIGURE,$(ZLIB),libz.a,)
+	@touch $@
+
+$(PROJECTS)/$(ZLIB)/configure: $(DOWNLOAD)/$(ZLIB).tar.xz
+	tar -C $(PROJECTS) -xf $(DOWNLOAD)/$(ZLIB).tar.xz
+	@touch $@
+
+$(DOWNLOAD)/$(ZLIB).tar.xz:
+	cd $(DOWNLOAD) && wget https://zlib.net/$(ZLIB).tar.xz
+
+# =================================================
+# libpng
+# =================================================
+LIBPNG=libpng-1.6.39
+
+.PHONY: libpng clean-libpng
+
+clean-libpng:
+	rm -rf $(BUILD)/$(LIBPNG)
+
+libpng: $(BUILD)/$(LIBPNG)/_done
+
+$(BUILD)/$(LIBPNG)/_done: $(PREFIX)/lib/libpng.a
+	@echo "done" >$@
+
+$(PREFIX)/lib/libpng.a: $(BUILD)/$(LIBPNG)/libpng.a
+	@rsync -a --no-group $(PROJECTS)/$(LIBPNG)/png.h $(PREFIX)/include/ 
+	@rsync -a --no-group $(PROJECTS)/$(LIBPNG)/pngconf.h $(PREFIX)/include/ 
+	@rsync -a --no-group $(BUILD)/$(LIBPNG)/pnglibconf.h $(PREFIX)/include/
+	@$(call COPY_MULTILIBS,$(LIBPNG),.libs/libpng16.a,libpng.a)
+	$(call INSTALL_MULTILIBS,$(LIBPNG),libpng.a)
+	@touch $@
+
+$(BUILD)/$(LIBPNG)/libpng.a: $(BUILD)/$(LIBPNG)/Makefile
+	+$(call MULTIMAKE,$(LIBPNG),libpng.a)
+	@touch $@
+
+$(BUILD)/$(LIBPNG)/Makefile: $(PROJECTS)/$(LIBPNG)/configure
+	$(call MULTICONFIGURE,$(LIBPNG),libpng.a,--host=m68k-amigaos)
+	@touch $@
+
+$(PROJECTS)/$(LIBPNG)/configure: $(DOWNLOAD)/$(LIBPNG).tar.xz $(BUILD)/$(ZLIB)/_done $(BUILD)/libnix/_done
+	tar -C $(PROJECTS) -xf $(DOWNLOAD)/$(LIBPNG).tar.xz
+	@touch $@
+
+$(DOWNLOAD)/$(LIBPNG).tar.xz:
+	cd $(DOWNLOAD) && wget https://sourceforge.net/projects/libpng/files/libpng16/$(subst libpng-,,$(LIBPNG))/$(LIBPNG).tar.xz
+
+# =================================================
+# libfreetype
+# =================================================
+LIBFREETYPE=freetype-2.12.1
+
+.PHONY: libfreetype2 clean-libfreetype2
+
+clean-libfreetype2:
+	rm -rf $(BUILD)/$(LIBFREETYPE)
+
+libfreetype2: $(BUILD)/$(LIBFREETYPE)/_done
+
+$(BUILD)/$(LIBFREETYPE)/_done: $(PREFIX)/lib/libfreetype.a
+	@echo "done" >$@
+
+$(PREFIX)/lib/libfreetype.a: $(BUILD)/$(LIBFREETYPE)/libfreetype.a
+	@rsync -a --no-group $(PROJECTS)/$(LIBFREETYPE)/include/ft2build.h $(PREFIX)/include/ 
+	@rsync -a --no-group $(PROJECTS)/$(LIBFREETYPE)/include/freetype $(PREFIX)/include/ 
+	@$(call COPY_MULTILIBS,$(LIBFREETYPE),.libs/libfreetype.a,libfreetype.a)
+	$(call INSTALL_MULTILIBS,$(LIBFREETYPE),libfreetype.a)
+	@touch $@
+
+$(BUILD)/$(LIBFREETYPE)/libfreetype.a: $(BUILD)/$(LIBFREETYPE)/Makefile
+	+$(call MULTIMAKE,$(LIBFREETYPE),libfreetype.a)
+	@touch $@
+
+$(BUILD)/$(LIBFREETYPE)/Makefile: $(PROJECTS)/$(LIBFREETYPE)/configure
+	$(call MULTICONFIGURE,$(LIBFREETYPE),libfreetype.a,--host=m68k-amigaos,--disable-shared)
+	@touch $@
+
+$(PROJECTS)/$(LIBFREETYPE)/configure: $(DOWNLOAD)/$(LIBFREETYPE).tar.xz $(BUILD)/libnix/_done
+	tar -C $(PROJECTS) -xf $(DOWNLOAD)/$(LIBFREETYPE).tar.xz
+	@touch $@
+
+$(DOWNLOAD)/$(LIBFREETYPE).tar.xz:
+	cd $(DOWNLOAD) && wget https://download.savannah.gnu.org/releases/freetype/$(LIBFREETYPE).tar.xz
+
+# =================================================
+# libsdl this is 68030 only ...
+# =================================================
+LIBSDL12=libSDL12
+CONFIG_LIBSDL12 := PREFX=$(PREFIX) PREF=$(PREFIX)
+
+.PHONY: libSDL12 clean-libSDL12
+clean-libSDL12:
+	rm -rf $(BUILD)/$(LIBSDL12)
+
+
+libSDL12: $(BUILD)/libSDL12/_done
+
+$(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
+	$(MAKE) sdk=ahi
+	$(MAKE) sdk=cgx
+	$(L0)"make libSDL12"$(L1) cd $(BUILD)/libSDL12 && CFLAGS="$(CFLAGS_FOR_TARGET)" $(MAKE) -f Makefile $(CONFIG_LIBSDL12) $(L2)
+	$(L0)"install libSDL12"$(L1) cp $(BUILD)/libSDL12/libSDL.a $(PREFIX)/lib/ $(L2)
+	@mkdir -p $(PREFIX)/include/GL
+	@mkdir -p $(PREFIX)/include/SDL
+	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.i $(PREFIX)/include/GL/
+	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.h $(PREFIX)/include/GL/
+	@rsync -a --no-group $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/include/SDL/
+	@echo "done" >$@
+
+$(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
+	@mkdir -p $(BUILD)/libSDL12
+	@rsync -a --no-group $(PROJECTS)/libSDL12/* $(BUILD)/libSDL12
+	@touch $(BUILD)/libSDL12/Makefile
+
+$(PROJECTS)/libSDL12/Makefile:
+	@cd $(PROJECTS) &&      git clone -b $(libSDL12_BRANCH) --depth 4 $(libSDL12_URL)
+
+# =================================================
+# libSDLmixer
+# =================================================
+LIBSDLMIXER=SDL_mixer-SDL-1.2
+
+# 1=module name
+MULTICC_SDLMIXER = $(L0)"compiling $1"$(L1) $(foreach T,$(subst MODNAME,$1,$(MULTI)), cd $(BUILD)/$(word 1,$(subst :, ,${T})) && \
+	m68k-amigaos-gcc -c $$(grep "CFLAGS  =" Makefile | cut -d "=" -f 2 | sed -e 's|srcdir|$(PROJECTS)/${T}|g') $$(grep "EXTRA_CFLAGS =" Makefile | cut -d "=" -f 2) \
+	-I $(PREFIX)/include/SDL \
+	$(PROJECTS)/$1/*.c && \
+	m68k-amigaos-ar rcs $2 *.o \
+	;) $(L2)
+
+.PHONY: libsdlmixer clean-libsdlmixer
+
+clean-libsdlmixer:
+	rm -rf $(BUILD)/$(LIBSDLMIXER)
+
+libsdlmixer: $(BUILD)/$(LIBSDLMIXER)/_done
+
+$(BUILD)/$(LIBSDLMIXER)/_done: $(PREFIX)/lib/libSDL_mixer.a
+	@echo "done" >$@
+
+$(PREFIX)/lib/libSDL_mixer.a: $(BUILD)/$(LIBSDLMIXER)/libSDL_mixer.a
+	@mkdir -p $(PREFIX)/include/SDL
+	@rsync -a --no-group $(PROJECTS)/$(LIBSDLMIXER)/SDL_mixer.h $(PREFIX)/include/SDL
+	$(call INSTALL_MULTILIBS,$(LIBSDLMIXER),libSDL_mixer.a)
+	@touch $@
+
+$(BUILD)/$(LIBSDLMIXER)/libSDL_mixer.a: $(BUILD)/$(LIBSDLMIXER)/Makefile
+	+$(call MULTICC_SDLMIXER,$(LIBSDLMIXER),libSDL_mixer.a)
+	@touch $@
+
+$(BUILD)/$(LIBSDLMIXER)/Makefile: $(PROJECTS)/$(LIBSDLMIXER)/configure
+	$(call MULTICONFIGURE,$(LIBSDLMIXER),libSDL_mixer.a,--host=m68k-amigaos,--disable-shared,--enable-static,--prefix=$(PREFIX))
+	@touch $@
+
+$(PROJECTS)/$(LIBSDLMIXER)/configure: $(DOWNLOAD)/$(LIBSDLMIXER).tar.gz $(BUILD)/libSDL12/_done $(BUILD)/libnix/_done
+	tar -C $(PROJECTS) -xf $(DOWNLOAD)/$(LIBSDLMIXER).tar.gz
+	@touch $@
+
+$(DOWNLOAD)/$(LIBSDLMIXER).tar.gz:
+	cd $(DOWNLOAD) && wget https://github.com/SDL-mirror/SDL_mixer/archive/SDL-1.2.tar.gz -O $(LIBSDLMIXER).tar.gz
+
+# =================================================
+# libSDLttf
+# =================================================
+LIBSDLTTF=SDL_ttf-SDL-1.2
+
+# 1=module name
+MULTICC_SDLTTF = $(L0)"compiling $1"$(L1) $(foreach T,$(subst MODNAME,$1,$(MULTI)), cd $(BUILD)/$(word 1,$(subst :, ,${T})) && \
+	m68k-amigaos-gcc -c $$(grep "CFLAGS  =" Makefile | cut -d "=" -f 2 | sed -e 's|srcdir|$(PROJECTS)/${T}|g') $$(grep "EXTRA_CFLAGS =" Makefile | cut -d "=" -f 2) \
+	-I $(PREFIX)/m68k-amigaos/include/SDL \
+	$(PROJECTS)/$1/*.c && \
+	m68k-amigaos-ar rcs $2 *.o \
+	;) $(L2)
+
+.PHONY: libsdlttf clean-libsdlttf
+
+clean-libsdlttf:
+	rm -rf $(BUILD)/$(LIBSDLTTF)
+
+libsdlttf: $(BUILD)/$(LIBSDLTTF)/_done
+
+$(BUILD)/$(LIBSDLTTF)/_done: $(PREFIX)/lib/libSDL_ttf.a
+	@echo "done" >$@
+
+$(PREFIX)/lib/libSDL_ttf.a: $(BUILD)/$(LIBSDLTTF)/libSDL_ttf.a
+	@mkdir -p $(PREFIX)/include/SDL
+	@rsync -a --no-group $(PROJECTS)/$(LIBSDLTTF)/SDL_ttf.h $(PREFIX)/include/SDL
+	$(call INSTALL_MULTILIBS,$(LIBSDLTTF),libSDL_ttf.a)
+	@touch $@
+
+$(BUILD)/$(LIBSDLTTF)/libSDL_ttf.a: $(BUILD)/$(LIBSDLTTF)/Makefile
+	+$(call MULTICC_SDLTTF,$(LIBSDLTTF),libSDL_ttf.a)
+	@touch $@
+
+$(BUILD)/$(LIBSDLTTF)/Makefile: $(PROJECTS)/$(LIBSDLTTF)/configure
+	$(call MULTICONFIGURE,$(LIBSDLTTF),libSDL_ttf.a,--host=m68k-amigaos,--disable-shared,--enable-static,--prefix=$(PREFIX))
+	@touch $@
+
+$(PROJECTS)/$(LIBSDLTTF)/configure: $(DOWNLOAD)/$(LIBSDLTTF).tar.gz $(BUILD)/libSDL12/_done $(BUILD)/libnix/_done
+	tar -C $(PROJECTS) -xf $(DOWNLOAD)/$(LIBSDLTTF).tar.gz
+	@touch $@
+
+$(DOWNLOAD)/$(LIBSDLTTF).tar.gz:
+	cd $(DOWNLOAD) && wget https://github.com/SDL-mirror/SDL_ttf/archive/SDL-1.2.tar.gz -O $(LIBSDLTTF).tar.gz
