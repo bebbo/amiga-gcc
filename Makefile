@@ -102,7 +102,10 @@ FLOCK := $(has_flock)
 endif
 
 L0 = @__p=
-L00 = __p=
+L00 = __p
+ifneq ($(VERBOSE),)
+verbose = $(VERBOSE)
+endif
 ifeq ($(verbose),)
 L1 = ; ($(FLOCK) 200; echo -e \\033[33m$$__p...\\033[0m >>.state; echo -ne \\033[33m$$__p...\\033[0m ) 200>.lock; mkdir -p log; __l="log/$$__p.log" ; (
 L2 = )$(TEEEE) "$$__l"; __r=$$?; ($(FLOCK) 200; if (( $$__r > 0 )); then \
