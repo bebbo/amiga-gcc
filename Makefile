@@ -343,7 +343,12 @@ update-mpfr:
 # =================================================
 # binutils
 # =================================================
-CONFIG_BINUTILS :=--prefix=$(PREFIX) --target=$(TARGET) --disable-plugins --disable-werror --enable-tui --disable-nls
+CONFIG_BINUTILS =--prefix=$(PREFIX) --target=$(TARGET) --disable-werror --enable-tui --disable-nls
+
+ifneq (m68k-elf,$(TARGET))
+CONFIG_BINUTILS += --disable-plugins
+endif
+
 BINUTILS_CMD := $(TARGET)-addr2line $(TARGET)-ar $(TARGET)-as $(TARGET)-c++filt \
 	$(TARGET)-ld $(TARGET)-nm $(TARGET)-objcopy $(TARGET)-objdump $(TARGET)-ranlib \
 	$(TARGET)-readelf $(TARGET)-size $(TARGET)-strings $(TARGET)-strip
