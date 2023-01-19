@@ -31,7 +31,7 @@ If building with a normal user, the `PREFIX` directory must be writable (default
 Install Homebrew (https://brew.sh/) or any other package manager first. The compiler will be installed together with XCode. Once XCode and Homebrew are up install the required packages:
 
 ```
-brew install bash wget make lhasa gmp mpfr libmpc flex gettext gnu-sed texinfo gcc@12 make autoconf
+brew install bash wget make lhasa gmp mpfr libmpc flex gettext gnu-sed texinfo gcc@12 make autoconf bison
 ```
 
 By default macOS uses an outdated version of bash. Therefore, on macOS host always pass the the SHELL=/usr/local/bin/bash parameter (or any other valid path pointing to bash), e.g.:
@@ -46,7 +46,16 @@ On macOS it may be also necessary to point to the brew version of gcc make and a
 CC=gcc-12 CXX=g++-12 gmake all SHELL=$(brew --prefix)/bin/bash
 ```
 
-**ALSO NOTE** If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
+**NOTE**
+
+* If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
+* The `gdb` build also needs a more recent `bison` version than the one installed
+  in macOS. Use the version from Homebrew instead. It's keg only so you need
+  to add it to your `PATH` manually:
+
+```
+export PATH=$(brew --prefix bison)/bin:$PATH
+```
 
 ### macOS on M1
 Native builds on M1 Macs are now directly supported.
