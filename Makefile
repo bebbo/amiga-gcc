@@ -349,6 +349,17 @@ ifneq (m68k-elf,$(TARGET))
 CONFIG_BINUTILS += --disable-plugins
 endif
 
+# FreeBSD, OSX : libs added by the command brew install gmp
+ifeq (Darwin, $(findstring Darwin, $(UNAME_S)))
+	BREW_PREFIX := $$(brew --prefix)
+	CONFIG_BINUTILS += --with-libgmp-prefix=$(BREW_PREFIX)
+endif
+
+ifeq (FreeBSD, $(findstring FreeBSD, $(UNAME_S)))
+	PORTS_PREFIX?=/usr/local
+	CONFIG_BINUTILS += --with-libgmp-prefix=$(PORTS_PREFIX)
+endif
+
 BINUTILS_CMD := $(TARGET)-addr2line $(TARGET)-ar $(TARGET)-as $(TARGET)-c++filt \
 	$(TARGET)-ld $(TARGET)-nm $(TARGET)-objcopy $(TARGET)-objdump $(TARGET)-ranlib \
 	$(TARGET)-readelf $(TARGET)-size $(TARGET)-strings $(TARGET)-strip
