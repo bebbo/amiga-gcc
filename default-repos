@@ -1,5 +1,5 @@
 amiga-netinclude   https://github.com/bebbo/amiga-netinclude	master
-binutils           https://github.com/bebbo/binutils-gdb		amiga-2.35.2
+binutils           https://github.com/bebbo/binutils-gdb		amiga
 clib2              https://github.com/bebbo/clib2				master
 fd2pragma          https://github.com/bebbo/fd2pragma			master
 fd2sfd             https://github.com/adtools/fd2sfd			master
