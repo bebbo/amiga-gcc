@@ -644,24 +644,40 @@ $(BUILD)/_lha_done:
 
 
 .PHONY: vbcc-target
-vbcc-target: $(BUILD)/vbcc_target_$(TARGET)/_done
+vbcc-target: $(BUILD)/vbcc_target_$(TARGET)/_done $(BUILD)/vbcc_target_m68k-kick13/_done
 
-$(BUILD)/vbcc_target_$(TARGET)/_done: $(BUILD)/vbcc_target_$(TARGET).info patches/vc.config $(BUILD)/vasm/_done
-	@mkdir -p $(PREFIX)/$(TARGET)/vbcc/include
-	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_$(TARGET)/targets/$(TARGET)/include/* $(PREFIX)/$(TARGET)/vbcc/include $(L2)
-	@mkdir -p $(PREFIX)/$(TARGET)/vbcc/lib
-	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_$(TARGET)/targets/$(TARGET)/lib/* $(PREFIX)/$(TARGET)/vbcc/lib $(L2)
+$(BUILD)/vbcc_target_m68k-kick13/_done: $(BUILD)/vbcc_target_m68k-kick13.info patches/vc.config $(BUILD)/vasm/_done
+	@mkdir -p $(PREFIX)/m68k-kick13/vbcc/include
+	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_m68k-kick13/targets/m68k-kick13/include/* $(PREFIX)/m68k-kick13/vbcc/include $(L2)
+	@mkdir -p $(PREFIX)/m68k-kick13/vbcc/lib
+	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_m68k-kick13/targets/m68k-kick13/lib/* $(PREFIX)/m68k-kick13/vbcc/lib $(L2)
+	@echo "done" >$@
+	$(L0)"creating vbcc kick13 config"$(L1) $(SED) -e "s|PREFIX|$(PREFIX)|g" patches/kick13.config >$(BUILD)/vasm/kick13.config ;\
+	install $(BUILD)/vasm/kick13.config $(PREFIX)/bin/ $(L2)
+
+$(BUILD)/vbcc_target_m68k-amigaos/_done: $(BUILD)/vbcc_target_m68k-amigaos.info $(BUILD)/vasm/_done
+	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/include
+	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/include/* $(PREFIX)/m68k-amigaos/vbcc/include $(L2)
+	@mkdir -p $(PREFIX)/m68k-amigaos/vbcc/lib
+	$(L0)"copying vbcc headers"$(L1) rsync --no-group $(BUILD)/vbcc_target_m68k-amigaos/targets/m68k-amigaos/lib/* $(PREFIX)/m68k-amigaos/vbcc/lib $(L2)
 	@echo "done" >$@
 	$(L0)"creating vbcc config"$(L1) $(SED) -e "s|PREFIX|$(PREFIX)|g" patches/vc.config >$(BUILD)/vasm/vc.config ;\
 	install $(BUILD)/vasm/vc.config $(PREFIX)/bin/ $(L2)
 
 
-$(BUILD)/vbcc_target_$(TARGET).info: $(DOWNLOAD)/vbcc_target_$(TARGET).lha $(BUILD)/_lha_done
-	$(L0)"unpack vbcc_target_$(TARGET)"$(L1) cd $(BUILD) && lha xf $(DOWNLOAD)/vbcc_target_$(TARGET).lha $(L2)
-	@touch $(BUILD)/vbcc_target_$(TARGET).info
+$(BUILD)/vbcc_target_m68k-kick13.info: $(DOWNLOAD)/vbcc_target_m68k-kick13.lha $(BUILD)/_lha_done
+	$(L0)"unpack vbcc_target_m68k-kick13"$(L1) cd $(BUILD) && lha xf $(DOWNLOAD)/vbcc_target_m68k-kick13.lha $(L2)
+	@touch $(BUILD)/vbcc_target_m68k-kick13.info
 
-$(DOWNLOAD)/vbcc_target_$(TARGET).lha:
-	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha -O vbcc_target_$(TARGET).lha $(L2)
+$(BUILD)/vbcc_target_m68k-amigaos.info: $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha $(BUILD)/_lha_done
+	$(L0)"unpack vbcc_target_m68k-amigaos"$(L1) cd $(BUILD) && lha xf $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha $(L2)
+	@touch $(BUILD)/vbcc_target_m68k-amigaos.info
+
+$(DOWNLOAD)/vbcc_target_m68k-kick13.lha:
+	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-kick13.lha -O vbcc_target_m68k-kick13.lha $(L2)
+
+$(DOWNLOAD)/vbcc_target_m68k-amigaos.lha:
+	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha -O vbcc_target_m68k-amigaos.lha $(L2)
 
 # =================================================
 # L I B R A R I E S
