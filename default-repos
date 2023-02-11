@@ -14,5 +14,5 @@ newlib-cygwin      https://github.com/bebbo/newlib-cygwin		amiga
 sfdc               https://github.com/bebbo/sfdc				master
 vasm               https://github.com/mheyer32/vasm			    master
 vbcc               https://github.com/bebbo/vbcc				master
-vlink              https://github.com/mheyer32/vlink			master
+vlink              https://github.com/bebbo/vlink			master
 aros-stuff         https://github.com/bebbo/aros-stuff			master
