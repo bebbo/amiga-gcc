@@ -14,6 +14,30 @@ Right now these tools are build:
 * vlink
 * libnix
 * ixemul (not really, but the headers are used)
+# COPYRIGHTS
+* amiga-netinclude: 'Roadshow' -- Amiga TCP/IP stack, Copyright © 2001-2016 by Olaf Barthel. Freely Distributable.
+* aros-stuff: libpthread, Copyright (C) 2014 Szilard Biro.
+* binutils: Free Software Foundation, GNU GENERAL PUBLIC LICENSE V2.
+* clib2: Copyright (c) 2002-2015 by Olaf Barthel.
+* fd2pragma: Dirk Stoecker, public domain.
+* fd2sfd: Martin Blom et al, GNU GENERAL PUBLIC LICENSE V2.
+* gcc: Free Software Foundation, GNU GENERAL PUBLIC LICENSE V2.
+* ira: Tim Ruehsen, Ilkka Lehtoranta, Frank Wille, Nicolas Bastien. Freeware.
+* ixemul: Markus Wild, Rafael W. Luebbert, Leonard Norrgard, Jeff Shepherd, Matthias Fleischer, Hans Verkuil. GNU GENERAL PUBLIC LICENSE V2.
+* libdebug: ?, GNU GENERAL PUBLIC LICENSE V2.
+* libnix: Matthias Fleischer, Gunther Nikl. Public Domain.
+* NDK3.2: Hyperion, unknown license...
+* newlib: Free Software Foundation, GNU GENERAL PUBLIC LICENSE V2.
+* sfdc: Martin Blom, GNU GENERAL PUBLIC LICENSE V2.
+* vasm: copyright in 2002-2022 by Volker Barthelmann, free for non-commercial purposes.
+* vbcc: copyright in 1995-2022 by Volker Barthelmann, free for non-commercial purposes.
+* vlink: copyright 1995-2022 by Frank Wille, free for non-commercial purposes.
+
+There are also libraries - calles SDK - which can be downloaded and installed plus libraries that are built from source. All of these provide their own copyrights - too long to list here.
+
+To get it work together and enhance it, some patches are applied here and there and the gcc compiler contains a tad more hacks/enhancements.
+None if these changese modifies the original copyright in any way. All other stuff here is published using the GNU GENERAL PUBLIC LICENSE V2.
+
 # Short Guide
 ## Prerequisites
 ### Centos
