@@ -100,14 +100,14 @@ make all 		          build and install all
 make <target>		      builds a target: binutils, gcc, fd2sfd, fd2pragma, ira, sfdc, vbcc, vlink, libnix, ixemul, libgcc
 make clean		        remove the build folder
 make clean-<target>	  remove the target's build folder
-make clean-prefix	    remove all content from the prefix folder
+make drop-prefix	    remove all content from the prefix folder, beware!
 make update		        perform git pull for all targets
 make update-<target>	perform git pull for the given target
 ```
 display which targets can be build, you'll mostly use
 *`make all`
 *`make clean`
-*`make clean-prefix`
+*`make drop-prefix`
 
 to use NDK3.2 add `NDK=3.2` to the make parameters
 
@@ -131,7 +131,7 @@ Simply run `make all`. Also add -j to speedup the build.
 
 ```
 make clean
-make clean-prefix
+make drop-prefix
 time make all -j3
 ```
 takes roughly 10 minutes on my laptop running ubuntu. takes forever running cygwin on windows^^.
