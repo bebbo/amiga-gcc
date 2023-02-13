@@ -819,14 +819,14 @@ $(PROJECTS)/amiga-netinclude/README.md:
 # =================================================
 # libamiga
 # =================================================
-LIBAMIGA := $(PREFIX)/$(TARGET)/lib/libamiga.a $(PREFIX)/$(TARGET)/lib/libb/libamiga.a
+LIBAMIGA := $(PREFIX)/$(TARGET)/lib/libamiga.a
 
 libamiga: $(LIBAMIGA)
 	@echo "built $(LIBAMIGA)"
 
-$(LIBAMIGA):
+$(LIBAMIGA): $(BUILD)/ndk-include_ndk $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib
 	@mkdir -p $(@D)
-	@cp -p $(patsubst $(PREFIX)/$(TARGET)/%,%,$@) $(@D)
+	@cp $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib $@
 
 # =================================================
 # libnix
