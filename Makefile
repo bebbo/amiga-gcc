@@ -826,7 +826,8 @@ libamiga: $(LIBAMIGA)
 
 $(LIBAMIGA): $(BUILD)/ndk-include_ndk $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib
 	@mkdir -p $(@D)
-	@cp $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib $@
+	#@cp $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib $@
+	@cp lib/libamiga.a $@
 
 # =================================================
 # libnix
