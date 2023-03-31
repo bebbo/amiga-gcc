@@ -15,6 +15,10 @@
 #define	NULL	0
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 __stdargs void *memset(void *, int, size_t);
 __stdargs void *memcpy(void *, const void *, size_t);
 __stdargs char *strchr(const char *, int);
@@ -69,5 +73,10 @@ __stdargs void *mempcpy(void *, const void *, size_t);
 #else
 #include "strsup.h"
 #endif
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 
 #endif // _STRING_H_
