@@ -147,7 +147,6 @@ help:
 	@echo "make update-<target>				perform git pull for the given target"
 	@echo "make sdk=<sdk>					install the sdk <sdk>"
 	@echo "make all-sdk					install all sdks"
-	@echo "make info					display some info"
 	@echo "make l   					print the last log entry for each project"
 	@echo "make b   					print the branch for each project"
 	@echo "make r   					print the remote for each project"
