@@ -824,7 +824,7 @@ LIBAMIGA := $(PREFIX)/$(TARGET)/lib/libamiga.a
 libamiga: $(LIBAMIGA)
 	@echo "built $(LIBAMIGA)"
 
-$(LIBAMIGA): $(BUILD)/ndk-include_ndk $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib
+$(LIBAMIGA): 
 	@mkdir -p $(@D)
 	#@cp $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib $@
 	@cp lib/libamiga.a $@
