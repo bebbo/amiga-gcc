@@ -111,7 +111,9 @@ SDK/MUI/sfd/muimaster_lib.sfd
 fd2sfd : muimaster_lib.fd clib/muimaster_protos.h
 sfdc : muimaster_lib.sfd muimaster.h muimaster_lib.h
 stubs : muimaster_lib.sfd
-lib : muimaster_lib.sfd
+liba : muimaster_lib.sfd
 patch : SDK/MUI/C/include/libraries/mui.h
+patch : libmui.c
+libc : muimaster_lib.sfd
 sed : m68k-amigaos/include/proto/muimaster_lib.h "s/(#\s+include <inline\/muimaster_lib.h>)/#define NO_INLINE_STDARG\n#define NO_INLINE_VARARGS\n\1\n#undef NO_INLINE_STDARG\n#undef NO_INLINE_VARARGS\n/g"
 symlink: include/proto/muimaster_lib.h include/proto/muimaster.h

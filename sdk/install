@@ -96,6 +96,21 @@ case $1 in
 				echo $3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o
 				$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o || exit 1
 			;;
+			liba)
+				sfd=${a[1]}
+				file=$(basename $sfd)
+				name=${file%????}
+				$3/bin/sfdc --mode=stubs --target=m68k-amigaos --output=build/$2/lib$2.c $3/m68k-amigaos/lib/sfd/$name.sfd || exit 1
+				sed -i.bak -e 's/__inline//g' -e 's/: \"d0\",/:/g' build/$2/lib$2.c || exit 1
+				rm build/$2/lib$2.c.bak
+			;;
+			libc)
+				echo $3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/lib$2.c -c
+				$3/bin/m68k-amigaos-gcc -Os -noixemul -fomit-frame-pointer build/$2/lib$2.c -c -o build/$2/lib$2.o || exit 1
+				echo $3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o
+				$3/bin/m68k-amigaos-ar r $3/m68k-amigaos/lib/lib$2.a build/$2/lib$2.o || exit 1
+			;;
+			
 			redirinc)
 				echo creating redirecting header $3/m68k-amigaos/include/${a[1]}
 				echo "#include \"${a[2]}\"" >$3/m68k-amigaos/include/${a[1]}
