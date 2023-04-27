@@ -1073,11 +1073,13 @@ branch:
 	    mv .repos .repos.bak; \
 	    grep -v $(mod) .repos.bak > .repos; \
 	    echo "$(mod) $$url $(branch)" >> .repos; \
-	    pushd projects/$(mod); \
-	    git fetch origin $(branch):$(branch); \
-	    git checkout $(branch); \
-	    git branch --set-upstream-to=origin/$(branch) $(branch); \
-	    popd ; \
+	    if [ -d  projects/$(mod) ]; then \
+	      pushd projects/$(mod); \
+	      git fetch origin $(branch):$(branch); \
+	      git checkout $(branch); \
+	      git branch --set-upstream-to=origin/$(branch) $(branch); \
+	      popd ; \
+	   fi \
 	else \
 		echo "$(mod) $(branch) does NOT exist!"; \
 	fi
