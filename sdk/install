@@ -57,6 +57,7 @@ case $1 in
 				rm $3/m68k-amigaos/include/proto/$name.h.bak
 				mkdir -p $3/m68k-amigaos/include/inline/
 				$3/bin/sfdc --mode=macros --target=m68k-amigaos --output=$3/m68k-amigaos/include/inline/$name.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+				$3/bin/sfdc --mode=macros --target=m68kvbcc-amigaos --output=$3/m68k-amigaos/include/inline/${name}_protos.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
 				mkdir -p $3/m68k-amigaos/include/lvo/
 				$3/bin/sfdc --mode=lvo --target=m68k-amigaos --output=$3/m68k-amigaos/include/lvo/$name.i $3/m68k-amigaos/lib/sfd/$sfd || exit 1
 				if [ "${a[2]}" != "" ] && [ "${a[3]}" != "" ]; then
@@ -65,7 +66,8 @@ case $1 in
 					sed -i.bak -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/proto/$name.h
 					sed -i.bak -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/lvo/$name.i
 					sed -i.bak -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/inline/$name.h
-					rm $3/m68k-amigaos/include/proto/$name.h.bak $3/m68k-amigaos/include/lvo/$name.i.bak $3/m68k-amigaos/include/inline/$name.h.bak
+					sed -i.bak -e "s/${a[2]}/${a[3]}/" $3/m68k-amigaos/include/inline/${name}_protos.h
+					rm $3/m68k-amigaos/include/proto/$name.h.bak $3/m68k-amigaos/include/lvo/$name.i.bak $3/m68k-amigaos/include/inline/$name.h.bak $3/m68k-amigaos/include/inline/${name}_protos.h.bak
 				fi
 			;;
 			stubs)
