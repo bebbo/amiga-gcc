@@ -72,6 +72,7 @@ CC=gcc-12 CXX=g++-12 gmake all SHELL=$(brew --prefix)/bin/bash
 
 **NOTE**
 
+* You might need to use the brew version of make when building your projects (e.g.: `gmake`). Link failures are known to happen with GNU Make 3.81, but to succeed with GNU Make 4.4.1 on the same machine and project
 * If you want `m68k-amigaos-gdb` then you have to build it with `gcc`
 * The `gdb` build also needs a more recent `bison` version than the one installed
   in macOS. Use the version from Homebrew instead. It's keg only so you need
