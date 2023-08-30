@@ -46,6 +46,13 @@ case $1 in
 				mkdir -p $3/m68k-amigaos/lib/sfd/
 				$3/bin/fd2sfd -o $3/m68k-amigaos/lib/sfd/$name.sfd $3/m68k-amigaos/lib/fd/$fd $3/m68k-amigaos/include/$proto || exit 1
 			;;
+			clib)
+				sfd=${a[1]}
+				file=$(basename $sfd)
+				name=${file%????}
+				mkdir -p $3/m68k-amigaos/include/clib/
+				$3/bin/sfdc --mode=clib --target=m68k-amigaos --output=$3/m68k-amigaos/include/clib/${name}_protos.h $3/m68k-amigaos/lib/sfd/$sfd || exit 1
+			;;
 			sfdc)
 				sfd=${a[1]}
 				file=$(basename $sfd)

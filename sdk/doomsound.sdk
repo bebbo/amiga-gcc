@@ -1,0 +1,8 @@
+Short: New Sound & Music Libraries for DOOM ports
+Version: 38.0
+Url: http://aminet.net/game/shoot/DoomSndLibs.lha
+
+doomsound_lib.sfd = doomsound.sfd
+
+sfdc : doomsound.sfd
+clib : doomsound.sfd
