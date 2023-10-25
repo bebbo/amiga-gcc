@@ -220,5 +220,17 @@ make branch mod=binutils branch=devel1
 ```
 The default branches and repositories are in the file **default-repos**, the local state is managed in the file **.repos**.
 
-Note that the gcc default branch is now `amiga6` and there is also an `amiga10` branch.
-
+Note that the gcc default branch is now `amiga6` and there is also an `amiga13.1` branch. To switch gcc to a specific branch use
+```
+make branch branch=amiga13.1 mod=gcc
+```
+If you start from scratch, switch gcc as soon as possible, e.g.:
+```
+sudo mkdir -p /opt/amiga13
+sudo chown $USER /opt/amiga13
+git clone https://github.com/bebbo/amiga-gcc
+cd amiga-gcc
+export PREFIX=/opt/amiga13
+make branch branch=amiga13.1 mod=gcc
+make all -j20
+```
