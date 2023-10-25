@@ -1251,6 +1251,9 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
 	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.i $(PREFIX)/include/GL/
 	@rsync -a --no-group $(BUILD)/libSDL12/include/GL/*.h $(PREFIX)/include/GL/
 	@rsync -a --no-group $(BUILD)/libSDL12/include/SDL/*.h $(PREFIX)/include/SDL/
+	@echo '#include "SDL/SDL.h"' >$(PREFIX)/include/SDL.h
+	@echo '#include "SDL/SDL_audio.h"' >$(PREFIX)/include/SDL_audio.h
+	@echo '#include "SDL/SDL_version.h"' >$(PREFIX)/include/SDL_version.h
 	@echo "done" >$@
 
 $(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
