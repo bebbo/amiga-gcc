@@ -824,14 +824,19 @@ $(PROJECTS)/amiga-netinclude/README.md:
 # libamiga
 # =================================================
 LIBAMIGA := $(PREFIX)/$(TARGET)/lib/libamiga.a
+LIBBAMIGA := $(PREFIX)/$(TARGET)/lib/libb/libamiga.a
 
-libamiga: $(LIBAMIGA)
-	@echo "built $(LIBAMIGA)"
+libamiga: $(LIBAMIGA) $(LIBBAMIGA)
+	@echo "built $(LIBAMIGA) and $(LIBBAMIGA)"
 
 $(LIBAMIGA): 
 	@mkdir -p $(@D)
 	#@cp $(PROJECTS)/$(NDK_FOLDER_NAME_LIBS)/amiga.lib $@
 	@cp lib/libamiga.a $@
+
+$(LIBBAMIGA): 
+	@mkdir -p $(@D)
+	@cp lib/libb/libamiga.a $@
 
 # =================================================
 # libnix
