@@ -234,3 +234,18 @@ export PREFIX=/opt/amiga13
 make branch branch=amiga13.1 mod=gcc
 make all -j20
 ```
+
+## Fortran support
+m68k-amigaos-gfortran is available now too. To build it add `ADDLANG=fortran`:
+```
+make all -j20 ADDLANG=fortran
+```
+
+The example from https://gcc.gnu.org/wiki/GFortranGettingStarted does work, you have to link using gcc:
+```
+> m68k-amigaos-gfortran -Os fprog.f90 -c
+> m68k-amigaos-gcc -Os -noixemul sub.c -c
+> m68k-amigaos-gcc fprog.o sub.o  -o fprog -lgfortran -noixemul -lm
+> vamos fprog
+abcd 5 4711 4712.000000 13 14
+```
