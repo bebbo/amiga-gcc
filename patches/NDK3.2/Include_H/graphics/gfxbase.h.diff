@@ -1,0 +1,18 @@
+--- old/graphics/gfxbase.h	2022-02-03 11:59:08.000000000 +0100
++++ new/graphics/gfxbase.h	2023-12-15 10:19:22.648814358 +0100
+@@ -116,6 +116,7 @@
+ 	UWORD	MonitorFlags;
+ 	UBYTE	ScanDoubledSprites;
+ 	UBYTE	BP3Bits;
++#ifndef __KICK13__
+ 	struct	AnalogSignalInterval MonitorVBlank;
+ 	struct	MonitorSpec *natural_monitor;
+ 	APTR	ProgData;
+@@ -127,6 +128,7 @@
+ 	ULONG	*HWEmul[9];
+         struct  RegionRectangle *Scratch;
+         ULONG   ScratchSize;
++#endif
+ };
+ 
+ #define ChunkyToPlanarPtr HWEmul[0]
