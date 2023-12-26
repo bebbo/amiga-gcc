@@ -1,9 +1,11 @@
 # amiga-gcc       [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YRRBRLCKDU3H6)
-The GNU C-Compiler with Binutils and other useful tools for cross development
 
-This is a Makefile based approach to build the same files as in the old amigaos-toolchain to reduce the build time.
+The GNU C Compiler with binutils and other useful tools for cross development of AmigaOS software.
 
-Right now these tools are build:
+This is a Makefile based approach to building the amigaos-toolchain, aiming to reduce its build time.
+
+Currently, these tools are built:
+
 * binutils
 * gcc with libs for C/C++/ObjC
 * fd2sfd
@@ -14,6 +16,7 @@ Right now these tools are build:
 * vlink
 * libnix
 * ixemul (not really, but the headers are used)
+
 # COPYRIGHTS
 * amiga-netinclude: 'Roadshow' -- Amiga TCP/IP stack, Copyright © 2001-2016 by Olaf Barthel. Freely Distributable.
 * aros-stuff: libpthread, Copyright (C) 2014 Szilard Biro.
@@ -33,12 +36,15 @@ Right now these tools are build:
 * vbcc: copyright in 1995-2022 by Volker Barthelmann, free for non-commercial purposes.
 * vlink: copyright 1995-2022 by Frank Wille, free for non-commercial purposes.
 
-There are also libraries - calles SDK - which can be downloaded and installed plus libraries that are built from source. All of these provide their own copyrights - too long to list here.
+There are also libraries (SDKs) which can be downloaded and installed. These libraries can all be built from source. All of these libraries are provided under their respective licenses.
 
-To get it work together and enhance it, some patches are applied here and there and the gcc compiler contains a tad more hacks/enhancements.
-None if these changese modifies the original copyright in any way. All other stuff here is published using the GNU GENERAL PUBLIC LICENSE V2.
+Various AmigaOS-specific patches have been applied to this version of gcc.
+None if these changes modify the original copyright in any way. All other changes are published using the GNU GENERAL PUBLIC LICENSE V2.
 
-# Short Guide
+# Notes
+
+amiga-gcc supports building binaries optimised for all of the various Motorola 68K series CPUs from the 68000 up to the 68060 and also features some optimisations for the Vampire/Apollo 68080.
+
 ## Prerequisites
 ### Centos
 `sudo yum install wget gcc gcc-c++ python git perl-Pod-Simple gperf patch autoconf automake make makedepend bison flex ncurses-devel gmp-devel mpfr-devel libmpc-devel gettext-devel texinfo rsync readline-devel`
