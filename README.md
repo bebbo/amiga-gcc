@@ -154,14 +154,14 @@ sudo usermod -a -G users username
 After adding the user to the group, you may have to logout and login again to apply the changes to your user.
 
 ## Building
-Simply run `make all`. Also add -j to speedup the build.
+In most cases you can simply run `make all` as root. You can use `-j` to speed up the build, adjusting the value of `-j` to the number of cores you wish to use for the build process.
 
 ```
 make clean
 make drop-prefix
-time make all -j3
+time make all -j4
 ```
-takes roughly 10 minutes on my laptop running ubuntu. takes forever running cygwin on windows^^.
+The above commands take roughly 10 minutes on my laptop running Ubuntu yet the same commands take forever running cygwin on Windows.
 
 ## Kickstart 1.3
 
