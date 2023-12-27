@@ -38,12 +38,7 @@ Currently, these tools are built:
 
 There are also libraries (SDKs) which can be downloaded and installed. These libraries can all be built from source. All of these libraries are provided under their respective licenses.
 
-Various AmigaOS-specific patches have been applied to this version of gcc.
-None if these changes modify the original copyright in any way. All other changes are published using the GNU GENERAL PUBLIC LICENSE V2.
-
-# Notes
-
-amiga-gcc supports building binaries optimised for all of the various Motorola 68K series CPUs from the 68000 up to the 68060 and also features some optimisations for the Vampire/Apollo 68080.
+Various AmigaOS-specific patches have been applied to this version of gcc. None if these changes modify the original copyright in any way. All other changes are published under the terms of the GNU GENERAL PUBLIC LICENSE V2.
 
 ## Prerequisites
 ### Centos
@@ -87,6 +82,7 @@ CC=gcc-12 CXX=g++-12 gmake all SHELL=$(brew --prefix)/bin/bash
 ```
 export PATH=$(brew --prefix bison)/bin:$PATH
 ```
+* This version of gcc supports building binaries optimised for the various Motorola 68K series CPUs from the 68000 to the 68060 and also features some optimisations for the Vampire/Apollo 68080.
 
 ### macOS on M1
 Native builds on M1 Macs are now directly supported.
