@@ -154,7 +154,7 @@ sudo usermod -a -G users username
 After adding the user to the group, you may have to logout and login again to apply the changes to your user.
 
 ## Building
-In most cases you can simply run `make all` as root. You can use `-j` to speed up the build, adjusting the value of `-j` to the number of cores you wish to use for the build process.
+In most cases you can simply run `sudo make all`. You can use `-j` to speed up the build, adjusting the value of `-j` to the number of cores you wish to use for the build process.
 
 ```
 make clean
