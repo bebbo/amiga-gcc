@@ -173,6 +173,16 @@ m68k-amigaos-gcc test.cpp -mcrt=nix13
 
 The include files for 1.3 - which are picked up by the compiler if `-mcrt=nix13` is used - can be found at `<PREFIX>/m68k-amigaos/ndk13-include` i.E. `/opt/amiga/m68k-amigaos/ndk13-include`
 
+## Libraries/Runtimes
+
+You can select one of the various runtimes. My favorite is `libnix` which is selected by specifying `-noixmeul` or `-mcrt=nix20`. Always specify this as the last parameter and only once. These are the available runtimes:
+
+* nothing specifed: newlib based libraries for Kickstart 2.0+
+* `-noixemul` or `-mcrt=nix20`: the libnix libraries for Kickstart 2.0+
+* `-mcrt=nix13`: the libnix libraries for Kickstart 1.3
+* `-mcrt=clib2`: the clib2 libraries.
+* `-mcrt=ixemul`: the ixemul libraries for Kickstart 2.0+, requires an installed `ixemul.library`
+
 ## Checking gcc
 
 To check the built version you may consider to run the gcc dejagnu tests. This does not cover everything but it's a start.
@@ -236,6 +246,13 @@ export PREFIX=/opt/amiga13
 make branch branch=amiga13.1 mod=gcc
 make all -j20
 ```
+
+### Notable branches
+* `amiga6`: The default branch providing gcc-6.5.0b with a lot of hacks^^
+* `amiga13.1': gcc-13.1.0  supports register parameters
+* `amiga13.2': gcc-13.2.0  supports register parameters
+* `68080regs`: gcc-6.5.0b supporting the B0-B7/E0-E7 AMMX registers of the Apollo 68080 (experimental)
+ 
 
 ## Fortran support
 m68k-amigaos-gfortran is available now too. To build it add `ADDLANG=fortran`:

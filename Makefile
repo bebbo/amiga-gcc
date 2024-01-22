@@ -966,6 +966,21 @@ $(PROJECTS)/newlib-cygwin/newlib/configure:
 $(PROJECTS)/ixemul/configure:
 	@cd $(PROJECTS) &&	git clone -b $(ixemul_BRANCH) $(ixemul_URL)
 
+.PHONY: ixemul
+ixemul:	$(PREFIX)/$(TARGET)/ixemul/lib/libc.a
+
+$(PREFIX)/$(TARGET)/ixemul/lib/libc.a: $(BUILD)/ixemul/lib/libc.a
+	@mkdir -p $(PREFIX)/$(TARGET)/ixemul
+	$(L0)"installing ixemul-sdk"$(L1) rsync -a --no-group $(BUILD)/ixemul/* $(PREFIX)/$(TARGET)/ixemul/ $(L2)
+
+
+$(BUILD)/ixemul/lib/libc.a: $(DOWNLOAD)/ixemul-sdk.lha
+	@mkdir -p $(BUILD)/ixemul
+	$(L0)"unpacking ixemul-sdk.lha"$(L1) cd $(BUILD)/ixemul && lha xf $(DOWNLOAD)/ixemul-sdk.lha $(L2)
+
+$(DOWNLOAD)/ixemul-sdk.lha:
+	$(L0)"downloading ixemul-sdk.lha"$(L1) cd $(DOWNLOAD) && wget https://aminet.net/util/libs/ixemul-sdk.lha $(L2)
+
 # =================================================
 # sdk installation
 # =================================================
