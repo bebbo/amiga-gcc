@@ -121,6 +121,27 @@ L2 = )
 endif
 
 # =================================================
+# download files
+# =================================================
+define get-file
+$(L0)"downloading $(1)"$(L1) cd $(DOWNLOAD); \
+  mv $(3) $(3).bak; \
+  wget $(2) -O $(3).neu; \
+  if [ -s $(3).neu ]; then \
+    if [ "$$(cmp --silent $(3).neu $(3).bak); echo $$?" == 0 ]; then \
+      mv $(3).bak $(3); \
+      rm $(3).neu; \
+    else \
+      mv $(3).neu $(3); \
+      rm -f $(3).bak; \
+    fi \
+  else \
+    rm $(3).neu; \
+  fi; \
+  cd .. $(L2)
+endef
+
+# =================================================
 
 .PHONY: x init
 x:
@@ -259,6 +280,15 @@ drop-prefix:
 
 .PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
 update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
+	+$(MAKE) -B $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha
+	+$(MAKE) -B $(DOWNLOAD)/vbcc_target_m68k-kick13.lha
+	+$(MAKE) -B $(DOWNLOAD)/$(NDK_ARC_NAME).lha
+	+$(MAKE) -B $(DOWNLOAD)/ixemul-sdk.lha
+	+$(MAKE) -B $(DOWNLOAD)/$(ZLIB).tar.xz
+	+$(MAKE) -B $(DOWNLOAD)/$(LIBPNG).tar.xz
+	+$(MAKE) -B $(DOWNLOAD)/$(LIBFREETYPE).tar.xz
+	+$(MAKE) -B $(DOWNLOAD)/$(LIBSDLMIXER).tar.gz
+	+$(MAKE) -B $(DOWNLOAD)/$(LIBSDLTTF).tar.gz
 
 update-gcc: $(PROJECTS)/gcc/configure
 	@cd $(PROJECTS)/gcc && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
@@ -673,10 +703,10 @@ $(BUILD)/vbcc_target_m68k-amigaos.info: $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha
 	@touch $(BUILD)/vbcc_target_m68k-amigaos.info
 
 $(DOWNLOAD)/vbcc_target_m68k-kick13.lha:
-	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-kick13.lha -O vbcc_target_m68k-kick13.lha $(L2)
+	$(call get-file,vbcc_target13,http://aminet.net/dev/c/vbcc_target_m68k-kick13.lha,vbcc_target_m68k-kick13.lha)
 
 $(DOWNLOAD)/vbcc_target_m68k-amigaos.lha:
-	$(L0)"downloading vbcc_target"$(L1) cd $(DOWNLOAD) && wget http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha -O vbcc_target_m68k-amigaos.lha $(L2)
+	$(call get-file,vbcc_target,http://aminet.net/dev/c/vbcc_target_m68k-amiga.lha,vbcc_target_m68k-amigaos.lha)
 
 # =================================================
 # L I B R A R I E S
@@ -771,7 +801,7 @@ $(PROJECTS)/$(NDK_FOLDER_NAME).info: $(BUILD)/_lha_done $(DOWNLOAD)/$(NDK_ARC_NA
 	@touch $(PROJECTS)/$(NDK_FOLDER_NAME).info
 
 $(DOWNLOAD)/$(NDK_ARC_NAME).lha:
-	@cd $(DOWNLOAD) && wget $(NDK_URL) -O $(NDK_ARC_NAME).lha
+	$(call get-file,$(NDK_ARC_NAME),$(NDK_URL),$(NDK_ARC_NAME).lha)
 
 
 # =================================================
@@ -918,8 +948,12 @@ $(PROJECTS)/libdebug/configure:
 libpthread: $(BUILD)/libpthread/_done
 
 $(BUILD)/libpthread/_done: $(BUILD)/libpthread/Makefile
-	$(L0)"make libpthread"$(L1) cd $(BUILD)/libpthread && $(MAKE) -f Makefile $(L2)
-	$(L0)"install libpthread"$(L1) cp $(BUILD)/libpthread/libpthread.a $(PREFIX)/$(TARGET)/lib/ $(L2)
+	$(L0)"make libpthread"$(L1) cd $(BUILD)/libpthread && $(MAKE) -f Makefile.gcc6 $(L2)
+	$(L0)"install libpthread lib"$(L1) cp $(BUILD)/libpthread/lib/libpthread.a $(PREFIX)/$(TARGET)/lib/ $(L2)
+	$(L0)"install libpthread libb"$(L1) cp $(BUILD)/libpthread/libb/libpthread.a $(PREFIX)/$(TARGET)/lib/libb/ $(L2)
+	$(L0)"install libpthread libm020"$(L1) cp $(BUILD)/libpthread/libm020/libpthread.a $(PREFIX)/$(TARGET)/lib/libm020/ $(L2)
+	$(L0)"install libpthread libm020bb"$(L1) cp $(BUILD)/libpthread/libm020bb/libpthread.a $(PREFIX)/$(TARGET)/lib/libb/libm020/ $(L2)
+	$(L0)"install libpthread libm020bb32"$(L1) cp $(BUILD)/libpthread/libm020bb32/libpthread.a $(PREFIX)/$(TARGET)/lib/libb32/libm020/ $(L2)
 	@rsync -a --no-group --exclude=debug.h $(BUILD)/libpthread/*.h $(PREFIX)/$(TARGET)/include/
 	@echo "done" >$@
 
@@ -979,7 +1013,7 @@ $(BUILD)/ixemul/lib/libc.a: $(DOWNLOAD)/ixemul-sdk.lha
 	$(L0)"unpacking ixemul-sdk.lha"$(L1) cd $(BUILD)/ixemul && lha xf $(DOWNLOAD)/ixemul-sdk.lha $(L2)
 
 $(DOWNLOAD)/ixemul-sdk.lha:
-	$(L0)"downloading ixemul-sdk.lha"$(L1) cd $(DOWNLOAD) && wget https://aminet.net/util/libs/ixemul-sdk.lha $(L2)
+	$(call get-file,ixemul-sdk,https://aminet.net/util/libs/ixemul-sdk.lha,ixemul-sdk.lha)
 
 # =================================================
 # sdk installation
@@ -1171,7 +1205,8 @@ $(PROJECTS)/$(ZLIB)/configure: $(DOWNLOAD)/$(ZLIB).tar.xz
 	@touch $@
 
 $(DOWNLOAD)/$(ZLIB).tar.xz:
-	cd $(DOWNLOAD) && wget https://zlib.net/$(ZLIB).tar.xz
+	$(call get-file,zlib,https://zlib.net/$(ZLIB).tar.xz,$(ZLIB).tar.xz)
+	
 
 # =================================================
 # libpng
@@ -1209,7 +1244,7 @@ $(PROJECTS)/$(LIBPNG)/configure: $(DOWNLOAD)/$(LIBPNG).tar.xz $(BUILD)/$(ZLIB)/_
 	@touch $@
 
 $(DOWNLOAD)/$(LIBPNG).tar.xz:
-	cd $(DOWNLOAD) && wget https://sourceforge.net/projects/libpng/files/libpng16/$(subst libpng-,,$(LIBPNG))/$(LIBPNG).tar.xz
+	$(call get-file,libpng16,https://sourceforge.net/projects/libpng/files/libpng16/$(subst libpng-,,$(LIBPNG))/$(LIBPNG).tar.xz,$(LIBPNG).tar.xz)
 
 # =================================================
 # libfreetype
@@ -1246,7 +1281,7 @@ $(PROJECTS)/$(LIBFREETYPE)/configure: $(DOWNLOAD)/$(LIBFREETYPE).tar.xz $(BUILD)
 	@touch $@
 
 $(DOWNLOAD)/$(LIBFREETYPE).tar.xz:
-	cd $(DOWNLOAD) && wget https://download.savannah.gnu.org/releases/freetype/$(LIBFREETYPE).tar.xz
+	$(call get-file,$(LIBFREETYPE),https://download.savannah.gnu.org/releases/freetype/$(LIBFREETYPE).tar.xz,$(LIBFREETYPE).tar.xz)
 
 # =================================================
 # libsdl this is 68030 only ...
@@ -1274,6 +1309,8 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
 	@echo '#include "SDL/SDL.h"' >$(PREFIX)/include/SDL.h
 	@echo '#include "SDL/SDL_audio.h"' >$(PREFIX)/include/SDL_audio.h
 	@echo '#include "SDL/SDL_version.h"' >$(PREFIX)/include/SDL_version.h
+	@echo -e 'while test $$# -gt 0; do\n  case "$$1" in\n   --cflags)\n      echo -I$(PREFIX)/include/SDL\n      ;;\n  esac\n  shift\ndone' > $PREFIX/bin/sdl-config
+	@chmod 0777 $PREFIX/bin/sdl-config	
 	@echo "done" >$@
 
 $(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
@@ -1326,7 +1363,7 @@ $(PROJECTS)/$(LIBSDLMIXER)/configure: $(DOWNLOAD)/$(LIBSDLMIXER).tar.gz $(BUILD)
 	@touch $@
 
 $(DOWNLOAD)/$(LIBSDLMIXER).tar.gz:
-	cd $(DOWNLOAD) && wget https://github.com/SDL-mirror/SDL_mixer/archive/SDL-1.2.tar.gz -O $(LIBSDLMIXER).tar.gz
+	$(call get-file,$(LIBSDLMIXER),https://github.com/SDL-mirror/SDL_mixer/archive/SDL-1.2.tar.gz,$(LIBSDLMIXER).tar.gz)
 
 # =================================================
 # libSDLttf
@@ -1336,7 +1373,7 @@ LIBSDLTTF=SDL_ttf-SDL-1.2
 # 1=module name
 MULTICC_SDLTTF = $(L0)"compiling $1"$(L1) $(foreach T,$(subst MODNAME,$1,$(MULTI)), cd $(BUILD)/$(word 1,$(subst :, ,${T})) && \
 	$(TARGET)-gcc -c $$(grep "CFLAGS  =" Makefile | cut -d "=" -f 2 | sed -e 's|srcdir|$(PROJECTS)/${T}|g') $$(grep "EXTRA_CFLAGS =" Makefile | cut -d "=" -f 2) \
-	-I $(PREFIX)/$(TARGET)/include/SDL \
+	-I $(PREFIX)/include/SDL \
 	$(PROJECTS)/$1/*.c && \
 	$(TARGET)-ar rcs $2 *.o \
 	;) $(L2)
@@ -1362,7 +1399,7 @@ $(BUILD)/$(LIBSDLTTF)/libSDL_ttf.a: $(BUILD)/$(LIBSDLTTF)/Makefile
 	@touch $@
 
 $(BUILD)/$(LIBSDLTTF)/Makefile: $(PROJECTS)/$(LIBSDLTTF)/configure
-	$o(call MULTICONFIGURE,$(LIBSDLTTF),libSDL_ttf.a,--host=$(TARGET),--disable-shared,--enable-static,--prefix=$(PREFIX))
+	$(call MULTICONFIGURE,$(LIBSDLTTF),libSDL_ttf.a,--host=$(TARGET),--disable-shared,--enable-static,--prefix=$(PREFIX))
 	@touch $@
 
 $(PROJECTS)/$(LIBSDLTTF)/configure: $(DOWNLOAD)/$(LIBSDLTTF).tar.gz $(BUILD)/libSDL12/_done $(BUILD)/libnix/_done
@@ -1370,4 +1407,4 @@ $(PROJECTS)/$(LIBSDLTTF)/configure: $(DOWNLOAD)/$(LIBSDLTTF).tar.gz $(BUILD)/lib
 	@touch $@
 
 $(DOWNLOAD)/$(LIBSDLTTF).tar.gz:
-	cd $(DOWNLOAD) && wget https://github.com/SDL-mirror/SDL_ttf/archive/SDL-1.2.tar.gz -O $(LIBSDLTTF).tar.gz
+	$(call get-file,$(LIBSDLTTF),https://github.com/SDL-mirror/SDL_ttf/archive/SDL-1.2.tar.gz,$(LIBSDLTTF).tar.gz)
