@@ -1310,7 +1310,7 @@ $(BUILD)/libSDL12/_done: $(BUILD)/libSDL12/Makefile
 	@echo '#include "SDL/SDL_audio.h"' >$(PREFIX)/include/SDL_audio.h
 	@echo '#include "SDL/SDL_version.h"' >$(PREFIX)/include/SDL_version.h
 	@echo -e 'while test $$# -gt 0; do\n  case "$$1" in\n   --cflags)\n      echo -I$(PREFIX)/include/SDL\n      ;;\n  esac\n  shift\ndone' > $(PREFIX)/bin/sdl-config
-	@chmod 0777 $PREFIX/bin/sdl-config	
+	@chmod 0777 $(PREFIX)/bin/sdl-config	
 	@echo "done" >$@
 
 $(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done $(PROJECTS)/libSDL12/Makefile $(shell find 2>/dev/null $(PROJECTS)/libSDL12 -not \( -path $(PROJECTS)/libSDL12/.git -prune \) -type f)
