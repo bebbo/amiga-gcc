@@ -180,7 +180,7 @@ help:
 # all
 # =================================================
 .PHONY: all gcc gdb gprof binutils fd2sfd fd2pragma ira sfdc vasm vbcc vlink libnix ixemul libgcc clib2 libdebug libpthread ndk ndk13 min
-all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc vbcc vasm vlink libnix ixemul libgcc clib2 libdebug libpthread ndk ndk13 libSDL12
+all: gcc binutils gdb gprof fd2sfd fd2pragma ira sfdc libnix ixemul libgcc clib2 libdebug libpthread ndk ndk13 libSDL12
 
 min: binutils gcc gprof libnix libgcc
 
