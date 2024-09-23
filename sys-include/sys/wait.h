@@ -26,6 +26,14 @@ extern "C" {
 #define WTERMSIG(w)	((w) & 0x7f)
 #define WSTOPSIG	WEXITSTATUS
 
+union wait {
+    int w_termsig;
+    int w_coredump;
+    int w_retcode;
+    int w_stopsig;
+    int w_status;
+};
+
 pid_t wait (int *);
 pid_t waitpid (pid_t, int *, int);
 

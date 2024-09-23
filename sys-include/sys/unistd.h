@@ -13,7 +13,8 @@ extern "C" {
 #include <sys/_types.h>
 #include <stddef.h>
 
-extern char **environ;
+extern char ***environ_ptr;
+#define environ (*environ_ptr)
 
 __stdargs void	_exit (int __status) _ATTRIBUTE ((__noreturn__));
 

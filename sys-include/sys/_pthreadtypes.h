@@ -43,8 +43,8 @@ typedef __uint32_t pthread_t;            /* identify a thread */
 #define PTHREAD_EXPLICIT_SCHED 2      /* set from provided attribute object */
 
 /* P1003.1c/D10, p. 141 */
-#define PTHREAD_CREATE_DETACHED 0
-#define PTHREAD_CREATE_JOINABLE  1
+#define PTHREAD_CREATE_JOINABLE  0
+#define PTHREAD_CREATE_DETACHED 1
 
 #if defined(__AMIGA__)
 struct pthread_attr;
