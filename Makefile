@@ -876,8 +876,8 @@ LIBNIX_SRC = $(shell find 2>/dev/null $(PROJECTS)/libnix -not \( -path $(PROJECT
 
 libnix: $(BUILD)/libnix/_done
 
-$(BUILD)/libnix/_done: $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done $(PROJECTS)/libnix/Makefile.gcc6 $(LIBAMIGA) $(LIBNIX_SRC)
-	@rsync -a --no-group --delete sys-include/ $(PREFIX)/$(TARGET)/sys-include
+$(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/ndk-include_ndk13 $(BUILD)/_netinclude $(BUILD)/binutils/_done $(BUILD)/gcc/_done $(PROJECTS)/libnix/Makefile.gcc6 $(LIBAMIGA) $(LIBNIX_SRC)
+#	@rsync -a --no-group --delete sys-include/ $(PREFIX)/$(TARGET)/sys-include
 	@mkdir -p $(PREFIX)/$(TARGET)/libnix/lib/libnix
 	@mkdir -p $(BUILD)/libnix
 	@mkdir -p $(PREFIX)/lib/gcc/$(TARGET)/$(GCC_VERSION)
