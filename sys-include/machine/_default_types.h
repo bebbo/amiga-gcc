@@ -62,7 +62,7 @@ typedef unsigned __INT8_TYPE__ __uint8_t;
 #endif
 #define ___int8_t_defined 1
 #elif __EXP(SCHAR_MAX) == 0x7f
-typedef char __int8_t ;
+typedef signed char __int8_t ;
 typedef unsigned char __uint8_t ;
 #define ___int8_t_defined 1
 #endif

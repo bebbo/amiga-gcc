@@ -8,14 +8,9 @@ extern "C" {
 #endif
 #define _SYS_ERRNO_H_
 
-#ifndef __stdargs
-#define __stdargs
-#endif
-
 #include <sys/reent.h>
 
-//#ifndef __libnix__
-#if 0
+#ifndef __libnix__
 #ifndef _REENT_ONLY
 #define errno (*__errno())
 #ifdef __NO_INLINE__
