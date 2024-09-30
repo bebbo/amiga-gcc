@@ -154,7 +154,7 @@ extern int  * __daylight;
 extern char **__tzname;
 
 //#define timezone (*__timezone)
-#define daylight (*__daylight)
+//#define daylight (*__daylight)
 #define _timezone (*__timezone)
 #define _daylight (*__daylight)
 
