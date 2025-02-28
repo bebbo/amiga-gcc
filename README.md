@@ -1,4 +1,4 @@
-# amiga-gcc       [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YRRBRLCKDU3H6)
+# amiga-gcc
 
 The GNU C Compiler with binutils and other useful tools for cross compiling software for the Commodore Amiga.
 
